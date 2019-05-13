@@ -155,7 +155,7 @@ class CommentController(BaseController):
             helpers.get_redirect_url(
                 content_type,
                 content_item_id if content_type == 'datarequest' else c.pkg.name,
-                comment_id
+                'comment_' + str(comment_id)
             ))
 
         return helpers.render_content_template(content_type)
