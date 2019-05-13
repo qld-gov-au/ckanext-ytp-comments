@@ -40,17 +40,21 @@ class CommentController(BaseController):
                 success = True
             except ValidationError, ve:
                 log.debug(ve)
+                if ve.error_dict and ve.error_dict.get('message'):
+                    msg = ve.error_dict['message']
+                else:
+                    msg = str(ve)
+                h.flash_error(msg)
             except Exception, e:
                 log.debug(e)
                 abort(403)
 
-            if success:
-                h.redirect_to(
-                    helpers.get_redirect_url(
-                        content_type,
-                        content_item_id if content_type == 'datarequest' else c.pkg.name,
-                        res['id']
-                    ))
+            h.redirect_to(
+                helpers.get_redirect_url(
+                    content_type,
+                    content_item_id if content_type == 'datarequest' else c.pkg.name,
+                    comment_id
+                ))
 
         return helpers.render_content_template(content_type)
 
@@ -97,17 +101,21 @@ class CommentController(BaseController):
                 success = True
             except ValidationError, ve:
                 log.debug(ve)
+                if ve.error_dict and ve.error_dict.get('message'):
+                    msg = ve.error_dict['message']
+                else:
+                    msg = str(ve)
+                h.flash_error(msg)
             except Exception, e:
                 log.debug(e)
                 abort(403)
 
-            if success:
-                h.redirect_to(
-                    helpers.get_redirect_url(
-                        content_type,
-                        content_item_id if content_type == 'datarequest' else c.pkg.name,
-                        res['id']
-                    ))
+            h.redirect_to(
+                helpers.get_redirect_url(
+                    content_type,
+                    content_item_id if content_type == 'datarequest' else c.pkg.name,
+                    res['id'] if success else None
+                ))
 
         return helpers.render_content_template(content_type)
 
@@ -126,20 +134,23 @@ class CommentController(BaseController):
         except:
             abort(403)
 
-        success = False
         try:
             data_dict = {'id': comment_id}
             get_action('comment_delete')(context, data_dict)
-            success = True
         except Exception, e:
             log.debug(e)
+            if e.error_dict and e.error_dict.get('message'):
+                msg = e.error_dict['message']
+            else:
+                msg = str(e)
+            h.flash_error(msg)
 
-        if success:
-            h.redirect_to(
-                helpers.get_redirect_url(
-                    content_type,
-                    content_item_id if content_type == 'datarequest' else c.pkg.name,
-                    comment_id
-                ))
+        h.redirect_to(
+            helpers.get_redirect_url(
+                content_type,
+                content_item_id if content_type == 'datarequest' else c.pkg.name,
+                comment_id
+            ))
 
         return helpers.render_content_template(content_type)
+
