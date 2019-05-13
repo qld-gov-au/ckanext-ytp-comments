@@ -53,8 +53,14 @@ class CommentController(BaseController):
                 helpers.get_redirect_url(
                     content_type,
                     content_item_id if content_type == 'datarequest' else c.pkg.name,
-                    comment_id
+                    'comment_' + str(comment_id) if success else 'edit_' + str(comment_id)
                 ))
+            # if success:
+            #     h.redirect_to(str('/dataset/%s#comment_%s' % (c.pkg.name, res['id'])))
+            # else:
+            #     # @todo check content_type for return URL
+            #     print(content_type)
+            #     h.redirect_to(str('/dataset/%s#edit_%s' % (c.pkg.name, comment_id)))
 
         return helpers.render_content_template(content_type)
 
@@ -114,7 +120,7 @@ class CommentController(BaseController):
                 helpers.get_redirect_url(
                     content_type,
                     content_item_id if content_type == 'datarequest' else c.pkg.name,
-                    res['id'] if success else None
+                    'comment_' + str(res['id']) if success else 'comment_form'
                 ))
 
         return helpers.render_content_template(content_type)

@@ -20,11 +20,11 @@ def check_content_access(content_type, context, data_dict):
         check_access('show_datarequest', context, data_dict)
 
 
-def get_redirect_url(content_type, content_item_id, comment_id=None):
+def get_redirect_url(content_type, content_item_id, anchor):
     if content_type == 'datarequest':
-        return str('/datarequest/comment/%s#comment_%s' % (content_item_id, comment_id))
+        return str('/datarequest/comment/%s#%s' % (content_item_id, anchor))
     else:
-        return str('/dataset/%s#comment_%s' % (content_item_id, comment_id))
+        return str('/dataset/%s#%s' % (content_item_id, anchor))
 
 
 def render_content_template(content_type):
