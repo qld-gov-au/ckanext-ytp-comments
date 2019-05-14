@@ -3,7 +3,7 @@ import logging
 
 from ckan.lib.base import h, BaseController, render, abort, request
 from ckan import model
-from ckan.common import c
+from ckan.common import c, _
 from ckan.logic import check_access, get_action, clean_dict, tuplize_dict, ValidationError, parse_params
 from ckan.lib.navl.dictization_functions import unflatten
 
