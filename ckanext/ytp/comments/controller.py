@@ -24,7 +24,7 @@ class CommentController(BaseController):
         check_access('package_show', context, data_dict)
 
         try:
-            c.pkg_dict = get_action('package_show')(context, {'id': dataset_id})
+            c.pkg_dict = get_action('package_show')(context, {'id': dataset_id, 'include_tracking': True})
             c.pkg = context['package']
         except:
             abort(403)
@@ -73,7 +73,7 @@ class CommentController(BaseController):
         check_access('package_show', context, data_dict)
 
         try:
-            c.pkg_dict = get_action('package_show')(context, {'id': dataset_id})
+            c.pkg_dict = get_action('package_show')(context, {'id': dataset_id, 'include_tracking': True})
             c.pkg = context['package']
         except:
             abort(403)
@@ -108,7 +108,7 @@ class CommentController(BaseController):
         check_access('package_show', context, data_dict)
 
         try:
-            c.pkg_dict = get_action('package_show')(context, {'id': dataset_id})
+            c.pkg_dict = get_action('package_show')(context, {'id': dataset_id, 'include_tracking': True})
             c.pkg = context['package']
         except:
             abort(403)
