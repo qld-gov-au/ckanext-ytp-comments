@@ -1,5 +1,7 @@
 import ckan.authz as authz
 import logging
+import email_notifications
+import ckan.plugins.toolkit as toolkit
 
 from ckan.lib.base import h, BaseController, render, abort, request
 from ckan import model
@@ -83,7 +85,8 @@ class CommentController(BaseController):
         try:
             c.pkg_dict = get_action('package_show')(context, {'id': dataset_id, 'include_tracking': True})
             c.pkg = context['package']
-        except:
+        except Exception, e:
+            log.debug(e)
             abort(403)
 
         if request.method == 'POST':
@@ -107,6 +110,17 @@ class CommentController(BaseController):
                 abort(403)
 
             if success:
+                email_notifications. notify_admins_and_commenters(
+                    c.pkg.owner_org,
+                    toolkit.c.userobj,
+                    '/templates/email/notification-new-comment.txt',
+                    'Queensland Government open data portal - New comment',
+                    'dataset' if not vars().has_key('content_type') else content_type,
+                    c.pkg.name,
+                    data_dict['url'],
+                    res['id']
+                )
+
                 h.redirect_to(str('/dataset/%s#comment_%s' % (c.pkg.name, res['id'])))
             else:
                 h.redirect_to(str('/dataset/%s#comment_form' % c.pkg.name))
