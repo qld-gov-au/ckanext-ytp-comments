@@ -1,8 +1,9 @@
+import ckan.authz as authz
 import logging
 
 from ckan.lib.base import h, BaseController, render, abort, request
 from ckan import model
-from ckan.common import c
+from ckan.common import c, _
 from ckan.logic import check_access, get_action, clean_dict, tuplize_dict, ValidationError, parse_params
 from ckan.lib.navl.dictization_functions import unflatten
 
@@ -133,6 +134,38 @@ class CommentController(BaseController):
         except Exception, e:
             log.debug(e)
 
+        h.redirect_to(str('/dataset/%s' % c.pkg.name))
+
+        return render("package/read.html")
+
+    def flag(self, comment_id):
+        if authz.auth_is_loggedin_user():
+            context = {'model': model, 'user': c.user}
+            comment = get_action('comment_show')(context, {'id': comment_id})
+            if comment and not comment['flagged']:
+                comment['comment'] = comment['content']
+                comment['flagged'] = True
+                get_action('comment_update')(context, comment)
+
+    def unflag(self, dataset_id, comment_id):
+        if not authz.auth_is_loggedin_user():
+            abort(403)
+
+        context = {'model': model, 'user': c.user}
+        comment = get_action('comment_show')(context, {'id': comment_id})
+
+        if not comment or not comment['flagged']:
+            abort(403)
+
+        if not check_access('package_update', context, {"id": dataset_id}):
+            abort(403)
+
+        c.pkg_dict = get_action('package_show')(context, {'id': dataset_id})
+        c.pkg = context['package']
+        comment['comment'] = comment['content']
+        comment['flagged'] = False
+        get_action('comment_update')(context, comment)
+        h.flash_success(_('Comment un-flagged'))
         h.redirect_to(str('/dataset/%s' % c.pkg.name))
 
         return render("package/read.html")

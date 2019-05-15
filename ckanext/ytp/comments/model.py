@@ -197,6 +197,8 @@ class Comment(Base):
 
     state = Column(types.UnicodeText, default=u'active')
 
+    flagged = Column(types.Boolean, default=False)
+
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -247,6 +249,7 @@ class Comment(Base):
             d['comments'] = [c.as_dict() for c in self.children if c.state == 'active']
         else:
             d['comments'] = [c.as_dict() for c in self.children]
+        d['flagged'] = self.flagged
         return d
 
     @classmethod
