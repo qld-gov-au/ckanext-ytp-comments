@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 
 class CommentController(BaseController):
     def add(self, dataset_id, content_type='dataset'):
-        return self._add_or_reply(dataset_id, content_type)
+        return self._add_or_reply('new', dataset_id, content_type)
 
     def edit(self, content_type, content_item_id, comment_id):
 
@@ -67,7 +67,7 @@ class CommentController(BaseController):
 
         return helpers.render_content_template(content_type)
 
-    def reply(self, dataset_id, parent_id):
+    def reply(self, content_type, dataset_id, parent_id):
         c.action = 'reply'
 
         try:
@@ -78,12 +78,16 @@ class CommentController(BaseController):
         except:
             abort(404)
 
-        return self._add_or_reply(dataset_id)
+        return self._add_or_reply('reply', dataset_id, content_type, parent_id)
 
-    def _add_or_reply(self, content_item_id, content_type):
-        """
-       Allows the user to add a comment to an existing dataset or datarequest
-       """
+    def _add_or_reply(self, comment_type, content_item_id, content_type, parent_id=None):
+        '''
+        Allows the user to add a comment to an existing dataset or datarequest
+        :param comment_type:
+        :param content_item_id:
+        :param content_type:
+        :return:
+        '''
         context = {'model': model, 'user': c.user}
 
         data_dict = {'id': content_item_id}
@@ -135,7 +139,7 @@ class CommentController(BaseController):
                 helpers.get_redirect_url(
                     content_type,
                     content_item_id if content_type == 'datarequest' else c.pkg.name,
-                    'comment_' + str(res['id']) if success else 'comment_form'
+                    'comment_' + str(res['id']) if success else ('comment_form' if comment_type == 'new' else 'reply_' + str(parent_id))
                 ))
 
         return helpers.render_content_template(content_type)

@@ -1,7 +1,7 @@
 function hideFormErrors()
 {
-    jQuery('#comment_form_errors').addClass('hidden');
-    jQuery('#comment_form_errors li').addClass('hidden');
+    jQuery('.form_errors').addClass('hidden');
+    jQuery('.form_errors li').addClass('hidden');
 }
 
 function showFormErrors()
@@ -19,6 +19,11 @@ function showEditFormErrors(id)
     jQuery('#' + id + ' .edit_form_errors').removeClass('hidden');
 }
 
+function showReplyFormErrors(id)
+{
+    jQuery('#' + id + ' .reply_form_errors').removeClass('hidden');
+}
+
 jQuery(document).ready(function() {
 
     jQuery('.module-content input[type="submit"]').on('click', function(e) {
@@ -30,11 +35,11 @@ jQuery(document).ready(function() {
             hideFormErrors();
 
             if (!comment) {
-                jQuery('#comment_form_errors .error-comment').removeClass('hidden');
+                form.find('.error-comment').removeClass('hidden');
                 display_errors = true;
             }
             if (display_errors) {
-                showFormErrors();
+                form.find('.form-errors').removeClass('hidden');
                 return false;
             }
         }
@@ -65,6 +70,21 @@ jQuery(document).ready(function() {
                 if (error_message.search("profanity") !== -1) {
                     showFormError(form_wrapper_id, 'profanity');
                     showEditFormErrors(form_wrapper_id);
+                }
+            }
+        }
+        else if (hash_no_hash.indexOf('reply_') !== -1) {
+            var form_wrapper_id = 'comment_form_' + hash_no_hash;
+            var parent_comment_wrapper_id = 'comment_' + hash_no_hash.replace('reply_', '');
+            jQuery(hash).removeClass('hidden');
+            document.getElementById(parent_comment_wrapper_id).scrollIntoView();
+            //  Regex the flash-messages for 'subject' 'comment' and 'profanity'
+            if (jQuery('#content .flash-messages').children().length > 0) {
+                var error_message = jQuery('#content .flash-messages').text()
+                //  Check for profanity error message
+                if (error_message.search("profanity") !== -1) {
+                    showFormError(form_wrapper_id, 'profanity');
+                    showReplyFormErrors(form_wrapper_id);
                 }
             }
         }

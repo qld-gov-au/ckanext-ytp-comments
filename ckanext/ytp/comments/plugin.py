@@ -70,7 +70,7 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
         map.connect('/{content_type}/{dataset_id}/comments/add', controller=controller, action='add')
         #map.connect('/dataset/{dataset_id}/comments/{comment_id}/edit', controller=controller, action='edit')
         map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/edit', controller=controller, action='edit')
-        map.connect('/dataset/{dataset_id}/comments/{parent_id}/reply', controller=controller, action='reply')
+        map.connect('/{content_type}/{dataset_id}/comments/{parent_id}/reply', controller=controller, action='reply')
         map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/delete', controller=controller, action='delete')
         # Flag a comment as inappropriate
         map.connect('/comment/{comment_id}/flag', controller=controller, action='flag')
