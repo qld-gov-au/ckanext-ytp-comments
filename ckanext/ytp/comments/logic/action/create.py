@@ -1,7 +1,10 @@
 import datetime
+import ckan.plugins.toolkit as toolkit
 import ckanext.ytp.comments.model as comment_model
 import ckanext.ytp.comments.util as util
 from ckan import logic
+from ckan.common import config
+from ckanext.ytp.comments import helpers
 from pprint import pprint
 import logging
 
@@ -35,6 +38,12 @@ def comment_create(context, data_dict):
 
     # Cleanup the comment
     cleaned_comment = util.clean_input(data_dict.get('comment'))
+
+    # Run profanity check
+    if toolkit.asbool(config.get('ckan.comments.check_for_profanity', False)) \
+            and (helpers.profanity_check(cleaned_comment)
+                 or helpers.profanity_check(data_dict.get('subject'))):
+        raise logic.ValidationError({"message": "Comment blocked due to profanity."})
 
     # Create the object
     cmt = comment_model.Comment(thread_id=thread_id,
