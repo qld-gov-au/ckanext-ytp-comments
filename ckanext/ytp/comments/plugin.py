@@ -67,24 +67,26 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
         """
         controller = 'ckanext.ytp.comments.controller:CommentController'
         map.connect('/dataset/{dataset_id}/comments/add', controller=controller, action='add')
-        map.connect('/dataset/{dataset_id}/comments/{comment_id}/edit', controller=controller, action='edit')
+        map.connect('/{content_type}/{dataset_id}/comments/add', controller=controller, action='add')
+        #map.connect('/dataset/{dataset_id}/comments/{comment_id}/edit', controller=controller, action='edit')
+        map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/edit', controller=controller, action='edit')
         map.connect('/dataset/{dataset_id}/comments/{parent_id}/reply', controller=controller, action='reply')
-        map.connect('/dataset/{dataset_id}/comments/{comment_id}/delete', controller=controller, action='delete')
+        map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/delete', controller=controller, action='delete')
         # Flag a comment as inappropriate
         map.connect('/comment/{comment_id}/flag', controller=controller, action='flag')
         # Un-flag a comment as inappropriate
         map.connect('/dataset/{dataset_id}/comments/{comment_id}/unflag', controller=controller, action='unflag')
         return map
 
-    def _get_comment_thread(self, dataset_name):
+    def _get_comment_thread(self, dataset_name, content_type='dataset'):
         import ckan.model as model
         from ckan.logic import get_action
-        url = '/dataset/%s' % dataset_name
+        url = '/%s/%s' % (content_type, dataset_name)
         return get_action('thread_show')({'model': model, 'with_deleted': True}, {'url': url})
 
-    def _get_comment_count_for_dataset(self, dataset_name):
+    def _get_comment_count_for_dataset(self, dataset_name, content_type='dataset'):
         import ckan.model as model
         from ckan.logic import get_action
-        url = '/dataset/%s' % dataset_name
+        url = '/%s/%s' % (content_type, dataset_name)
         count = get_action('comment_count')({'model': model}, {'url': url})
         return count
