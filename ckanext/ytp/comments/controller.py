@@ -125,12 +125,15 @@ class CommentController(BaseController):
 
             if success:
                 email_notifications. notify_admins_and_commenters(
-                    c.pkg.owner_org,
+                    # @todo: refactor to helper function
+                    c.datarequest['organization_id'] if ('dataset' if not vars().has_key('content_type') else content_type) == 'datarequest' else c.pkg.owner_org,
                     toolkit.c.userobj,
                     '/templates/email/notification-new-comment.txt',
                     'Queensland Government open data portal - New comment',
                     'dataset' if not vars().has_key('content_type') else content_type,
-                    c.pkg.name,
+                    # c.pkg.name,
+                    # @todo: refactor to helper function
+                    c.datarequest['id'] if ('dataset' if not vars().has_key('content_type') else content_type) == 'datarequest' else c.pkg.name,
                     data_dict['url'],
                     res['id']
                 )
