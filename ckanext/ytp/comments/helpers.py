@@ -61,3 +61,22 @@ def render_content_template(content_type):
     return render(
         'datarequests/comment.html' if content_type == 'datarequest' else "package/read.html"
     )
+
+
+def user_can_edit_comment(comment_user_id):
+    user = toolkit.c.userobj
+    if user and comment_user_id == user.id and users_can_edit():
+        return True
+    return False
+
+
+def user_can_manage_comments(content_type, content_item_id):
+    if content_type == 'datarequest':
+        return toolkit.h.check_access('update_datarequest', {'id': content_item_id})
+    elif content_type == 'dataset':
+        return toolkit.h.check_access('package_update', {'id': content_item_id})
+    return False
+
+
+def get_org_id(content_type):
+    return c.datarequest['organization_id'] if content_type == 'datarequest' else c.pkg.owner_org

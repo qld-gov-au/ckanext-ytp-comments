@@ -58,12 +58,6 @@ class CommentController(BaseController):
                     content_item_id if content_type == 'datarequest' else c.pkg.name,
                     'comment_' + str(comment_id) if success else 'edit_' + str(comment_id)
                 ))
-            # if success:
-            #     h.redirect_to(str('/dataset/%s#comment_%s' % (c.pkg.name, res['id'])))
-            # else:
-            #     # @todo check content_type for return URL
-            #     print(content_type)
-            #     h.redirect_to(str('/dataset/%s#edit_%s' % (c.pkg.name, comment_id)))
 
         return helpers.render_content_template(content_type)
 
@@ -85,9 +79,11 @@ class CommentController(BaseController):
         Allows the user to add a comment to an existing dataset or datarequest
         :param comment_type:
         :param content_item_id:
-        :param content_type:
+        :param content_type: string 'dataset' or 'datarequest'
         :return:
         '''
+        content_type = 'dataset' if not vars().has_key('content_type') else content_type
+
         context = {'model': model, 'user': c.user}
 
         data_dict = {'id': content_item_id}
@@ -124,16 +120,17 @@ class CommentController(BaseController):
                 abort(403)
 
             if success:
-                email_notifications. notify_admins_and_commenters(
+                email_notifications.notify_admins_and_commenters(
                     # @todo: refactor to helper function
-                    c.datarequest['organization_id'] if ('dataset' if not vars().has_key('content_type') else content_type) == 'datarequest' else c.pkg.owner_org,
+                    # c.datarequest['organization_id'] if ('dataset' if not vars().has_key('content_type') else content_type) == 'datarequest' else c.pkg.owner_org,
+                    helpers.get_org_id(content_type),
                     toolkit.c.userobj,
                     '/templates/email/notification-new-comment.txt',
-                    'Queensland Government open data portal - New comment',
+                    'Queensland Government Open Data - Comments',
                     'dataset' if not vars().has_key('content_type') else content_type,
                     # c.pkg.name,
                     # @todo: refactor to helper function
-                    c.datarequest['id'] if ('dataset' if not vars().has_key('content_type') else content_type) == 'datarequest' else c.pkg.name,
+                    c.datarequest['id'] if content_type == 'datarequest' else c.pkg.name,
                     data_dict['url'],
                     res['id']
                 )
@@ -191,25 +188,38 @@ class CommentController(BaseController):
                 comment['flagged'] = True
                 get_action('comment_update')(context, comment)
 
-    def unflag(self, dataset_id, comment_id):
-        if not authz.auth_is_loggedin_user():
-            abort(403)
-
+    def unflag(self, content_type, content_item_id, comment_id):
+        '''
+        Remove the 'flagged' attribute on a comment
+        :param content_type: string 'dataset' or 'datarequest'
+        :param content_item_id: string
+        :param comment_id: string ID of the comment to unflag
+        :return:
+        '''
         context = {'model': model, 'user': c.user}
         comment = get_action('comment_show')(context, {'id': comment_id})
 
-        if not comment or not comment['flagged']:
+        if not comment \
+                or not comment['flagged'] \
+                or not authz.auth_is_loggedin_user() \
+                or not helpers.user_can_manage_comments(content_type, content_item_id):
             abort(403)
 
-        if not check_access('package_update', context, {"id": dataset_id}):
-            abort(403)
-
-        c.pkg_dict = get_action('package_show')(context, {'id': dataset_id})
-        c.pkg = context['package']
         comment['comment'] = comment['content']
         comment['flagged'] = False
-        get_action('comment_update')(context, comment)
-        h.flash_success(_('Comment un-flagged'))
-        h.redirect_to(str('/dataset/%s' % c.pkg.name))
 
-        return render("package/read.html")
+        get_action('comment_update')(context, comment)
+
+        h.flash_success(_('Comment un-flagged'))
+
+        data_dict = {'id': content_item_id}
+
+        if content_type == 'datarequest':
+            c.datarequest = get_action('show_datarequest')(context, data_dict)
+            h.redirect_to(str('/datarequest/comment/%s#%s' % (content_item_id, comment_id)))
+        else:
+            c.pkg_dict = get_action('package_show')(context, data_dict)
+            c.pkg = context['package']
+            h.redirect_to(str('/dataset/%s#%s' % (content_item_id, comment_id)))
+
+        return helpers.render_content_template(content_type)

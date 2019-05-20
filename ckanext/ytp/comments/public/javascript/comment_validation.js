@@ -88,6 +88,9 @@ jQuery(document).ready(function() {
                 }
             }
         }
+        else if (hash.indexOf('#comment_') !== -1) {
+            jQuery(hash).addClass('highlight');
+        }
     }
 
 });
