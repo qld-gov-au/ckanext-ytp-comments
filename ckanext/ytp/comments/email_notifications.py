@@ -7,51 +7,13 @@ import logging
 import sqlalchemy
 
 from ckan.common import config
+from ckan.lib.base import render_jinja2
 from ckanext.ytp.comments.model import Comment, CommentThread
 
 
 log1 = logging.getLogger(__name__)
 NotFound = logic.NotFound
 _and_ = sqlalchemy.and_
-
-
-def load_notification_template(template):
-    import os
-
-    path = os.path.dirname(os.path.realpath(__file__)) + template
-
-    try:
-        fp = open(path, 'rb')
-        notification_template = fp.read()
-        fp.close()
-
-        return notification_template
-    except IOError as error:
-        log1.error(error)
-        raise
-
-
-def mail_merge(msg, dict):
-
-    if 'organization' in dict:
-        msg = msg.replace('[[ORGANIZATION]]', dict['organization'])
-
-    if 'user' in dict:
-        msg = msg.replace('[[USER]]', dict['user'])
-
-    if 'url' in dict:
-        msg = msg.replace('[[URL]]', dict['url'])
-
-    if 'email' in dict:
-        msg = msg.replace('[[EMAIL]]', dict['email'])
-
-    if 'name' in dict:
-        msg = msg.replace('[[NAME]]', dict['name'])
-
-    if 'comment_id' in dict:
-        msg = msg.replace('[[COMMENT_ID]]', dict['comment_id'])
-
-    return msg
 
 
 def get_member_list(context, data_dict=None):
@@ -101,39 +63,42 @@ def get_member_list(context, data_dict=None):
             for m in q.all()]
 
 
-def get_admin_users_for_org(owner_org, excluded_emails=[]):
-    '''
-    A list of admin user emails for the supplied organisation ID
+def get_users_for_org_by_capacity(owner_org, capacity, excluded_emails=[]):
+    """
+    Returns a list of user email addresses in the supplied organisation ID, for a given capacity
+
     :param owner_org: string
-    :param excluded_emails: list
-    :return:
-    '''
-    admin_users = []
+    :param capacity: string
+    :param excluded_emails: list of email addresses to exclude
+    :return: list of user email addresses
+    """
+    users = []
 
     member_list = get_member_list(
         {'model': model},
         {
             'id': owner_org,
             'object_type': 'user',
-            'capacity': 'admin'
+            'capacity': capacity
         })
 
     for member in member_list:
         user = model.User.get(member[0])
         if user and user.email and user.email not in excluded_emails:
-            admin_users.append(user.email)
+            users.append(user.email)
 
-    return admin_users
+    return users
 
 
-def send_notification_email(to, subject, msg):
-    '''
+def send_email(to, subject, msg):
+    """
     Use CKAN mailer logic to send an email to an individual email address
+
     :param to: string
     :param subject: string
     :param msg: string
     :return:
-    '''
+    """
     # Attempt to send mail.
     mail_dict = {
         'recipient_email': to,
@@ -149,39 +114,40 @@ def send_notification_email(to, subject, msg):
         log1.error(u'Cannot send email notification to %s.', to, exc_info=1)
 
 
-def notify_admin_users(owner_org, template, subject, package_name, comment_id):
-    admin_users = get_admin_users_for_org(owner_org)
+def send_notification_emails(users, template, extra_vars):
+    """
+    Sets the email body and sends an email notification to each user in the list provided
 
-    if admin_users:
-        msg = load_notification_template(template)
+    :param users: list of user email addresses to receive the notification
+    :param template: string indicating which email template to use
+    :param extra_vars: dict
+    :return:
+    """
+    subject = render_jinja2('emails/subjects/{0}.txt'.format(template), extra_vars)
+    body = render_jinja2('emails/bodies/{0}.txt'.format(template), extra_vars)
 
-        msg = mail_merge(msg, {
-            'url': toolkit.url_for('dataset_read', id=package_name, qualified=True),
-            'comment_id': comment_id
-        })
-
-        for user in admin_users:
-            send_notification_email(
-                user,
-                subject,
-                msg
-            )
+    for user in users:
+        send_email(
+            user,
+            subject,
+            body
+        )
 
 
-def notify_admins_and_commenters(owner_org, user, template, subject, content_type, content_item_id, thread_url, comment_id):
-    '''
+def notify_admins_and_commenters(owner_org, user, template, content_type, content_item_id, thread_url, comment_id):
+    """
 
     :param owner_org: organization.id of the content item owner
     :param user: c.user_obj of the user who submitted the comment
     :param template: string indicating which email template to use
-    :param subject: string to be used for email subject
-    :param content_item_name:
+    :param content_type:
+    :param content_item_id:
     :param thread_url: URL of the comment thread (used to determine other commenters in thread)
     :param comment_id: ID of the comment submitted (used in URL of email body)
     :return:
-    '''
+    """
     # Get all the org admin users (excluding the user who made the comment)
-    admin_users = get_admin_users_for_org(owner_org, [user.email])
+    admin_users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
 
     # Get all the other commenters (excluding the user who made the comment)
     other_commenters = get_other_commenters(thread_url, user.email)
@@ -190,26 +156,22 @@ def notify_admins_and_commenters(owner_org, user, template, subject, content_typ
     users = list(set(admin_users + other_commenters))
 
     if users:
-        msg = load_notification_template(template)
-        msg = mail_merge(msg, {
-            'url': get_content_item_link(content_type, content_item_id, comment_id)
-        })
-
-        for user in users:
-            send_notification_email(
-                user,
-                subject,
-                msg
-            )
+        send_notification_emails(
+            users,
+            template,
+            {
+                'url': get_content_item_link(content_type, content_item_id, comment_id)
+            }
+        )
 
 
 def get_other_commenters(thread_url, commenter_email):
-    '''
+    """
     Queries the database to find other commenters for a given thread
     :param thread_url: URL of the comment thread
     :param commenter_email: Email address of the user who submitted the comment
     :return:
-    '''
+    """
     session = model.Session
 
     comments = (
@@ -218,11 +180,11 @@ def get_other_commenters(thread_url, commenter_email):
         )
         .join(
             Comment,
-            Comment.user_id==model.User.id
+            Comment.user_id == model.User.id
         )
         .join(
             CommentThread,
-            Comment.thread_id==CommentThread.id
+            Comment.thread_id == CommentThread.id
         )
         .filter(
             _and_(
@@ -236,13 +198,14 @@ def get_other_commenters(thread_url, commenter_email):
 
 
 def get_content_item_link(content_type, content_item_id, comment_id=None):
-    '''
+    """
     Get a fully qualified URL to the content item being commented on.
+
     :param content_type: string Currently only supports 'dataset' or 'datarequest'
     :param content_item_id: string Package name, or Data Request ID
     :param comment_id: string `comment`.`id`
     :return:
-    '''
+    """
     url = ''
     if content_type == 'datarequest':
         url = toolkit.url_for('datarequest_comment', id=content_item_id, qualified=True)
@@ -251,3 +214,49 @@ def get_content_item_link(content_type, content_item_id, comment_id=None):
     if comment_id:
         url += '#comment_' + str(comment_id)
     return url
+
+
+def flagged_comment_notification(comment):
+    """
+    Determines the organisation of the content item the comment belongs to and which users to notify
+
+    :param comment: comment object
+    :return:
+    """
+    org_id = None
+    context = {'model': model}
+    thread = logic.get_action('thread_show')(context, {'id': comment.thread_id})
+
+    if thread:
+        # Last fragment contains the UUID of the content item
+        content_item_id = thread['url'].split("/")[-1]
+        # Derive content type from `thread`.`url`
+        try:
+            if thread['url'].find('datarequest') != -1:
+                content_type = 'datarequest'
+                datarequest = logic.get_action('show_datarequest')(context, {'id': content_item_id})
+                if datarequest:
+                    org_id = datarequest['organization_id']
+            elif thread['url'].find('dataset') != -1:
+                content_type = 'dataset'
+                dataset = logic.get_action('package_show')(context, {'id': content_item_id})
+                if dataset:
+                    org_id = dataset['owner_org']
+        except NotFound:
+            log1.error('Content item with ID %s not found' % content_item_id)
+            return
+
+    if org_id:
+        # Fetch the admin & editor users of the organisation owning the content item commented on
+        users = list(
+            set(get_users_for_org_by_capacity(org_id, 'admin') + get_users_for_org_by_capacity(org_id, 'editor'))
+        )
+        # Email those users
+        if users:
+            send_notification_emails(
+                users,
+                'notification-flagged-comment',
+                {
+                    'url': get_content_item_link(content_type, content_item_id, comment.id)
+                }
+            )
