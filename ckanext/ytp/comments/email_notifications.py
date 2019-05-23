@@ -123,15 +123,16 @@ def send_notification_emails(users, template, extra_vars):
     :param extra_vars: dict
     :return:
     """
-    subject = render_jinja2('emails/subjects/{0}.txt'.format(template), extra_vars)
-    body = render_jinja2('emails/bodies/{0}.txt'.format(template), extra_vars)
+    if users:
+        subject = render_jinja2('emails/subjects/{0}.txt'.format(template), extra_vars)
+        body = render_jinja2('emails/bodies/{0}.txt'.format(template), extra_vars)
 
-    for user in users:
-        send_email(
-            user,
-            subject,
-            body
-        )
+        for user in users:
+            send_email(
+                user,
+                subject,
+                body
+            )
 
 
 def notify_admins_and_commenters(owner_org, user, template, content_type, content_item_id, thread_url, comment_id):
@@ -208,7 +209,7 @@ def get_content_item_link(content_type, content_item_id, comment_id=None):
     """
     url = ''
     if content_type == 'datarequest':
-        url = toolkit.url_for('datarequest_comment', id=content_item_id, qualified=True)
+        url = toolkit.url_for('comment_datarequest', id=content_item_id, qualified=True)
     else:
         url = toolkit.url_for('dataset_read', id=content_item_id, qualified=True)
     if comment_id:
@@ -216,14 +217,40 @@ def get_content_item_link(content_type, content_item_id, comment_id=None):
     return url
 
 
+def get_content_type_and_org_id(context, thread_url, content_item_id):
+    """
+    Derives the content type and ID of the owning organisation from the comment thread URL and the content item ID
+
+    :param context:
+    :param thread_url:
+    :param content_item_id:
+    :return:
+    """
+    org_id = None
+    data_dict = {'id': content_item_id}
+    try:
+        if thread_url.find('datarequest') != -1:
+            content_type = 'datarequest'
+            action = 'show_datarequest'
+        else:
+            content_type = 'dataset'
+            action = 'package_show'
+        content_item = logic.get_action(action)(context, data_dict)
+        if content_item:
+            org_id = content_item['organization_id'] if content_type == 'datarequest' else content_item['owner_org']
+    except NotFound:
+        log1.error('Content item (%s) with ID %s not found' % (content_type, content_item_id))
+
+    return content_type, org_id
+
+
 def flagged_comment_notification(comment):
     """
-    Determines the organisation of the content item the comment belongs to and which users to notify
+    Determines the organisation of the content item the comment belongs to and sends email notifications
 
     :param comment: comment object
     :return:
     """
-    org_id = None
     context = {'model': model}
     thread = logic.get_action('thread_show')(context, {'id': comment.thread_id})
 
@@ -231,30 +258,16 @@ def flagged_comment_notification(comment):
         # Last fragment contains the UUID of the content item
         content_item_id = thread['url'].split("/")[-1]
         # Derive content type from `thread`.`url`
-        try:
-            if thread['url'].find('datarequest') != -1:
-                content_type = 'datarequest'
-                datarequest = logic.get_action('show_datarequest')(context, {'id': content_item_id})
-                if datarequest:
-                    org_id = datarequest['organization_id']
-            elif thread['url'].find('dataset') != -1:
-                content_type = 'dataset'
-                dataset = logic.get_action('package_show')(context, {'id': content_item_id})
-                if dataset:
-                    org_id = dataset['owner_org']
-        except NotFound:
-            log1.error('Content item with ID %s not found' % content_item_id)
-            return
-
-    if org_id:
-        # Fetch the admin & editor users of the organisation owning the content item commented on
-        users = list(
-            set(get_users_for_org_by_capacity(org_id, 'admin') + get_users_for_org_by_capacity(org_id, 'editor'))
+        content_type, org_id = get_content_type_and_org_id(
+            context,
+            thread['url'],
+            content_item_id
         )
-        # Email those users
-        if users:
+
+        if content_type and org_id:
+            # Email the org admin users of the content item being commented on
             send_notification_emails(
-                users,
+                get_users_for_org_by_capacity(org_id, 'admin'),
                 'notification-flagged-comment',
                 {
                     'url': get_content_item_link(content_type, content_item_id, comment.id)
