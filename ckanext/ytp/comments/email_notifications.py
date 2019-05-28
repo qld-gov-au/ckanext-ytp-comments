@@ -13,7 +13,6 @@ from ckanext.ytp.comments.model import Comment, CommentThread
 
 log1 = logging.getLogger(__name__)
 NotFound = logic.NotFound
-_and_ = sqlalchemy.and_
 
 
 def get_member_list(context, data_dict=None):
@@ -135,15 +134,39 @@ def send_notification_emails(users, template, extra_vars):
             )
 
 
-def notify_admins_and_commenters(owner_org, user, template, content_type, content_item_id, thread_url, comment_id):
+def notify_admins(owner_org, user, template, content_type, content_item_id, comment_id):
     """
 
     :param owner_org: organization.id of the content item owner
     :param user: c.user_obj of the user who submitted the comment
     :param template: string indicating which email template to use
-    :param content_type:
-    :param content_item_id:
-    :param thread_url: URL of the comment thread (used to determine other commenters in thread)
+    :param content_type: string dataset or datarequest
+    :param content_item_id: UUID of the content item
+    :param comment_id: ID of the comment submitted (used in URL of email body)
+    :return:
+    """
+    # Get all the org admin users (excluding the user who made the comment)
+    users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
+
+    if users:
+        send_notification_emails(
+            users,
+            template,
+            {
+                'url': get_content_item_link(content_type, content_item_id, comment_id)
+            }
+        )
+
+
+def notify_admins_and_other_commenters(owner_org, user, template, content_type, content_item_id, parent_id, comment_id):
+    """
+
+    :param owner_org: organization.id of the content item owner
+    :param user: c.user_obj of the user who submitted the comment
+    :param template: string indicating which email template to use
+    :param content_type: string dataset or datarequest
+    :param content_item_id: UUID of the content item
+    :param parent_id: ID of the comment thread parent (used to determine other commenters in thread)
     :param comment_id: ID of the comment submitted (used in URL of email body)
     :return:
     """
@@ -151,7 +174,7 @@ def notify_admins_and_commenters(owner_org, user, template, content_type, conten
     admin_users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
 
     # Get all the other commenters (excluding the user who made the comment)
-    other_commenters = get_other_commenters(thread_url, user.email)
+    other_commenters = get_other_commenters(parent_id, user.email)
 
     # Combine the two lists
     users = list(set(admin_users + other_commenters))
@@ -166,10 +189,10 @@ def notify_admins_and_commenters(owner_org, user, template, content_type, conten
         )
 
 
-def get_other_commenters(thread_url, commenter_email):
+def get_other_commenters(parent_id, commenter_email):
     """
     Queries the database to find other commenters for a given thread
-    :param thread_url: URL of the comment thread
+    :param parent_id: ID of the comment thread parent
     :param commenter_email: Email address of the user who submitted the comment
     :return:
     """
@@ -187,11 +210,8 @@ def get_other_commenters(thread_url, commenter_email):
             CommentThread,
             Comment.thread_id == CommentThread.id
         )
-        .filter(
-            _and_(
-                CommentThread.url == thread_url,
-                model.User.email != commenter_email,
-            ))
+        .filter(model.User.email != commenter_email)
+        .filter((Comment.parent_id == parent_id) | (Comment.id == parent_id))
         .group_by(model.User.email)
     )
 

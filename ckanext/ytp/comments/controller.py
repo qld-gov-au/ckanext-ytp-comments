@@ -121,15 +121,25 @@ class CommentController(BaseController):
                 abort(403)
 
             if success:
-                email_notifications.notify_admins_and_commenters(
-                    helpers.get_org_id(content_type),
-                    toolkit.c.userobj,
-                    'notification-new-comment',
-                    content_type,
-                    helpers.get_content_item_id(content_type),
-                    data_dict['url'],
-                    res['id']
-                )
+                if comment_type == 'reply':
+                    email_notifications.notify_admins_and_other_commenters(
+                        helpers.get_org_id(content_type),
+                        toolkit.c.userobj,
+                        'notification-new-comment',
+                        content_type,
+                        helpers.get_content_item_id(content_type),
+                        res['parent_id'],
+                        res['id']
+                    )
+                else:
+                    email_notifications.notify_admins(
+                        helpers.get_org_id(content_type),
+                        toolkit.c.userobj,
+                        'notification-new-comment',
+                        content_type,
+                        helpers.get_content_item_id(content_type),
+                        res['id']
+                    )
 
             h.redirect_to(
                 helpers.get_redirect_url(

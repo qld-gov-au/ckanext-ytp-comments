@@ -250,6 +250,8 @@ class Comment(Base):
         else:
             d['comments'] = [c.as_dict() for c in self.children]
         d['flagged'] = self.flagged
+        if self.parent_id:
+            d['parent_id'] = self.parent_id
         return d
 
     @classmethod
