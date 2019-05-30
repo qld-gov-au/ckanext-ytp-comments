@@ -1,6 +1,9 @@
 import ckan.plugins as plugins
+import ckan.model as model
+from ckan.logic import get_action
 from ckan.plugins import implements, toolkit
 
+import helpers
 import logging
 
 log = logging.getLogger(__name__)
@@ -27,7 +30,12 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
     def get_helpers(self):
         return {
             'get_comment_thread': self._get_comment_thread,
-            'get_comment_count_for_dataset': self._get_comment_count_for_dataset
+            'get_comment_count_for_dataset': self._get_comment_count_for_dataset,
+            'threaded_comments_enabled': helpers.threaded_comments_enabled,
+            'users_can_edit': helpers.users_can_edit,
+            'user_can_edit_comment': helpers.user_can_edit_comment,
+            'user_can_manage_comments': helpers.user_can_manage_comments,
+            'get_org_id': helpers.get_org_id,
         }
 
     def get_actions(self):
@@ -67,20 +75,22 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
         """
         controller = 'ckanext.ytp.comments.controller:CommentController'
         map.connect('/dataset/{dataset_id}/comments/add', controller=controller, action='add')
-        map.connect('/dataset/{dataset_id}/comments/{comment_id}/edit', controller=controller, action='edit')
-        map.connect('/dataset/{dataset_id}/comments/{parent_id}/reply', controller=controller, action='reply')
-        map.connect('/dataset/{dataset_id}/comments/{comment_id}/delete', controller=controller, action='delete')
+        map.connect('/{content_type}/{dataset_id}/comments/add', controller=controller, action='add')
+        #map.connect('/dataset/{dataset_id}/comments/{comment_id}/edit', controller=controller, action='edit')
+        map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/edit', controller=controller, action='edit')
+        map.connect('/{content_type}/{dataset_id}/comments/{parent_id}/reply', controller=controller, action='reply')
+        map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/delete', controller=controller, action='delete')
+        # Flag a comment as inappropriate
+        map.connect('/comment/{comment_id}/flag', controller=controller, action='flag')
+        # Un-flag a comment as inappropriate
+        map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/unflag', controller=controller, action='unflag')
         return map
 
-    def _get_comment_thread(self, dataset_name):
-        import ckan.model as model
-        from ckan.logic import get_action
-        url = '/dataset/%s' % dataset_name
+    def _get_comment_thread(self, dataset_name, content_type='dataset'):
+        url = '/%s/%s' % (content_type, dataset_name)
         return get_action('thread_show')({'model': model, 'with_deleted': True}, {'url': url})
 
-    def _get_comment_count_for_dataset(self, dataset_name):
-        import ckan.model as model
-        from ckan.logic import get_action
-        url = '/dataset/%s' % dataset_name
+    def _get_comment_count_for_dataset(self, dataset_name, content_type='dataset'):
+        url = '/%s/%s' % (content_type, dataset_name)
         count = get_action('comment_count')({'model': model}, {'url': url})
         return count
