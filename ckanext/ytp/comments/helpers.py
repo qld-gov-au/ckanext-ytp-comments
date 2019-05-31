@@ -42,7 +42,7 @@ def get_content_item(content_type, context, data_dict):
 
 
 def check_content_access(content_type, context, data_dict):
-    check_access('show_datarequest' if content_type == 'datareqest' else 'package_show', context, data_dict)
+    check_access('show_datarequest' if content_type == 'datarequest' else 'package_show', context, data_dict)
 
 
 def get_redirect_url(content_type, content_item_id, anchor):
