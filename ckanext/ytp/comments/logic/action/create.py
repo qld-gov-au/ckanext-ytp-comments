@@ -41,7 +41,7 @@ def comment_create(context, data_dict):
     if toolkit.asbool(config.get('ckan.comments.check_for_profanity', False)) \
             and (helpers.profanity_check(cleaned_comment)
                  or helpers.profanity_check(data_dict.get('subject', ''))):
-        raise logic.ValidationError({"message": "Comment blocked due to profanity"})
+        raise logic.ValidationError({"message": "Comment blocked due to profanity."})
 
     # Create the object
     cmt = comment_model.Comment(thread_id=thread_id,
