@@ -229,6 +229,8 @@ class Comment(Base):
         u = model.User.get(self.user_id)
         if u:
             name = u.fullname
+            user_login_name = u.name
+            user_state = u.state
 
         # Hack
         if name == config.get('ckan.site_id', 'ckan_site_user') or not name:
@@ -238,6 +240,8 @@ class Comment(Base):
         d['id'] = self.id
         d['user_id'] = self.user_id
         d['username'] = name
+        d['user_state'] = user_state
+        d['user_login_name'] = user_login_name
         d['subject'] = self.subject
         d['content'] = self.comment
         d['state'] = self.state
