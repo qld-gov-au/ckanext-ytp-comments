@@ -1,2 +1,2 @@
-profanity
+profanityfilter
 lxml

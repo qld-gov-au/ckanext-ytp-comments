@@ -1,7 +1,7 @@
 import ckan.plugins.toolkit as toolkit
 
 from ckan.common import config, request
-from profanity import profanity
+from profanityfilter import ProfanityFilter
 from ckan.common import c
 from ckan.lib.base import render
 from ckan.logic import check_access, get_action
@@ -17,8 +17,10 @@ def users_can_edit():
 
 
 def profanity_check(cleaned_comment):
-    profanity.load_words(load_bad_words())
-    return profanity.contains_profanity(cleaned_comment)
+    more_words = load_bad_words()
+
+    pf = ProfanityFilter(extra_censor_list=more_words)
+    return pf.is_profane(cleaned_comment)
 
 
 def load_bad_words():
