@@ -31,8 +31,7 @@ def comment_update(context, data_dict):
 
     # Run profanity check
     if toolkit.asbool(config.get('ckan.comments.check_for_profanity', False)) \
-            and (helpers.profanity_check(cleaned_comment)
-                 or helpers.profanity_check(data_dict.get('subject', ''))):
+            and (helpers.profanity_check(cleaned_comment) or helpers.profanity_check(data_dict.get('subject', ''))):
         raise logic.ValidationError("Comment blocked due to profanity.")
 
     comment.subject = data_dict.get('subject')

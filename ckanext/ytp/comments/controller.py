@@ -5,10 +5,10 @@ import ckan.plugins.toolkit as toolkit
 import model as comment_model
 import helpers
 
-from ckan.lib.base import h, BaseController, render, abort, request
+from ckan.lib.base import h, BaseController, abort, request
 from ckan import model
-from ckan.common import c, _, config
-from ckan.logic import check_access, get_action, clean_dict, tuplize_dict, ValidationError, parse_params
+from ckan.common import c, _
+from ckan.logic import get_action, clean_dict, tuplize_dict, ValidationError, parse_params
 from ckan.lib.navl.dictization_functions import unflatten
 
 
@@ -40,7 +40,7 @@ class CommentController(BaseController):
             data_dict['id'] = comment_id
             success = False
             try:
-                res = get_action('comment_update')(context, data_dict)
+                get_action('comment_update')(context, data_dict)
                 success = True
             except ValidationError, ve:
                 log.debug(ve)
@@ -83,7 +83,7 @@ class CommentController(BaseController):
         :param content_type: string 'dataset' or 'datarequest'
         :return:
         """
-        content_type = 'dataset' if not vars().has_key('content_type') else content_type
+        content_type = 'dataset' if 'content_type' not in vars() else content_type
 
         context = {'model': model, 'user': c.user}
 
