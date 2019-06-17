@@ -1,6 +1,6 @@
 import ckan.plugins.toolkit as toolkit
 
-from ckan.common import config, request
+from ckan.common import config
 from profanityfilter import ProfanityFilter
 from ckan.common import c
 from ckan.lib.base import render

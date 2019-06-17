@@ -1,2 +1,2 @@
 profanityfilter
-lxml
+lxml==3.4.2
