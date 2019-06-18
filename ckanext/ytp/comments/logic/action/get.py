@@ -42,8 +42,7 @@ def thread_show(context, data_dict):
     # Add more filters based on whether we want comments of a certain state,
     # or spam comments etc.
     if context.get('approved_only') is True:
-        comments = comments.filter(comment_model.Comment.approval_status ==
-                                   comment_model.COMMENT_APPROVED)
+        comments = comments.filter(comment_model.Comment.approval_status == comment_model.COMMENT_APPROVED)
 
     if context.get('with_deleted') is not True:
         # TODO: Restrict to sysadmin

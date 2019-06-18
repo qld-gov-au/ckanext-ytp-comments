@@ -4,7 +4,6 @@ import ckan.logic as logic
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 import logging
-import sqlalchemy
 
 from ckan.common import config
 from ckan.lib.base import render_jinja2

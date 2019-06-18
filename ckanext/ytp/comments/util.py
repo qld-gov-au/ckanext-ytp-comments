@@ -27,4 +27,3 @@ def clean_input(comment):
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
             message = template.format(type(e).__name__, e.args)
             log.debug(message)
-
