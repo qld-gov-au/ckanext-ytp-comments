@@ -10,9 +10,6 @@ CKAN_INI_FILE=/app/ckan/default/production.ini
 . /app/ckan/default/bin/activate \
     && cd /app/ckan/default/src/ckan
 
-# Use CKAN's built-in paster command for creating some test datasets...
-paster create-test-data -c $CKAN_INI_FILE
-
 # We know the "admin" sysadmin account exists, so we'll use her API KEY to create further data
 API_KEY=$(paster --plugin=ckan user admin -c ${CKAN_INI_FILE} | tr -d '\n' | sed -r 's/^(.*)apikey=(\S*)(.*)/\2/')
 
@@ -39,5 +36,21 @@ echo "Creating test Data Request:"
 wget -O- --header="Authorization: ${API_KEY}" \
     --post-data "title=Test Request&description=This is an example&organization_id=${TEST_ORG_ID}" \
     ${CKAN_ACTION_URL}/create_datarequest
+
+# Use CKAN's built-in paster command for creating some test datasets...
+paster create-test-data -c $CKAN_INI_FILE
+
+# Datasets need to be assigned to an organisation
+
+echo "Assigning test Datasets to Organisation..."
+
+wget -q -O- --header="Authorization: ${API_KEY}" \
+    --post-data "id=annakarenina&owner_org=${TEST_ORG_ID}" \
+    ${CKAN_ACTION_URL}/package_patch >> /dev/null
+
+wget -q -O- --header="Authorization: ${API_KEY}" \
+    --post-data "id=warandpeace&owner_org=${TEST_ORG_ID}" \
+    ${CKAN_ACTION_URL}/package_patch >> /dev/null
+
 
 deactivate
