@@ -55,14 +55,15 @@ Feature: Comments
         Then I submit a reply with comment "This is a reply"
         Then I should see "This is a reply" within 10 seconds
 
-# @Todo: There is a bug that needs to be fixed in order for org admins to delete comments
-#    Scenario: DQL-74 BDD-7a Admin user delete comment
-#        Given "SalsaAdmin" as the persona
-#        When I log in
-#        And I go to data request "Test Request" comments
-#        And I press the element with xpath "//a[@title='Delete comment']"
-#        Then I should see "Are you sure you want to delete this comment?" within 1 seconds
-#        Then I take a screenshot
+    Scenario: DQL-74 BDD-7a Admin user delete comment
+        Given "SalsaAdmin" as the persona
+        When I log in
+        Then I go to dataset "warandpeace"
+        And I press the element with xpath "//a[@title='Delete comment']"
+        Then I should see "Are you sure you want to delete this comment?" within 1 seconds
+        Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
+        Then I should see "This comment was deleted." within 2 seconds
+        Then I take a screenshot
 
     Scenario: DQL-74 BDD-7b Sysadmin user delete comment
         Given "Admin" as the persona
@@ -70,6 +71,6 @@ Feature: Comments
         And I go to data request "Test Request" comments
         And I press the element with xpath "//a[@title='Delete comment']"
         Then I should see "Are you sure you want to delete this comment?" within 1 seconds
-        Then I take a screenshot
         Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
         Then I should see "This comment was deleted." within 2 seconds
+        Then I take a screenshot
