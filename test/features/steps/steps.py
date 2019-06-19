@@ -49,18 +49,6 @@ def go_to_data_request_comments(context, subject):
     """ % (subject))
 
 
-# @step(u'I submit a comment with subject "{subject}" and comment "{comment}"')
-# def submit_comment_with_subject_and_comment(context, subject, comment):
-#
-#     assert context.persona
-#     context.execute_steps(u"""
-#         When I fill in "subject" with "%s"
-#         And I fill in "comment" with "%s"
-#         # Save is an input submit button without "name" or "id".
-#         And I press the element with xpath "//div/article/div/form[last()]/div/input[@value='Save']"
-#     """ % (subject, comment))
-
-
 @step(u'I get the current URL')
 def get_current_url(context):
     context.browser.evaluate_script("document.documentElement.clientWidth")
