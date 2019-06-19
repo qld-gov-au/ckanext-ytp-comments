@@ -166,7 +166,7 @@ class CommentController(BaseController):
             abort(403)
 
         try:
-            data_dict = {'id': comment_id}
+            data_dict = {'id': comment_id, 'content_type': content_type, 'content_item_id': content_item_id}
             get_action('comment_delete')(context, data_dict)
         except Exception, e:
             log.debug(e)
