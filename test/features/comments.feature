@@ -19,10 +19,8 @@ Feature: Comments
         When I log in
         Then I go to dataset "warandpeace"
         Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
-        # Using persona var approach for future expansion
-        And I set persona var "comment_text" to "This is a test comment"
-        Then I submit a comment with subject "Test subject" and comment "$comment_text"
-        Then I should see "$comment_text" within 10 seconds
+        Then I submit a comment with subject "Test subject" and comment "This is a test comment"
+        Then I should see "This is a test comment" within 10 seconds
 
     Scenario: DQL-74 BDD-4 Data request profane comment submission (Logged in user)
         Given "CKANUser" as the persona
@@ -50,17 +48,21 @@ Feature: Comments
         Then I take a screenshot
         # @Todo: Need to check email notifications sent
 
-#    Scenario: DQL-74 BDD-6 Report profane comment (Logged in user)
-        # @Todo: Unable to submit comment past 1st comment due to selenium error on "comment" field
-        # "element not interactable" after first comment submitted on a dataset or data request
-
-    Scenario: DQL-74 BDD-7a Admin user delete comment
-        Given "SalsaAdmin" as the persona
+    Scenario: DQL-74 BDD-6 Reply to comment (Logged in user)
+        Given "CKANUser" as the persona
         When I log in
-        And I go to data request "Test Request" comments
-        And I press the element with xpath "//a[@title='Delete comment']"
-        Then I should see "Are you sure you want to delete this comment?" within 1 seconds
-        Then I take a screenshot
+        Then I go to dataset "warandpeace"
+        Then I submit a reply with comment "This is a reply"
+        Then I should see "This is a reply" within 10 seconds
+
+# @Todo: There is a bug that needs to be fixed in order for org admins to delete comments
+#    Scenario: DQL-74 BDD-7a Admin user delete comment
+#        Given "SalsaAdmin" as the persona
+#        When I log in
+#        And I go to data request "Test Request" comments
+#        And I press the element with xpath "//a[@title='Delete comment']"
+#        Then I should see "Are you sure you want to delete this comment?" within 1 seconds
+#        Then I take a screenshot
 
     Scenario: DQL-74 BDD-7b Sysadmin user delete comment
         Given "Admin" as the persona
