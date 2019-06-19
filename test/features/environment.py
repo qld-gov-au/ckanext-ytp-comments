@@ -18,6 +18,32 @@ PERSONAS = {
         name=u'admin',
         email=u'admin@localhost',
         password=u'password'
+    ),
+    'Unathenticated': dict(
+        name=u'',
+        email=u'',
+        password=u''
+    ),
+    # This user will not be assigned to any organisations
+    'CKANUser': dict(
+        name=u'ckan_user',
+        email=u'ckan_user@localhost',
+        password=u'password'
+    ),
+    'SalsaAdmin': dict(
+        name=u'salsa_admin',
+        email=u'salsa_admin@localhost',
+        password=u'password'
+    ),
+    'SalsaEditor': dict(
+        name=u'salsa_editor',
+        email=u'salsa_editor@localhost',
+        password=u'password'
+    ),
+    'SalsaMember': dict(
+        name=u'salsa_member',
+        email=u'salsa_member@localhost',
+        password=u'password'
     )
 }
 
