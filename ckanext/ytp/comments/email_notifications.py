@@ -129,7 +129,6 @@ def send_notification_emails(users, template, extra_vars):
             toolkit.enqueue_job(send_email, [user, subject, body], title=u'Comment Email')
 
 
-
 def notify_admins(owner_org, user, template, content_type, content_item_id, comment_id):
     """
 
