@@ -126,11 +126,7 @@ def send_notification_emails(users, template, extra_vars):
         body = render_jinja2('emails/bodies/{0}.txt'.format(template), extra_vars)
 
         for user in users:
-            send_email(
-                user,
-                subject,
-                body
-            )
+            toolkit.enqueue_job(send_email, [user, subject, body], title=u'Comment Email')
 
 
 def notify_admins(owner_org, user, template, content_type, content_item_id, comment_id):
