@@ -107,7 +107,7 @@ def send_email(to, subject, msg):
     }
 
     try:
-        mailer.mail_recipient(**mail_dict)
+        mailer.mail_recipient(**mail_dict)    
     except mailer.MailerException:
         log1.error(u'Cannot send email notification to %s.', to, exc_info=1)
 
@@ -126,11 +126,8 @@ def send_notification_emails(users, template, extra_vars):
         body = render_jinja2('emails/bodies/{0}.txt'.format(template), extra_vars)
 
         for user in users:
-            send_email(
-                user,
-                subject,
-                body
-            )
+            toolkit.enqueue_job(send_email, [user, subject, body], title=u'Comment Email')
+
 
 
 def notify_admins(owner_org, user, template, content_type, content_item_id, comment_id):
@@ -146,7 +143,7 @@ def notify_admins(owner_org, user, template, content_type, content_item_id, comm
     """
     # Get all the org admin users (excluding the user who made the comment)
     users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
-
+    
     if users:
         send_notification_emails(
             users,
