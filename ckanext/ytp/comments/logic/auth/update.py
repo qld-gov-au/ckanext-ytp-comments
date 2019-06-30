@@ -28,10 +28,10 @@ def comment_update(context, data_dict):
     content_item_id = data_dict.get('content_item_id', None)
 
     if content_type and content_item_id:
-        if not helpers.user_can_manage_comments(content_type, content_item_id):
-            return {'success': False, 'msg': _('User is not authorised to delete this comment')}
-        else:
+        if helpers.user_can_manage_comments(content_type, content_item_id):
             return {'success': True}
+        else:
+            return {'success': False, 'msg': _('User is not authorised to edit this comment')}
 
     if comment.user_id != userobj.id:
         return {'success': False, 'msg': _('User is not the author of the comment')}
