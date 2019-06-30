@@ -38,6 +38,8 @@ class CommentController(BaseController):
             data_dict = clean_dict(unflatten(
                 tuplize_dict(parse_params(request.POST))))
             data_dict['id'] = comment_id
+            data_dict['content_type'] = content_type
+            data_dict['content_item_id'] = content_item_id
             success = False
             try:
                 get_action('comment_update')(context, data_dict)
