@@ -197,6 +197,8 @@ class Comment(Base):
 
     state = Column(types.UnicodeText, default=u'active')
 
+    flagged = Column(types.Boolean, default=False)
+
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -227,6 +229,8 @@ class Comment(Base):
         u = model.User.get(self.user_id)
         if u:
             name = u.fullname
+            user_login_name = u.name
+            user_state = u.state
 
         # Hack
         if name == config.get('ckan.site_id', 'ckan_site_user') or not name:
@@ -236,6 +240,8 @@ class Comment(Base):
         d['id'] = self.id
         d['user_id'] = self.user_id
         d['username'] = name
+        d['user_state'] = user_state
+        d['user_login_name'] = user_login_name
         d['subject'] = self.subject
         d['content'] = self.comment
         d['state'] = self.state
@@ -247,6 +253,9 @@ class Comment(Base):
             d['comments'] = [c.as_dict() for c in self.children if c.state == 'active']
         else:
             d['comments'] = [c.as_dict() for c in self.children]
+        d['flagged'] = self.flagged
+        if self.parent_id:
+            d['parent_id'] = self.parent_id
         return d
 
     @classmethod
