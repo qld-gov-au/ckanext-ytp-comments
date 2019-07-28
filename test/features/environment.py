@@ -18,6 +18,32 @@ PERSONAS = {
         name=u'admin',
         email=u'admin@localhost',
         password=u'password'
+    ),
+    'Unathenticated': dict(
+        name=u'',
+        email=u'',
+        password=u''
+    ),
+    # This user will not be assigned to any organisations
+    'CKANUser': dict(
+        name=u'ckan_user',
+        email=u'ckan_user@localhost',
+        password=u'password'
+    ),
+    'TestOrgAdmin': dict(
+        name=u'test_org_admin',
+        email=u'test_org_admin@localhost',
+        password=u'password'
+    ),
+    'TestOrgEditor': dict(
+        name=u'test_org_editor',
+        email=u'test_org_editor@localhost',
+        password=u'password'
+    ),
+    'TestOrgMember': dict(
+        name=u'test_org_member',
+        email=u'test_org_member@localhost',
+        password=u'password'
     )
 }
 
@@ -27,6 +53,8 @@ def before_all(context):
     context.screenshots_dir = os.path.join(ROOT_PATH, 'test/screenshots')
     # The path where file attachments can be found.
     context.attachment_dir = os.path.join(ROOT_PATH, 'test/fixtures')
+    # The path where emails can be found.
+    context.mail_path = os.path.join(ROOT_PATH, 'test/emails')
 
     # Set base url for all relative links.
     context.base_url = BASE_URL
