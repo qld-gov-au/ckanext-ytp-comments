@@ -87,16 +87,18 @@ def get_users_for_org_by_capacity(owner_org, capacity, excluded_emails=[]):
 
     return users
 
+
 def get_dataset_author_email(dataset_id):
     """
     Returns the email address of the dataset author
-    :param dataset_id: string   
+    :param dataset_id: string
     :return: string of dataset author email address
     """
     context = {'model': model}
-    dataset = logic.get_action('package_show')(context, {'id': dataset_id})  
+    dataset = logic.get_action('package_show')(context, {'id': dataset_id})
 
     return dataset.get('author_email', None) if dataset else None
+
 
 def send_email(to, subject, msg):
     """
