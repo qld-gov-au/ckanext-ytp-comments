@@ -88,6 +88,18 @@ def get_users_for_org_by_capacity(owner_org, capacity, excluded_emails=[]):
     return users
 
 
+def get_dataset_author_email(dataset_id):
+    """
+    Returns the email address of the dataset author
+    :param dataset_id: string
+    :return: string of dataset author email address
+    """
+    context = {'model': model}
+    dataset = logic.get_action('package_show')(context, {'id': dataset_id})
+
+    return dataset.get('author_email', None) if dataset else None
+
+
 def send_email(to, subject, msg):
     """
     Use CKAN mailer logic to send an email to an individual email address
@@ -140,8 +152,12 @@ def notify_admins(owner_org, user, template, content_type, content_item_id, comm
     :param comment_id: ID of the comment submitted (used in URL of email body)
     :return:
     """
-    # Get all the org admin users (excluding the user who made the comment)
-    users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
+    if content_type == 'dataset':
+        author_email = get_dataset_author_email(content_item_id)
+        users = [author_email] if author_email else []
+    else:
+        # Get all the org admin users (excluding the user who made the comment)
+        users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
 
     if users:
         send_notification_emails(
@@ -165,8 +181,12 @@ def notify_admins_and_other_commenters(owner_org, user, template, content_type, 
     :param comment_id: ID of the comment submitted (used in URL of email body)
     :return:
     """
-    # Get all the org admin users (excluding the user who made the comment)
-    admin_users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
+    if content_type == 'dataset':
+        author_email = get_dataset_author_email(content_item_id)
+        admin_users = [author_email] if author_email else []
+    else:
+        # Get all the org admin users (excluding the user who made the comment)
+        admin_users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
 
     # Get all the other commenters (excluding the user who made the comment)
     other_commenters = get_other_commenters(parent_id, user.email)
