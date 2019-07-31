@@ -1,4 +1,6 @@
+import ckan.model as model
 import ckan.plugins.toolkit as toolkit
+import sqlalchemy
 
 from ckan.common import config
 from profanityfilter import ProfanityFilter
@@ -6,6 +8,9 @@ from ckan.common import c
 from ckan.lib.base import render
 from ckan.logic import check_access, get_action
 from ckanext.datarequests import actions
+from notification_models import CommentNotificationRecipient
+
+_and_ = sqlalchemy.and_
 
 
 def threaded_comments_enabled():
@@ -82,3 +87,33 @@ def get_org_id(content_type):
 
 def get_content_item_id(content_type):
     return c.datarequest['id'] if content_type == 'datarequest' else c.pkg.name
+
+
+def comment_notification_recipients_enabled():
+    # @todo: check the database tables exist
+    return True
+
+
+def get_user_comment_follows(user_id, thread_id):
+    following = []
+    records = (
+        model.Session.query(
+            CommentNotificationRecipient
+        )
+        .filter(
+            _and_(
+                CommentNotificationRecipient.user_id == user_id,
+                CommentNotificationRecipient.thread_id == thread_id,
+                CommentNotificationRecipient.action == 'follow',
+        ))
+    )
+
+    from pprint import pprint
+    for record in records:
+        if record.comment_id:
+            following.append(record.comment_id)
+        else:
+            following.append(record.thread_id)
+        pprint(record)
+
+    return list(set(following))
