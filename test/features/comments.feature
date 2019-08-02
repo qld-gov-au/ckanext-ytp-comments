@@ -3,7 +3,7 @@ Feature: Comments
 
     Scenario: The Add Comment form should not display for a non-logged-in user - instead they see a 'Login to comment' button
         Given "Unathenticated" as the persona
-        Then I go to dataset "warandpeace"
+        When I go to dataset "warandpeace"
         Then I should see an element with xpath "//a[contains(string(), 'Login to comment')]"
         And I should not see "Add a comment"
 
