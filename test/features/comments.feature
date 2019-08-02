@@ -49,7 +49,6 @@ Feature: Comments
         Then I should see "Reported" within 5 seconds
         When I wait for 3 seconds
         Then I should receive an email at "dr_admin@localhost" with subject "Queensland Government Open Data - Comments"
-        And I should receive a base64 email at "dr_admin@localhost" containing "This comment has been flagged as inappropriate by a user"
 
     @comment-report
     Scenario: When a logged-in user reports a comment on a Dataset the comment should be marked as reported and an email sent to the admins of the organisation
