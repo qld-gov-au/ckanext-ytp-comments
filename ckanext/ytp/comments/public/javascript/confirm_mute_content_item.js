@@ -1,4 +1,4 @@
-this.ckan.module('follow-mute-thread', function (jQuery) {
+this.ckan.module('confirm-mute-content-item', function (jQuery) {
   return {
     /* An object of module options */
     options: {
@@ -32,6 +32,7 @@ this.ckan.module('follow-mute-thread', function (jQuery) {
         '</div>',
         '<div class="modal-body"></div>',
         '<div class="modal-footer">',
+        '<button class="btn btn-default btn-cancel"></button>',
         '<button class="btn btn-primary"></button>',
         '</div>',
         '</div>',
@@ -50,12 +51,18 @@ this.ckan.module('follow-mute-thread', function (jQuery) {
       this.el.on('click', this._onClick);
     },
 
-    /* Presents the user with a modal dialogue to notify them that a
-     * thread has been followed or muted
+    /* Presents the user with a confirm dialogue to ensure that they wish to
+     * continue with the current action.
+     *
+     * Examples
+     *
+     *   jQuery('.delete').click(function () {
+     *     module.confirm();
+     *   });
      *
      * Returns nothing.
      */
-    displayModal: function () {
+    confirm: function () {
       this.sandbox.body.append(this.createModal());
       this.modal.modal('show');
 
@@ -66,6 +73,31 @@ this.ckan.module('follow-mute-thread', function (jQuery) {
       });
     },
 
+    /* Performs the action for the current item.
+     *
+     * Returns nothing.
+     */
+    performAction: function (thread_id) {
+      var element = this.modal;
+      var el = this.el;
+      jQuery.get(this.el.attr('href'), function() {
+        jQuery(el).addClass('hidden');
+        jQuery(el).parent().find('.comments-follow').removeClass('hidden');
+        element.modal('hide');
+        jQuery('.comments-mute-thread').each(function(){
+          if (!jQuery(this).hasClass('hidden')) {
+            jQuery(this).addClass('hidden');
+            jQuery(this).parent().find('.comments-follow-thread').removeClass('hidden');
+          }
+        });
+      })
+      .fail(function() {
+        element.find('.modal-title').text('Error');
+        element.find('.modal-body').text('An unexpected error has occurred. Please close this pop-up and try again.');
+      });
+
+    },
+
     /* Creates the modal dialog, attaches event listeners and localised
      * strings.
      *
@@ -74,16 +106,18 @@ this.ckan.module('follow-mute-thread', function (jQuery) {
     createModal: function () {
       if (!this.modal) {
         var element = this.modal = jQuery(this.options.template);
-        element.on('click', '.btn-primary', this._onClose);
+        element.on('click', '.btn-primary', this._onConfirmSuccess);
+        element.on('click', '.btn-cancel', this._onConfirmCancel);
         element.modal({show: false});
 
-        element.find('.modal-title').text(this.options.title);
-
+        var title = jQuery(this.el).attr('title') || 'Confirm action';
+        element.find('.modal-title').text(title);
         var content = this.options.content ||
                       this.options.i18n.content || /* Backwards-compatibility */
-                      this._('Thread followed.');
+                      this._('Are you sure you want to perform this action?');
         element.find('.modal-body').text(content);
-        element.find('.btn-primary').text(this._('Close'));
+        element.find('.btn-primary').text(this._('Confirm'));
+        element.find('.btn-cancel').text(this._('Cancel'));
       }
       return this.modal;
     },
@@ -91,28 +125,16 @@ this.ckan.module('follow-mute-thread', function (jQuery) {
     /* Event handler that displays the confirm dialog */
     _onClick: function (event) {
       event.preventDefault();
-      var action = 'follow';
-      var inverse = 'mute';
-      if (this.options.action === 'mute') {
-          action = 'mute';
-          inverse = 'follow';
-      }
-      var comment_id = this.options.comment_id;
-      var element = this;
-      this.options.title = jQuery(element.el).attr('title');
-      jQuery.get('/comments/' + comment_id + '/' + action, function() {
-        jQuery(element.el).addClass('hidden');
-        jQuery(element.el).parent().find('.comments-' + inverse + '-thread').removeClass('hidden');
-      })
-      .fail(function() {
-        element.options.content = 'An error occurred while attempting to ' + action + ' this thread.';
-      });
-      this.displayModal();
-      return false;
+      this.confirm();
     },
 
-    /* Event handler for the close event */
-    _onClose: function (event) {
+    /* Event handler for the success event */
+    _onConfirmSuccess: function (event) {
+      this.performAction();
+    },
+
+    /* Event handler for the cancel event */
+    _onConfirmCancel: function (event) {
       this.modal.modal('hide');
     }
   };

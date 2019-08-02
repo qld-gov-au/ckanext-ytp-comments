@@ -1,0 +1,21 @@
+{% set base_url = '/comments/' + comment_id %}
+<div class="comment-action">
+    <button href="{{ base_url }}/follow"
+            class="btn btn-success btn-xs comments-follow-thread {{ 'hidden' if following }}"
+            title="Thread followed"
+            data-module="follow-or-mute"
+            data-module-action="follow"
+            data-module-content="You are now following comments on this thread."
+            data-module-comment_id="{{ comment_id }}">
+        Follow thread
+    </button>
+    <button href="{{ base_url }}/mute"
+            class="btn btn-warning btn-xs comments-mute-thread {{ 'hidden' if not following }}"
+            title="Thread muted"
+            data-module="follow-or-mute"
+            data-module-action="mute"
+            data-module-content="You are no longer following comments on this thread."
+            data-module-comment_id="{{ comment_id }}">
+        Mute thread
+    </button>
+</div>

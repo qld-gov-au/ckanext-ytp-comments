@@ -1,5 +1,6 @@
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
+import logging
 import sqlalchemy
 
 from ckan.common import config
@@ -9,8 +10,10 @@ from ckan.lib.base import render
 from ckan.logic import check_access, get_action
 from ckanext.datarequests import actions
 from notification_models import CommentNotificationRecipient
+from psycopg2 import ProgrammingError
 
 _and_ = sqlalchemy.and_
+log = logging.getLogger(__name__)
 
 
 def threaded_comments_enabled():
@@ -94,19 +97,28 @@ def comment_notification_recipients_enabled():
     return True
 
 
+def get_user_id():
+    user = toolkit.c.userobj
+    return user.id
+
+
 def get_user_comment_follows(user_id, thread_id):
-    following = []
-    records = (
+    return (
         model.Session.query(
             CommentNotificationRecipient
         )
         .filter(
             _and_(
                 CommentNotificationRecipient.user_id == user_id,
-                CommentNotificationRecipient.thread_id == thread_id,
-                CommentNotificationRecipient.action == 'follow',
+                CommentNotificationRecipient.thread_id == thread_id
         ))
     )
+
+
+def get_user_comment_follows_ids(user_id, thread_id):
+    print('********** get_user_comment_follows_ids **********')
+    following = []
+    records = get_user_comment_follows(user_id, thread_id)
 
     from pprint import pprint
     for record in records:
@@ -117,3 +129,35 @@ def get_user_comment_follows(user_id, thread_id):
         pprint(record)
 
     return list(set(following))
+
+
+def add_comment_notification_recipient(data_dict):
+    model.Session.add(CommentNotificationRecipient(**data_dict))
+    model.Session.commit()
+
+
+def remove_comment_notification_recipient(record):
+    try:
+        model.Session.delete(record)
+        model.Session.commit()
+    except Exception, e:
+        log.error('Error removing `comment_notification_recipient` record:')
+        log.error(str(e))
+
+
+def add_user_to_comment_notifications(user_id, thread_id, comment_id=u''):
+    # Is the user attempting to follow at the dataset/data request or the comment level?
+    notification_level = 'top_level_comment' if comment_id else 'content_item'
+    add_comment_notification_recipient({
+        'user_id': user_id,
+        'thread_id': thread_id,
+        'comment_id': comment_id,
+        'notification_level': notification_level
+    })
+
+
+def remove_all_comment_notification_recipient(user_id, thread_id):
+    follows = get_user_comment_follows(user_id, thread_id)
+    print('would remove these records')
+    for record in follows:
+        remove_comment_notification_recipient(record)

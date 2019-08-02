@@ -28,9 +28,8 @@ comment_notification_recipient_table = Table('comment_notification_recipient', m
                         Column('timestamp', types.DateTime, default=datetime.datetime.utcnow()),
                         Column('user_id', types.UnicodeText),
                         Column('thread_id', types.UnicodeText),
-                        Column('comment_id', types.UnicodeText),
-                        Column('notification_level', types.UnicodeText),
-                        Column('action', types.UnicodeText),
+                        Column('comment_id', types.UnicodeText, default=u''),
+                        Column('notification_level', types.UnicodeText)
                        )
 mapper(CommentNotificationRecipient, comment_notification_recipient_table)
 

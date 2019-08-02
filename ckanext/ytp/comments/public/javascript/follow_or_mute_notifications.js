@@ -1,4 +1,4 @@
-this.ckan.module('follow-mute-item', function (jQuery) {
+this.ckan.module('follow-or-mute', function (jQuery) {
   return {
     /* An object of module options */
     options: {
@@ -28,7 +28,7 @@ this.ckan.module('follow-mute-item', function (jQuery) {
         '<div class="modal-content">',
         '<div class="modal-header">',
         '<button type="button" class="close" data-dismiss="modal">×</button>',
-        '<h3 class="modal-title">x Thread Followed</h3>',
+        '<h3 class="modal-title"></h3>',
         '</div>',
         '<div class="modal-body"></div>',
         '<div class="modal-footer">',
@@ -77,9 +77,11 @@ this.ckan.module('follow-mute-item', function (jQuery) {
         element.on('click', '.btn-primary', this._onClose);
         element.modal({show: false});
 
+        element.find('.modal-title').text(this.options.title);
+
         var content = this.options.content ||
                       this.options.i18n.content || /* Backwards-compatibility */
-                      this._('x Thread followed.');
+                      this._('Thread followed.');
         element.find('.modal-body').text(content);
         element.find('.btn-primary').text(this._('Close'));
       }
@@ -95,14 +97,17 @@ this.ckan.module('follow-mute-item', function (jQuery) {
           action = 'mute';
           inverse = 'follow';
       }
+      var content_type = this.options.content_type;
+      var thread_id = this.options.thread_id;
       var comment_id = this.options.comment_id;
       var element = this;
-      jQuery.get('/comments/' + comment_id + '/' + action, function() {
+      this.options.title = jQuery(element.el).attr('title');
+      jQuery.get('/comments/' + (thread_id ? thread_id : comment_id) + '/' + action, function() {
         jQuery(element.el).addClass('hidden');
-        jQuery(element.el).parent().find('.comments-' + inverse + '-thread').removeClass('hidden');
+        jQuery(element.el).parent().find('.comments-' + inverse + (thread_id ? '' : '-thread')).removeClass('hidden');
       })
       .fail(function() {
-        element.options.content = 'An error occurred while attempting to ' + action + ' comments.';
+        element.options.content = 'An error occurred while attempting to ' + action + ' this ' + (thread_id ? content_type : 'thread') + '.';
       });
       this.displayModal();
       return false;

@@ -36,7 +36,7 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
             'user_can_edit_comment': helpers.user_can_edit_comment,
             'user_can_manage_comments': helpers.user_can_manage_comments,
             'get_org_id': helpers.get_org_id,
-            'user_comment_follows': helpers.get_user_comment_follows,
+            'user_comment_follows': helpers.get_user_comment_follows_ids,
             'comment_notification_recipients_enabled': helpers.comment_notification_recipients_enabled,
         }
 

@@ -133,6 +133,8 @@ class CommentController(BaseController):
                         res['parent_id'],
                         res['id']
                     )
+                    # Add the user who submitted the reply to comment notifications for this thread
+                    helpers.add_user_to_comment_notifications(toolkit.c.userobj.id, res['thread_id'], res['parent_id'])
                 else:
                     email_notifications.notify_admins(
                         helpers.get_org_id(content_type),
@@ -142,6 +144,8 @@ class CommentController(BaseController):
                         helpers.get_content_item_id(content_type),
                         res['id']
                     )
+                    # Add the user who submitted the comment notifications for this new thread
+                    helpers.add_user_to_comment_notifications(toolkit.c.userobj.id, res['thread_id'], res['id'])
 
             h.redirect_to(
                 helpers.get_redirect_url(
