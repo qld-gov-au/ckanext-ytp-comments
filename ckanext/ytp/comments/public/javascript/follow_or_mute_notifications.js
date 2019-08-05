@@ -105,6 +105,10 @@ this.ckan.module('follow-or-mute', function (jQuery) {
       jQuery.get('/comments/' + (thread_id ? thread_id : comment_id) + '/' + action, function() {
         jQuery(element.el).addClass('hidden');
         jQuery(element.el).parent().find('.comments-' + inverse + (thread_id ? '' : '-thread')).removeClass('hidden');
+        if (!comment_id) {
+          jQuery('.comments-follow-thread').addClass('hidden');
+          jQuery('.comments-mute-thread').removeClass('hidden');
+        }
       })
       .fail(function() {
         element.options.content = 'An error occurred while attempting to ' + action + ' this ' + (thread_id ? content_type : 'thread') + '.';

@@ -1,7 +1,3 @@
-{% if g.debug %}
-    <p>Content item thread ID: {{ thread_id }}</p>
-{% endif %}
-
 {% set base_url = '/comments/' + thread_id %}
 <div class="notification-actions">
     <button href="{{ base_url }}/follow"

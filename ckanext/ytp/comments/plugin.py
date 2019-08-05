@@ -4,6 +4,7 @@ from ckan.logic import get_action
 from ckan.plugins import implements, toolkit
 
 import helpers
+import notification_helpers
 import logging
 
 log = logging.getLogger(__name__)
@@ -36,8 +37,8 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
             'user_can_edit_comment': helpers.user_can_edit_comment,
             'user_can_manage_comments': helpers.user_can_manage_comments,
             'get_org_id': helpers.get_org_id,
-            'user_comment_follows': helpers.get_user_comment_follows_ids,
-            'comment_notification_recipients_enabled': helpers.comment_notification_recipients_enabled,
+            'comment_notification_recipients_enabled': notification_helpers.comment_notification_recipients_enabled,
+            'user_comment_follow_mute_status': notification_helpers.get_user_comment_follow_mute_status
         }
 
     def get_actions(self):

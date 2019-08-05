@@ -4,10 +4,11 @@ import ckan.logic as logic
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 import logging
+import notification_helpers
 
 from ckan.common import config
 from ckan.lib.base import render_jinja2
-from ckanext.ytp.comments.model import Comment, CommentThread
+from notification_models import CommentNotificationRecipient
 
 
 log1 = logging.getLogger(__name__)
@@ -141,6 +142,16 @@ def send_notification_emails(users, template, extra_vars):
             toolkit.enqueue_job(send_email, [user, subject, body], title=u'Comment Email')
 
 
+def get_admins(owner_org, user, content_type, content_item_id):
+    if content_type == 'dataset':
+        author_email = get_dataset_author_email(content_item_id)
+        users = [author_email] if author_email else []
+    else:
+        # Get all the org admin users (excluding the user who made the comment)
+        users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
+    return users
+
+
 def notify_admins(owner_org, user, template, content_type, content_item_id, comment_id):
     """
 
@@ -152,12 +163,43 @@ def notify_admins(owner_org, user, template, content_type, content_item_id, comm
     :param comment_id: ID of the comment submitted (used in URL of email body)
     :return:
     """
-    if content_type == 'dataset':
-        author_email = get_dataset_author_email(content_item_id)
-        users = [author_email] if author_email else []
+    admin_users = get_admins(owner_org, user, content_type, content_item_id)
+
+    if admin_users:
+        send_notification_emails(
+            admin_users,
+            template,
+            {
+                'url': get_content_item_link(content_type, content_item_id, comment_id)
+            }
+        )
+
+
+def notify_admins_and_comment_notification_recipients(owner_org, user, template, content_type, content_item_id, thread_id, parent_id, comment_id):
+
+    admin_users = get_admins(owner_org, user, content_type, content_item_id)
+
+    # Get email addresses for all users following the content item (excluding user who made the comment)
+    content_item_followers = notification_helpers.get_content_item_followers(user.email, thread_id)
+
+    if parent_id:
+        # Get email addresses for all users following the top level comment (excluding user who made the comment)
+        top_level_comment_followers = notification_helpers.get_top_level_comment_followers(user.email, thread_id, parent_id)
     else:
-        # Get all the org admin users (excluding the user who made the comment)
-        users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
+        top_level_comment_followers = []
+
+    # Combine all lists
+    users = list(set(admin_users + content_item_followers + top_level_comment_followers))
+
+    # Remove any users who have specifically muted the thread
+    if parent_id:
+        top_level_comment_mutees = notification_helpers.get_top_level_comment_mutees(thread_id, parent_id)
+        for mutee in top_level_comment_mutees:
+            if mutee in users:
+                try:
+                    users.remove(mutee)
+                except ValueError, e:
+                    continue
 
     if users:
         send_notification_emails(
@@ -167,70 +209,6 @@ def notify_admins(owner_org, user, template, content_type, content_item_id, comm
                 'url': get_content_item_link(content_type, content_item_id, comment_id)
             }
         )
-
-
-def notify_admins_and_other_commenters(owner_org, user, template, content_type, content_item_id, parent_id, comment_id):
-    """
-
-    :param owner_org: organization.id of the content item owner
-    :param user: c.user_obj of the user who submitted the comment
-    :param template: string indicating which email template to use
-    :param content_type: string dataset or datarequest
-    :param content_item_id: UUID of the content item
-    :param parent_id: ID of the comment thread parent (used to determine other commenters in thread)
-    :param comment_id: ID of the comment submitted (used in URL of email body)
-    :return:
-    """
-    if content_type == 'dataset':
-        author_email = get_dataset_author_email(content_item_id)
-        admin_users = [author_email] if author_email else []
-    else:
-        # Get all the org admin users (excluding the user who made the comment)
-        admin_users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
-
-    # Get all the other commenters (excluding the user who made the comment)
-    other_commenters = get_other_commenters(parent_id, user.email)
-
-    # Combine the two lists
-    users = list(set(admin_users + other_commenters))
-
-    if users:
-        send_notification_emails(
-            users,
-            template,
-            {
-                'url': get_content_item_link(content_type, content_item_id, comment_id)
-            }
-        )
-
-
-def get_other_commenters(parent_id, commenter_email):
-    """
-    Queries the database to find other commenters for a given thread
-    :param parent_id: ID of the comment thread parent
-    :param commenter_email: Email address of the user who submitted the comment
-    :return:
-    """
-    session = model.Session
-
-    comments = (
-        session.query(
-            model.User.email
-        )
-        .join(
-            Comment,
-            Comment.user_id == model.User.id
-        )
-        .join(
-            CommentThread,
-            Comment.thread_id == CommentThread.id
-        )
-        .filter(model.User.email != commenter_email)
-        .filter((Comment.parent_id == parent_id) | (Comment.id == parent_id))
-        .group_by(model.User.email)
-    )
-
-    return [email[0] for email in comments.all()]
 
 
 def get_content_item_link(content_type, content_item_id, comment_id=None):
