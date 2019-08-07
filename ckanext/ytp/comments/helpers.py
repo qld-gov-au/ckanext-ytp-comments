@@ -1,4 +1,6 @@
 import ckan.plugins.toolkit as toolkit
+import logging
+import sqlalchemy
 
 from ckan.common import config
 from profanityfilter import ProfanityFilter
@@ -6,6 +8,9 @@ from ckan.common import c
 from ckan.lib.base import render
 from ckan.logic import check_access, get_action
 from ckanext.datarequests import actions
+
+_and_ = sqlalchemy.and_
+log = logging.getLogger(__name__)
 
 
 def threaded_comments_enabled():
@@ -82,3 +87,8 @@ def get_org_id(content_type):
 
 def get_content_item_id(content_type):
     return c.datarequest['id'] if content_type == 'datarequest' else c.pkg.name
+
+
+def get_user_id():
+    user = toolkit.c.userobj
+    return user.id

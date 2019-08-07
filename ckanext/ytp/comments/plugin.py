@@ -4,6 +4,7 @@ from ckan.logic import get_action
 from ckan.plugins import implements, toolkit
 
 import helpers
+import notification_helpers
 import logging
 
 log = logging.getLogger(__name__)
@@ -36,6 +37,7 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
             'user_can_edit_comment': helpers.user_can_edit_comment,
             'user_can_manage_comments': helpers.user_can_manage_comments,
             'get_org_id': helpers.get_org_id,
+            'user_comment_follow_mute_status': notification_helpers.get_user_comment_follow_mute_status
         }
 
     def get_actions(self):
@@ -83,6 +85,10 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
         map.connect('/comment/{comment_id}/flag', controller=controller, action='flag')
         # Un-flag a comment as inappropriate
         map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/unflag', controller=controller, action='unflag')
+        # Routes for following and muting comment notifications
+        notification_controller = 'ckanext.ytp.comments.notification_controller:NotificationController'
+        map.connect('/comments/{thread_or_comment_id}/follow', controller=notification_controller, action='follow')
+        map.connect('/comments/{thread_or_comment_id}/mute', controller=notification_controller, action='mute')
         return map
 
     def _get_comment_thread(self, dataset_name, content_type='dataset'):
