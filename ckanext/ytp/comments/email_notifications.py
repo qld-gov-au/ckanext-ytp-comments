@@ -179,27 +179,31 @@ def notify_admins_and_comment_notification_recipients(owner_org, user, template,
 
     admin_users = get_admins(owner_org, user, content_type, content_item_id)
 
-    # Get email addresses for all users following the content item (excluding user who made the comment)
-    content_item_followers = notification_helpers.get_content_item_followers(user.email, thread_id)
+    if notification_helpers.comment_notification_recipients_enabled():
+        # Get email addresses for all users following the content item (excluding user who made the comment)
+        content_item_followers = notification_helpers.get_content_item_followers(user.email, thread_id)
 
-    if parent_id:
-        # Get email addresses for all users following the top level comment (excluding user who made the comment)
-        top_level_comment_followers = notification_helpers.get_top_level_comment_followers(user.email, thread_id, parent_id)
+        if parent_id:
+            # Get email addresses for all users following the top level comment (excluding user who made the comment)
+            top_level_comment_followers = notification_helpers.get_top_level_comment_followers(user.email, thread_id, parent_id)
+        else:
+            top_level_comment_followers = []
+
+    if notification_helpers.comment_notification_recipients_enabled():
+        # Combine all lists
+        users = list(set(admin_users + content_item_followers + top_level_comment_followers))
+
+        # Remove any users who have specifically muted the thread
+        if parent_id:
+            top_level_comment_mutees = notification_helpers.get_top_level_comment_mutees(thread_id, parent_id)
+            for mutee in top_level_comment_mutees:
+                if mutee in users:
+                    try:
+                        users.remove(mutee)
+                    except ValueError, e:
+                        continue
     else:
-        top_level_comment_followers = []
-
-    # Combine all lists
-    users = list(set(admin_users + content_item_followers + top_level_comment_followers))
-
-    # Remove any users who have specifically muted the thread
-    if parent_id:
-        top_level_comment_mutees = notification_helpers.get_top_level_comment_mutees(thread_id, parent_id)
-        for mutee in top_level_comment_mutees:
-            if mutee in users:
-                try:
-                    users.remove(mutee)
-                except ValueError, e:
-                    continue
+        users = list(set(admin_users))
 
     if users:
         send_notification_emails(

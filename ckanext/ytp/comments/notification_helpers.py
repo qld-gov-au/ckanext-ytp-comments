@@ -2,6 +2,7 @@ import ckan.model as model
 import logging
 import sqlalchemy
 
+from ckan.common import config
 from model import Comment, CommentThread
 from notification_models import CommentNotificationRecipient
 
@@ -10,8 +11,7 @@ log = logging.getLogger(__name__)
 
 
 def comment_notification_recipients_enabled():
-    # @todo: check the database tables exist
-    return True
+    return config.get('ckan.comments.follow_mute_enabled', False)
 
 
 def get_thread_comment_or_both(thread_or_comment_id):
@@ -137,7 +137,6 @@ def mute_comment_thread_for_user(user_id, thread_id, comment_id):
     add_comment_notification_record(user_id, thread_id, comment_id, 'top_level_comment', 'mute')
 
 
-
 def process_follow_request(user_id, thread, comment, existing_record, notification_level):
 
     following_content_item, \
@@ -194,25 +193,30 @@ def process_mute_request(user_id, thread, comment, existing_record, notification
 
 
 def get_comment_notification_recipients(action, user_email, thread_id, comment_id=None):
-    if not comment_id:
-        comment_id = u''
+    try:
+        if not comment_id:
+            comment_id = u''
 
-    session = model.Session
-    emails = (
-        session.query(
-            model.User.email
+        session = model.Session
+        emails = (
+            session.query(
+                model.User.email
+            )
+            .join(
+                CommentNotificationRecipient,
+                CommentNotificationRecipient.user_id == model.User.id
+            )
+            .filter(CommentNotificationRecipient.thread_id == thread_id)
+            .filter(CommentNotificationRecipient.comment_id == comment_id)
+            .filter(CommentNotificationRecipient.action == action)
+            .filter(model.User.email != user_email)
+            .group_by(model.User.email)
         )
-        .join(
-            CommentNotificationRecipient,
-            CommentNotificationRecipient.user_id == model.User.id
-        )
-        .filter(CommentNotificationRecipient.thread_id == thread_id)
-        .filter(CommentNotificationRecipient.comment_id == comment_id)
-        .filter(CommentNotificationRecipient.action == action)
-        .filter(model.User.email != user_email)
-        .group_by(model.User.email)
-    )
-    return [email[0] for email in emails.all()]
+        return [email[0] for email in emails.all()]
+    except Exception, e:
+        log.error('Exception raised in `get_comment_notification_recipients`')
+        log.error(str(e))
+    return []
 
 
 def get_content_item_followers(user_email, thread_id):
@@ -224,7 +228,4 @@ def get_top_level_comment_followers(user_email, thread_id, comment_id):
 
 
 def get_top_level_comment_mutees(thread_id, comment_id):
-    print('>>>> func get_top_level_comment_mutees')
-    print('>>>> thread_id %s' % thread_id)
-    print('>>>> comment_id %s' % comment_id)
     return get_comment_notification_recipients('mute', None, thread_id, comment_id)

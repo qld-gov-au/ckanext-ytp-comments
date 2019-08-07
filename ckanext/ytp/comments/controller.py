@@ -135,12 +135,13 @@ class CommentController(BaseController):
                     res['id']
                 )
 
-                if comment_type == 'reply':
-                    # Add the user who submitted the reply to comment notifications for this thread
-                    notification_helpers.add_commenter_to_comment_notifications(toolkit.c.userobj.id, res['thread_id'], res['parent_id'])
-                else:
-                    # Add the user who submitted the comment notifications for this new thread
-                    notification_helpers.add_commenter_to_comment_notifications(toolkit.c.userobj.id, res['thread_id'], res['id'])
+                if notification_helpers.comment_notification_recipients_enabled():
+                    if comment_type == 'reply':
+                        # Add the user who submitted the reply to comment notifications for this thread
+                        notification_helpers.add_commenter_to_comment_notifications(toolkit.c.userobj.id, res['thread_id'], res['parent_id'])
+                    else:
+                        # Add the user who submitted the comment notifications for this new thread
+                        notification_helpers.add_commenter_to_comment_notifications(toolkit.c.userobj.id, res['thread_id'], res['id'])
 
             h.redirect_to(
                 helpers.get_redirect_url(
