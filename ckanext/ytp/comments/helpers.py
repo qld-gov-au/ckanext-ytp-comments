@@ -1,4 +1,3 @@
-import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 import logging
 import sqlalchemy
@@ -9,8 +8,6 @@ from ckan.common import c
 from ckan.lib.base import render
 from ckan.logic import check_access, get_action
 from ckanext.datarequests import actions
-from notification_models import CommentNotificationRecipient
-from psycopg2 import ProgrammingError
 
 _and_ = sqlalchemy.and_
 log = logging.getLogger(__name__)
