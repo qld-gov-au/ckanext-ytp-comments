@@ -47,7 +47,8 @@ def get_existing_record(user_id, thread_id, comment_id=None):
                 CommentNotificationRecipient.user_id == user_id,
                 CommentNotificationRecipient.thread_id == thread_id,
                 CommentNotificationRecipient.comment_id == comment_id
-        ))
+            )
+        )
     ).first()
 
     return record
@@ -63,7 +64,8 @@ def get_comment_notification_records_for_user(user_id, thread_id):
                 _and_(
                     CommentNotificationRecipient.user_id == user_id,
                     CommentNotificationRecipient.thread_id == thread_id
-            ))
+                )
+            )
         )
         return records
     except Exception, e:

@@ -8,7 +8,6 @@ import notification_helpers
 
 from ckan.common import config
 from ckan.lib.base import render_jinja2
-from notification_models import CommentNotificationRecipient
 
 
 log1 = logging.getLogger(__name__)
@@ -200,7 +199,7 @@ def notify_admins_and_comment_notification_recipients(owner_org, user, template,
                 if mutee in users:
                     try:
                         users.remove(mutee)
-                    except ValueError, e:
+                    except ValueError:
                         continue
     else:
         users = list(set(admin_users))
