@@ -4,7 +4,6 @@ import datetime
 from sqlalchemy import Table, Column, MetaData
 from sqlalchemy import types
 from sqlalchemy.orm import mapper
-from ckan.lib.base import *
 from ckan.model.types import make_uuid
 
 log = __import__('logging').getLogger(__name__)
