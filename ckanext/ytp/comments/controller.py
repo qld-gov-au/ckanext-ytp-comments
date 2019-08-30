@@ -4,6 +4,7 @@ import email_notifications
 import ckan.plugins.toolkit as toolkit
 import model as comment_model
 import helpers
+import notification_helpers
 
 from ckan.lib.base import h, BaseController, abort, request
 from ckan import model
@@ -123,25 +124,24 @@ class CommentController(BaseController):
                 abort(403)
 
             if success:
-                if comment_type == 'reply':
-                    email_notifications.notify_admins_and_other_commenters(
-                        helpers.get_org_id(content_type),
-                        toolkit.c.userobj,
-                        'notification-new-comment',
-                        content_type,
-                        helpers.get_content_item_id(content_type),
-                        res['parent_id'],
-                        res['id']
-                    )
-                else:
-                    email_notifications.notify_admins(
-                        helpers.get_org_id(content_type),
-                        toolkit.c.userobj,
-                        'notification-new-comment',
-                        content_type,
-                        helpers.get_content_item_id(content_type),
-                        res['id']
-                    )
+                email_notifications.notify_admins_and_comment_notification_recipients(
+                    helpers.get_org_id(content_type),
+                    toolkit.c.userobj,
+                    'notification-new-comment',
+                    content_type,
+                    helpers.get_content_item_id(content_type),
+                    res['thread_id'],
+                    res['parent_id'] if comment_type == 'reply' else None,
+                    res['id']
+                )
+
+                if notification_helpers.comment_notification_recipients_enabled():
+                    if comment_type == 'reply':
+                        # Add the user who submitted the reply to comment notifications for this thread
+                        notification_helpers.add_commenter_to_comment_notifications(toolkit.c.userobj.id, res['thread_id'], res['parent_id'])
+                    else:
+                        # Add the user who submitted the comment notifications for this new thread
+                        notification_helpers.add_commenter_to_comment_notifications(toolkit.c.userobj.id, res['thread_id'], res['id'])
 
             h.redirect_to(
                 helpers.get_redirect_url(
