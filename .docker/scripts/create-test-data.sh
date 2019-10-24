@@ -29,7 +29,7 @@ paster --plugin=ckan user add test_org_member email=test_org_member@localhost pa
 echo "Creating ${TEST_ORG_TITLE} Organisation:"
 
 TEST_ORG=$( \
-    curl -L -s -O- --header "Authorization: ${API_KEY}" \
+    curl -L -s --header "Authorization: ${API_KEY}" \
     --data "name=${TEST_ORG_NAME}&title=${TEST_ORG_TITLE}" \
     ${CKAN_ACTION_URL}/organization_create
 )
@@ -38,15 +38,15 @@ TEST_ORG_ID=$(echo $TEST_ORG | sed -r 's/^(.*)"id": "(.*)",(.*)/\2/')
 
 echo "Assigning test users to ${TEST_ORG_TITLE} Organisation:"
 
-curl -L -s -O- --header "Authorization: ${API_KEY}" \
+curl -L -s --header "Authorization: ${API_KEY}" \
     --data "id=${TEST_ORG_ID}&object=test_org_admin&object_type=user&capacity=admin" \
     ${CKAN_ACTION_URL}/member_create
 
-curl -L -s -O- --header "Authorization: ${API_KEY}" \
+curl -L -s --header "Authorization: ${API_KEY}" \
     --data "id=${TEST_ORG_ID}&object=test_org_editor&object_type=user&capacity=editor" \
     ${CKAN_ACTION_URL}/member_create
 
-curl -L -s -O- --header "Authorization: ${API_KEY}" \
+curl -L -s --header "Authorization: ${API_KEY}" \
     --data "id=${TEST_ORG_ID}&object=test_org_member&object_type=user&capacity=member" \
     ${CKAN_ACTION_URL}/member_create
 
@@ -57,11 +57,11 @@ paster create-test-data -c ${CKAN_INI_FILE}
 
 echo "Assigning test Datasets to Organisation..."
 
-curl -L -s -q -O- --header "Authorization: ${API_KEY}" \
+curl -L -s -q --header "Authorization: ${API_KEY}" \
     --data "id=annakarenina&owner_org=${TEST_ORG_ID}" \
     ${CKAN_ACTION_URL}/package_patch >> /dev/null
 
-curl -L -s -q -O- --header "Authorization: ${API_KEY}" \
+curl -L -s -q --header "Authorization: ${API_KEY}" \
     --data "id=warandpeace&owner_org=${TEST_ORG_ID}" \
     ${CKAN_ACTION_URL}/package_patch >> /dev/null
 ##
@@ -83,7 +83,7 @@ paster --plugin=ckan user add dr_editor email=dr_editor@localhost password=passw
 echo "Creating Data Request Organisation:"
 
 DR_ORG=$( \
-    curl -L -s -O- \
+    curl -L -s \
     --header "Authorization: ${API_KEY}" \
     --data "name=${DR_ORG_NAME}&title=${DR_ORG_TITLE}" \
     ${CKAN_ACTION_URL}/organization_create
@@ -91,17 +91,17 @@ DR_ORG=$( \
 
 DR_ORG_ID=$(echo $DR_ORG | sed -r 's/^(.*)"id": "(.*)",(.*)/\2/')
 
-curl -L -s -O- --header "Authorization: ${API_KEY}" \
+curl -L -s --header "Authorization: ${API_KEY}" \
     --data "id=${DR_ORG_ID}&object=dr_admin&object_type=user&capacity=admin" \
     ${CKAN_ACTION_URL}/member_create
 
-curl -L -s -O- --header "Authorization: ${API_KEY}" \
+curl -L -s --header "Authorization: ${API_KEY}" \
     --data "id=${DR_ORG_ID}&object=dr_editor&object_type=user&capacity=editor" \
     ${CKAN_ACTION_URL}/member_create
 
 echo "Creating test Data Request:"
 
-curl -L -s -O- --header "Authorization: ${API_KEY}" \
+curl -L -s --header "Authorization: ${API_KEY}" \
     --data "title=Test Request&description=This is an example&organization_id=${DR_ORG_ID}" \
     ${CKAN_ACTION_URL}/create_datarequest
 
