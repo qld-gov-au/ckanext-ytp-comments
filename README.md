@@ -8,11 +8,49 @@ A custom CKAN extension for Data.Qld
   - [Docker](https://www.docker.com/)
   - [Pygmy](https://pygmy.readthedocs.io/)
   - [Ahoy](https://github.com/ahoy-cli/ahoy)
-- Make sure that all local web development services are shut down (Apache/Nginx, Mysql, MAMP etc).
+- Make sure that all local web development services are shut down (Apache/Nginx, Mysql, MAMP etc).i.e. ports 80 is open etc
 - Checkout project repository (in one of the [supported Docker directories](https://docs.docker.com/docker-for-mac/osxfs/#access-control)).  
 - `pygmy up`
 - `ahoy build`
+- you may need to use sudo on linux
 
+Building on ubuntu (optional: behind proxy)
+- composer from compose
+  - sudo pip install docker-compose 
+- sudo apt-get install composer 
+- ensure /etc/gemrc has the following
+  ``http_proxy: http://localhost:3128
+    https_proxy: http://localhost:3128``
+- if squid proxy is in use on your machine ensure that ``acl localnet src 172.17.0.0/16``  #  allows your public ip for loopback
+- https://docs.docker.com/network/proxy/
+  ~/.docker/config.json
+  ``
+{
+ "proxies":
+  {
+  "default":
+   {
+     "httpProxy": "http://hostexternalip:3128",
+     "httpsProxy": "http://hostexternalip:3128",
+     "noProxy": ""
+   }
+  }
+}
+``
+  - https://docs.docker.com/config/daemon/systemd/
+    sudo mkdir -p /etc/systemd/system/docker.service.d
+    sudo vi /etc/systemd/system/docker.service.d/http-proxy.conf
+    ``[Service]
+      Environment="HTTP_PROXY=http://localhost:3128/"``
+    sudo vi /etc/systemd/system/docker.service.d/https-proxy.conf
+    ``[Service]
+      Environment="HTTPS_PROXY=http://localhost:3128/"``
+    sudo systemctl daemon-reload
+    sudo systemctl restart docker
+
+
+
+  
 Use `admin`/`password` to login to CKAN.
 
 ## Available `ahoy` commands
