@@ -41,9 +41,9 @@ Feature: Comments
         When I log in
         Then I go to dataset "warandpeace"
         Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
-        Then I submit a comment with subject "Test subject" and comment "Testing that \"sex\" is not blocked"
+        Then I submit a comment with subject "Test subject" and comment "sex"
         Then I take a screenshot
-        Then I should see "Testing that \"sex\" is not blocked" within 10 seconds
+        Then I should see "sex" within 10 seconds
 
     @comment-add
     Scenario: When a logged-in user submits a comment on a Data Request the comment should then be visible on the Comments tab of the Data Request
