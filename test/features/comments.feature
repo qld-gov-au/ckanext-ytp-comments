@@ -31,6 +31,15 @@ Feature: Comments
         Then I submit a comment with subject "Test subject" and comment "Go fuck yourself!"
         Then I should see "Comment blocked due to profanity" within 5 seconds
 
+    @comment-add @comment-profane
+    Scenario: When a logged-in user submits a comment containing whitelisted profanity on a Dataset the comment should display within 10 seconds
+        Given "CKANUser" as the persona
+        When I log in
+        Then I go to dataset "warandpeace"
+        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
+        Then I submit a comment with subject "Test subject" and comment "Testing that 'sex' is not blocked"
+        Then I should see "Testing that 'sex' is not blocked" within 10 seconds
+
     @comment-add
     Scenario: When a logged-in user submits a comment on a Data Request the comment should then be visible on the Comments tab of the Data Request
         Given "CKANUser" as the persona
