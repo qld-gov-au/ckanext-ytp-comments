@@ -23,8 +23,11 @@ def users_can_edit():
 
 def profanity_check(cleaned_comment):
     more_words = load_bad_words()
+    whitelist_words = load_good_words()
 
     pf = ProfanityFilter(extra_censor_list=more_words)
+    for word in whitelist_words:
+        pf.remove_word(word)
     return pf.is_profane(cleaned_comment)
 
 
@@ -33,6 +36,17 @@ def load_bad_words():
     if not filepath:
         import os
         filepath = os.path.dirname(os.path.realpath(__file__)) + '/bad_words.txt'
+    f = open(filepath, 'r')
+    x = f.read().splitlines()
+    f.close()
+    return x
+
+
+def load_good_words():
+    filepath = config.get('ckan.comments.good_words_file', None)
+    if not filepath:
+        import os
+        filepath = os.path.dirname(os.path.realpath(__file__)) + '/good_words.txt'
     f = open(filepath, 'r')
     x = f.read().splitlines()
     f.close()
