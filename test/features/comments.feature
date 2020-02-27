@@ -4,6 +4,7 @@ Feature: Comments
     Scenario: The Add Comment form should not display for a non-logged-in user - instead they see a 'Login to comment' button
         Given "Unathenticated" as the persona
         When I go to dataset "warandpeace"
+        Then I take a screenshot
         Then I should see an element with xpath "//a[contains(string(), 'Login to comment')]"
         And I should not see "Add a comment"
 
@@ -11,6 +12,7 @@ Feature: Comments
         Given "CKANUser" as the persona
         When I log in
         Then I go to dataset "warandpeace"
+        Then I take a screenshot
         Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
 
     @comment-add
@@ -20,6 +22,7 @@ Feature: Comments
         Then I go to dataset "warandpeace"
         Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
         Then I submit a comment with subject "Test subject" and comment "This is a test comment"
+        Then I take a screenshot
         Then I should see "This is a test comment" within 10 seconds
 
     @comment-profane
@@ -29,6 +32,7 @@ Feature: Comments
         And I go to data request "Test Request" comments
         Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
         Then I submit a comment with subject "Test subject" and comment "Go fuck yourself!"
+        Then I take a screenshot
         Then I should see "Comment blocked due to profanity" within 5 seconds
 
     @comment-add @comment-profane
@@ -38,6 +42,7 @@ Feature: Comments
         Then I go to dataset "warandpeace"
         Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
         Then I submit a comment with subject "Test subject" and comment "Testing that \"sex\" is not blocked"
+        Then I take a screenshot
         Then I should see "Testing that \"sex\" is not blocked" within 10 seconds
 
     @comment-add
@@ -47,6 +52,7 @@ Feature: Comments
         And I go to data request "Test Request" comments
         Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
         Then I submit a comment with subject "Test subject" and comment "This is a test comment"
+        Then I take a screenshot
         Then I should see "This is a test comment" within 10 seconds
 
     @comment-report
@@ -75,6 +81,7 @@ Feature: Comments
         When I log in
         Then I go to dataset "warandpeace"
         Then I submit a reply with comment "This is a reply"
+        Then I take a screenshot
         Then I should see "This is a reply" within 10 seconds
 
     @comment-delete
@@ -85,6 +92,7 @@ Feature: Comments
         And I press the element with xpath "//a[@title='Delete comment']"
         Then I should see "Are you sure you want to delete this comment?" within 1 seconds
         Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
+        Then I take a screenshot
         Then I should see "This comment was deleted." within 2 seconds
 
     @comment-delete
@@ -95,4 +103,5 @@ Feature: Comments
         And I press the element with xpath "//a[@title='Delete comment']"
         Then I should see "Are you sure you want to delete this comment?" within 1 seconds
         Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
+        Then I take a screenshot
         Then I should see "This comment was deleted." within 2 seconds
