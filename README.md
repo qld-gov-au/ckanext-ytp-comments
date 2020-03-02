@@ -9,15 +9,15 @@ A custom CKAN extension for Data.Qld
   - [Pygmy](https://pygmy.readthedocs.io/)
   - [Ahoy](https://github.com/ahoy-cli/ahoy)
 - Make sure that all local web development services are shut down (Apache/Nginx, Mysql, MAMP etc).i.e. ports 80 is open etc
-- Checkout project repository (in one of the [supported Docker directories](https://docs.docker.com/docker-for-mac/osxfs/#access-control)).  
+- Checkout project repository (in one of the [supported Docker directories](https://docs.docker.com/docker-for-mac/osxfs/#access-control)).
 - `pygmy up`
 - `ahoy build`
 - you may need to use sudo on linux
 
 Building on ubuntu (optional: behind proxy)
 - composer from compose
-  - sudo pip install docker-compose 
-- sudo apt-get install composer 
+  - sudo pip install docker-compose
+- sudo apt-get install composer
 - ensure /etc/gemrc has the following
   ``http_proxy: http://localhost:3128
     https_proxy: http://localhost:3128``
@@ -49,13 +49,11 @@ Building on ubuntu (optional: behind proxy)
     sudo systemctl restart docker
 
 
-
-  
 Use `admin`/`password` to login to CKAN.
 
 ## Available `ahoy` commands
 Run each command as `ahoy <command>`.
-  ```  
+  ```
    build        Build or rebuild project.
    clean        Remove containers and all build files.
    cli          Start a shell inside CLI container or run a command.
@@ -77,7 +75,7 @@ Run each command as `ahoy <command>`.
   ```
 
 ## Coding standards
-Python code linting uses [flake8](https://github.com/PyCQA/flake8) with configuration captured in `.flake8` file.   
+Python code linting uses [flake8](https://github.com/PyCQA/flake8) with configuration captured in `.flake8` file.
 
 Set `ALLOW_LINT_FAIL=1` in `.env` to allow lint failures.
 
@@ -99,50 +97,66 @@ Custom steps described in `test/features/steps/steps.py`.
 Test scenarios located in `test/features/*.feature` files.
 
 Test environment configuration is located in `test/features/environment.py` and is setup to connect to a remote Chrome
-instance running in a separate Docker container. 
+instance running in a separate Docker container.
 
 During the test, Behaving passes connection information to [Splinter](https://github.com/cobrateam/splinter) which
-instantiates WebDriver object and establishes connection with Chrome instance. All further communications with Chrome 
+instantiates WebDriver object and establishes connection with Chrome instance. All further communications with Chrome
 are handled through this driver, but in a developer-friendly way.
 
 For a list of supported step-definitions, see https://github.com/ggozad/behaving#behavingweb-supported-matcherssteps.
 
 ## Automated builds (Continuous Integration)
-In software engineering, continuous integration (CI) is the practice of merging all developer working copies to a shared mainline several times a day. 
+In software engineering, continuous integration (CI) is the practice of merging all developer working copies to a shared mainline several times a day.
 Before feature changes can be merged into a shared mainline, a complete build must run and pass all tests on CI server.
 
-This project uses [Circle CI](https://circleci.com/) as a CI server: it imports production backups into fully built codebase and runs code linting and tests. When tests pass, a deployment process is triggered for nominated branches (usually, `master` and `develop`).
+This project uses [Circle CI](https://circleci.com/) as a CI server: it imports production backups into fully built codebase and runs code linting and tests.
+When tests pass, a deployment process is triggered for nominated branches (usually, `master` and `develop`).
 
 Add `[skip ci]` to the commit subject to skip CI build. Useful for documentation changes.
 
 ### SSH
-Circle CI supports shell access to the build for 120 minutes after the build is finished when the build is started with SSH support. Use "Rerun job with SSH" button in Circle CI UI to start build with SSH support.
+Circle CI supports shell access to the build for 120 minutes after the build is finished when the build is started with SSH support.
+Use "Rerun job with SSH" button in Circle CI UI to start build with SSH support.
 
 ## Follow / Mute comments
 
-Comment notifications (via email) are managed by opt-in, i.e. without opting in to receive comment notifications at the content item or thread level, only authors or organisation admins will receive email notifications. 
+Comment notifications (via email) are managed by opt-in, i.e. without opting in to receive comment notifications at the content item or thread level,
+only authors or organisation admins will receive email notifications.
 
 This feature allows users to following or mute comments at the content item level or for a specific comment thread on the content item.
 
 When a user follows comments on a content item or content item thread they will receive email notifications when new comments or replies are posted.
 
+### Blacklist Words
+
+Comments are checked using the [profanityfilter](https://github.com/areebbeigh/profanityfilter) Python module; any comments containing profanity are blocked.
+
+'profanityfilter' has a built-in blacklist of words. Additional banned words are contained in `ckanext/ytp/comments/bad_words.txt` by default.
+You can point to another word list by setting `ckan.comments.bad_words_file` in your config.
+
+Any words from the built-in list that you do *not* wish to block are contained in `ckanext/ytp/comments/good_words.txt` by default.
+You can point to another word list by setting `ckan.comments.good_words_file` in your config.
+
 ### Setup
 
-1. Initialise the comment notification receipients database table, e.g.
+1. Initialise the comment notification recipients database table, e.g.
 
         cd /usr/lib/ckan/default/src/ckanext-ytp-comments # Your PATH may vary
-        
+
         paster init_notifications_db -c /etc/ckan/default/development.ini # Use YOUR path and relevant CKAN .ini file
 
     This will create a new table in the CKAN database named `comment_notification_recipient` that holds the status of individual user's follow or mute preferences.
-    
+
     *Note:* if your deployment process does not run `python setup.py develop` after deploying code changes for extensions, you may need to run this in order for paster to recognise the `init_notifications_db` command:
 
         python setup.py develop
 
-2. Add the following config setting to your CKAN `.ini` file:
+2. Add the following config settings to your CKAN `.ini` file:
 
         ckan.comments.follow_mute_enabled = True
+        # Optional
+        ckan.comments.bad_words_file = /path/to/blacklist_words.txt
+        ckan.comments.good_words_file = /path/to/whitelist_words.txt
 
 3. Restart CKAN
 
