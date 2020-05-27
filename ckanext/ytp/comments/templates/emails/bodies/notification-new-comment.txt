@@ -1,5 +1,9 @@
 A comment has been made on the Queensland Government open data portal that may be relevant to you.
 
+Dataset name: {{ title }}
+Dataset comment:
+{{ comment }}
+
 {{ url }}
 
 Do not reply to this email.

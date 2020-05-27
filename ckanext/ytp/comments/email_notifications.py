@@ -5,6 +5,7 @@ import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 import logging
 import notification_helpers
+import ckanext.ytp.comments.util as util
 
 from ckan.common import config
 from ckan.lib.base import render_jinja2
@@ -151,7 +152,7 @@ def get_admins(owner_org, user, content_type, content_item_id):
     return users
 
 
-def notify_admins(owner_org, user, template, content_type, content_item_id, comment_id):
+def notify_admins(owner_org, user, template, content_type, content_item_id, comment_id, title, comment):
     """
 
     :param owner_org: organization.id of the content item owner
@@ -169,12 +170,14 @@ def notify_admins(owner_org, user, template, content_type, content_item_id, comm
             admin_users,
             template,
             {
-                'url': get_content_item_link(content_type, content_item_id, comment_id)
+                'url': get_content_item_link(content_type, content_item_id, comment_id),
+                'title': title,
+                'comment': util.convert_html_to_text(comment)
             }
         )
 
 
-def notify_admins_and_comment_notification_recipients(owner_org, user, template, content_type, content_item_id, thread_id, parent_id, comment_id):
+def notify_admins_and_comment_notification_recipients(owner_org, user, template, content_type, content_item_id, thread_id, parent_id, comment_id, title, comment):
 
     admin_users = get_admins(owner_org, user, content_type, content_item_id)
 
@@ -209,7 +212,9 @@ def notify_admins_and_comment_notification_recipients(owner_org, user, template,
             users,
             template,
             {
-                'url': get_content_item_link(content_type, content_item_id, comment_id)
+                'url': get_content_item_link(content_type, content_item_id, comment_id),
+                'title': title,
+                'comment': util.convert_html_to_text(comment)
             }
         )
 
