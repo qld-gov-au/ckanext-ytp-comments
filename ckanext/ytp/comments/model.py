@@ -199,6 +199,11 @@ class Comment(Base):
 
     flagged = Column(types.Boolean, default=False)
 
+    deleted_by_user_id = Column(types.UnicodeText, ForeignKey(model.User.id), nullable=True)
+    
+    comment_user = relationship(model.User, foreign_keys=user_id)
+    comment_deleted_by_user = relationship(model.User, foreign_keys=deleted_by_user_id)
+
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -226,11 +231,11 @@ class Comment(Base):
         if has any
         """
         name = 'anonymous'
-        u = model.User.get(self.user_id)
-        if u:
-            name = u.fullname
-            user_login_name = u.name
-            user_state = u.state
+        if self.comment_user:
+            name = self.comment_user.fullname
+            user_login_name = self.comment_user.name
+            user_state = self.comment_user.state
+
 
         # Hack
         if name == config.get('ckan.site_id', 'ckan_site_user') or not name:
@@ -256,6 +261,11 @@ class Comment(Base):
         d['flagged'] = self.flagged
         if self.parent_id:
             d['parent_id'] = self.parent_id
+        if self.comment_deleted_by_user:
+            d['deleted_by_user_id'] = self.deleted_by_user_id
+            d['deleted_username'] = self.comment_deleted_by_user.fullname
+            d['deleted_user_state'] = self.comment_deleted_by_user.state
+            d['deleted_user_login_name'] = self.comment_deleted_by_user.name
         return d
 
     @classmethod

@@ -30,14 +30,15 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
 
     def get_helpers(self):
         return {
-            'get_comment_thread': self._get_comment_thread,
-            'get_comment_count_for_dataset': self._get_comment_count_for_dataset,
+            'get_comment_thread': helpers.get_comment_thread,
+            'get_content_type_comments_badge': helpers.get_content_type_comments_badge,
             'threaded_comments_enabled': helpers.threaded_comments_enabled,
             'users_can_edit': helpers.users_can_edit,
             'user_can_edit_comment': helpers.user_can_edit_comment,
             'user_can_manage_comments': helpers.user_can_manage_comments,
             'get_org_id': helpers.get_org_id,
-            'user_comment_follow_mute_status': notification_helpers.get_user_comment_follow_mute_status
+            'user_comment_follow_mute_status': notification_helpers.get_user_comment_follow_mute_status,
+            'ytp_comments_show_comments_tab_page': helpers.show_comments_tab_page
         }
 
     def get_actions(self):
@@ -76,6 +77,8 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
             /dataset/NAME/comments/add
         """
         controller = 'ckanext.ytp.comments.controller:CommentController'
+        if helpers.show_comments_tab_page():
+            map.connect('dataset_comments', '/dataset/{dataset_id}/comments', controller=controller, action='dataset_comments', ckan_icon='comment')
         map.connect('/dataset/{dataset_id}/comments/add', controller=controller, action='add')
         map.connect('/{content_type}/{dataset_id}/comments/add', controller=controller, action='add')
         map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/edit', controller=controller, action='edit')
@@ -90,12 +93,3 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
         map.connect('/comments/{thread_or_comment_id}/follow', controller=notification_controller, action='follow')
         map.connect('/comments/{thread_or_comment_id}/mute', controller=notification_controller, action='mute')
         return map
-
-    def _get_comment_thread(self, dataset_name, content_type='dataset'):
-        url = '/%s/%s' % (content_type, dataset_name)
-        return get_action('thread_show')({'model': model, 'with_deleted': True}, {'url': url})
-
-    def _get_comment_count_for_dataset(self, dataset_name, content_type='dataset'):
-        url = '/%s/%s' % (content_type, dataset_name)
-        count = get_action('comment_count')({'model': model}, {'url': url})
-        return count
