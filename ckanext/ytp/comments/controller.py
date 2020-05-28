@@ -132,7 +132,9 @@ class CommentController(BaseController):
                     helpers.get_content_item_id(content_type),
                     res['thread_id'],
                     res['parent_id'] if comment_type == 'reply' else None,
-                    res['id']
+                    res['id'],
+                    c.pkg_dict['title'] if content_type == 'dataset' else c.datarequest['title'],
+                    res['content'] # content is the comment that has been cleaned up in the action comment_create
                 )
 
                 if notification_helpers.comment_notification_recipients_enabled():
