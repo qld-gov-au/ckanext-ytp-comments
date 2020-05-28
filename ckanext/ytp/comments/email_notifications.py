@@ -152,7 +152,7 @@ def get_admins(owner_org, user, content_type, content_item_id):
     return users
 
 
-def notify_admins(owner_org, user, template, content_type, content_item_id, comment_id, title, comment):
+def notify_admins(owner_org, user, template, content_type, content_item_id, comment_id, dataset_title, comment):
     """
 
     :param owner_org: organization.id of the content item owner
@@ -171,13 +171,13 @@ def notify_admins(owner_org, user, template, content_type, content_item_id, comm
             template,
             {
                 'url': get_content_item_link(content_type, content_item_id, comment_id),
-                'title': title,
-                'comment': util.convert_html_to_text(comment)
+                'dataset_title': dataset_title,
+                'comment_text': util.remove_HTML_markup(comment)
             }
         )
 
 
-def notify_admins_and_comment_notification_recipients(owner_org, user, template, content_type, content_item_id, thread_id, parent_id, comment_id, title, comment):
+def notify_admins_and_comment_notification_recipients(owner_org, user, template, content_type, content_item_id, thread_id, parent_id, comment_id, dataset_title, comment):
 
     admin_users = get_admins(owner_org, user, content_type, content_item_id)
 
@@ -213,8 +213,8 @@ def notify_admins_and_comment_notification_recipients(owner_org, user, template,
             template,
             {
                 'url': get_content_item_link(content_type, content_item_id, comment_id),
-                'title': title,
-                'comment': util.convert_html_to_text(comment)
+                'dataset_title': dataset_title,
+                'comment_text': util.remove_HTML_markup(comment)
             }
         )
 

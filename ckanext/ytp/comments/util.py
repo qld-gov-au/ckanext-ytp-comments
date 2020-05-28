@@ -29,9 +29,9 @@ def clean_input(comment):
             message = template.format(type(e).__name__, e.args)
             log.debug(message)
 
-def convert_html_to_text(text):
+def remove_HTML_markup(text):
     try:
-        # Returns the text content of the element, including the text content of its children, with no markup.
+        # Returns the text content of the element, including the text content of its children, with no HTML markup.
         return fromstring(text.replace('<br/>', '\n')).text_content()
     except Exception, e:
         if type(e).__name__ == "ParserError":
