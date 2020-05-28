@@ -73,7 +73,7 @@ def check_content_access(content_type, context, data_dict):
 def get_redirect_url(content_type, content_item_id, anchor):
     return '/%s/%s#%s' % (
         'datarequest/comment' if content_type == 'datarequest' else 'dataset',
-        content_item_id if not show_comments_tab_page() else content_item_id + '/comments',
+        content_item_id + '/comments' if show_comments_tab_page() else content_item_id,
         anchor
     )
 
