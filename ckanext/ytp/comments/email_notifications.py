@@ -152,7 +152,7 @@ def get_admins(owner_org, user, content_type, content_item_id):
     return users
 
 
-def notify_admins_and_comment_notification_recipients(owner_org, user, template, content_type, content_item_id, thread_id, parent_id, comment_id, content_title, comment):
+def notify_admins_and_comment_notification_recipients(owner_org, user, template, content_type, content_item_id, thread_id, parent_id, comment_id, content_item_title, comment):
 
     admin_users = get_admins(owner_org, user, content_type, content_item_id)
 
@@ -188,7 +188,7 @@ def notify_admins_and_comment_notification_recipients(owner_org, user, template,
             template,
             {
                 'url': get_content_item_link(content_type, content_item_id, comment_id),
-                'content_title': content_title,
+                'content_item_title': content_item_title,
                 'comment_text': util.remove_HTML_markup(comment)
             }
         )
