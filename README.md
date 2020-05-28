@@ -142,7 +142,8 @@ You can point to another word list by setting `ckan.comments.good_words_file` in
 1. Initialise the comment notification recipients database table, e.g.
 
         cd /usr/lib/ckan/default/src/ckanext-ytp-comments # Your PATH may vary
-
+        paster initdb -c /etc/ckan/default/development.ini # Use YOUR path and relevant CKAN .ini file
+        paster updatedb -c /etc/ckan/default/development.ini # Use YOUR path and relevant CKAN .ini file
         paster init_notifications_db -c /etc/ckan/default/development.ini # Use YOUR path and relevant CKAN .ini file
 
     This will create a new table in the CKAN database named `comment_notification_recipient` that holds the status of individual user's follow or mute preferences.
