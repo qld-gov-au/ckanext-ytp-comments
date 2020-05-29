@@ -8,6 +8,7 @@ from ckan.common import c
 from ckan.lib.base import render
 from ckan.logic import check_access, get_action
 from ckanext.datarequests import actions
+import ckan.model as model
 
 _and_ = sqlalchemy.and_
 log = logging.getLogger(__name__)
@@ -110,3 +111,19 @@ def get_content_item_id(content_type):
 def get_user_id():
     user = toolkit.c.userobj
     return user.id
+
+
+def get_comment_thread(dataset_name, content_type='dataset'):
+    url = '/%s/%s' % (content_type, dataset_name)
+    return get_action('thread_show')({'model': model, 'with_deleted': True}, {'url': url})
+
+
+def get_comment_count_for_dataset(dataset_name, content_type='dataset'):
+    url = '/%s/%s' % (content_type, dataset_name)
+    count = get_action('comment_count')({'model': model}, {'url': url})
+    return count
+
+
+def get_content_type_comments_badge(dataset_name, content_type='dataset'):
+    comments_count = get_comment_count_for_dataset(dataset_name, content_type)
+    return toolkit.render_snippet('snippets/count_badge.html',  {'count': comments_count})
