@@ -37,7 +37,8 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
             'user_can_edit_comment': helpers.user_can_edit_comment,
             'user_can_manage_comments': helpers.user_can_manage_comments,
             'get_org_id': helpers.get_org_id,
-            'user_comment_follow_mute_status': notification_helpers.get_user_comment_follow_mute_status
+            'user_comment_follow_mute_status': notification_helpers.get_user_comment_follow_mute_status,
+            'ytp_comments_show_comments_tab_page': helpers.show_comments_tab_page
         }
 
     def get_actions(self):
@@ -76,6 +77,8 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
             /dataset/NAME/comments/add
         """
         controller = 'ckanext.ytp.comments.controller:CommentController'
+        if helpers.show_comments_tab_page():
+            map.connect('dataset_comments', '/dataset/{dataset_id}/comments', controller=controller, action='dataset_comments', ckan_icon='comment')
         map.connect('/dataset/{dataset_id}/comments/add', controller=controller, action='add')
         map.connect('/{content_type}/{dataset_id}/comments/add', controller=controller, action='add')
         map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/edit', controller=controller, action='edit')

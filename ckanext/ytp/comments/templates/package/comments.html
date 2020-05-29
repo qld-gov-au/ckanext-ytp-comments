@@ -1,0 +1,7 @@
+{% extends "package/read.html" %}
+
+{% block primary_content_inner %}
+
+  {% snippet "package/comment_list.html", pkg_id=c.pkg.id, pkg_name=c.pkg.name, userobj=c.userobj %}
+
+{% endblock %}
