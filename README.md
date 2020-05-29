@@ -158,6 +158,8 @@ You can point to another word list by setting `ckan.comments.good_words_file` in
         # Optional
         ckan.comments.bad_words_file = /path/to/blacklist_words.txt
         ckan.comments.good_words_file = /path/to/whitelist_words.txt
+        # To display dataset comments on a datasets tab page instead of below the dataset additional information, set to True
+        ckan.comments.show_comments_tab_page = True # Defaults to False
 
 3. Restart CKAN
 

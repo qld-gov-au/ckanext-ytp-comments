@@ -21,6 +21,10 @@ def users_can_edit():
     return toolkit.asbool(config.get('ckan.comments.users_can_edit', False))
 
 
+def show_comments_tab_page():
+    return toolkit.asbool(config.get('ckan.comments.show_comments_tab_page', False))
+
+
 def profanity_check(cleaned_comment):
     more_words = load_bad_words()
     whitelist_words = load_good_words()
@@ -69,7 +73,7 @@ def check_content_access(content_type, context, data_dict):
 def get_redirect_url(content_type, content_item_id, anchor):
     return '/%s/%s#%s' % (
         'datarequest/comment' if content_type == 'datarequest' else 'dataset',
-        content_item_id,
+        content_item_id + '/comments' if show_comments_tab_page() else content_item_id,
         anchor
     )
 

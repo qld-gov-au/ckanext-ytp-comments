@@ -236,3 +236,18 @@ class CommentController(BaseController):
             h.redirect_to(str('/dataset/%s#comment_%s' % (content_item_id, comment_id)))
 
         return helpers.render_content_template(content_type)
+
+    def dataset_comments(self, dataset_id):
+        context = {'model': model, 'user': c.user}
+
+        data_dict = {'id': dataset_id}
+        content_type = 'dataset'
+        # Auth check to make sure the user can see this content item
+        helpers.check_content_access(content_type, context, data_dict)
+
+        try:
+            # Load the content item
+            helpers.get_content_item(content_type, context, data_dict)
+        except:
+            abort(403)
+        return toolkit.render('package/comments.html')
