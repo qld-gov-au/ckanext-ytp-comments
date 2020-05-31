@@ -203,11 +203,14 @@ def get_content_item_link(content_type, content_item_id, comment_id=None):
     :param comment_id: string `comment`.`id`
     :return:
     """
-    url = ''
+    # Default to the dataset route as this is the way `ckanext-ytp-comments` always worked
+    url = toolkit.url_for('dataset_read', id=content_item_id, qualified=True)
     if content_type == 'datarequest':
         url = toolkit.url_for('comment_datarequest', id=content_item_id, qualified=True)
-    else:
-        url = toolkit.url_for('dataset_read', id=content_item_id, qualified=True)
+    elif toolkit.asbool(config.get('ckan.comments.show_comments_tab_page', False)):
+        # Not sure why `url_for` won't recognise "dataset_comments" as a named route, even though it is named in
+        # the plugins.py "before_map" function as such, so we do this:
+        url += '/comments'
     if comment_id:
         url += '#comment_' + str(comment_id)
     return url
