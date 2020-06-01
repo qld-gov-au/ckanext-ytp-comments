@@ -30,8 +30,8 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
 
     def get_helpers(self):
         return {
-            'get_comment_thread': self._get_comment_thread,
-            'get_comment_count_for_dataset': self._get_comment_count_for_dataset,
+            'get_comment_thread': helpers.get_comment_thread,
+            'get_content_type_comments_badge': helpers.get_content_type_comments_badge,
             'threaded_comments_enabled': helpers.threaded_comments_enabled,
             'users_can_edit': helpers.users_can_edit,
             'user_can_edit_comment': helpers.user_can_edit_comment,
@@ -93,12 +93,3 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
         map.connect('/comments/{thread_or_comment_id}/follow', controller=notification_controller, action='follow')
         map.connect('/comments/{thread_or_comment_id}/mute', controller=notification_controller, action='mute')
         return map
-
-    def _get_comment_thread(self, dataset_name, content_type='dataset'):
-        url = '/%s/%s' % (content_type, dataset_name)
-        return get_action('thread_show')({'model': model, 'with_deleted': True}, {'url': url})
-
-    def _get_comment_count_for_dataset(self, dataset_name, content_type='dataset'):
-        url = '/%s/%s' % (content_type, dataset_name)
-        count = get_action('comment_count')({'model': model}, {'url': url})
-        return count
