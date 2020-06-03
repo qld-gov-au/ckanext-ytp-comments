@@ -30,6 +30,14 @@ def go_to_dataset(context, name):
     when_i_visit_url(context, '/dataset/' + name)
 
 
+@step(u'I go to dataset "{name}" comments')
+def go_to_data_request_comments(context, name):
+    context.execute_steps(u"""
+        When I go to dataset "%s"
+        And I click the link with text that contains "Comments"
+    """ % (name))
+
+
 @step(u'I go to the data requests page')
 def go_to_data_requests_page(context):
     when_i_visit_url(context, '/datarequest')
