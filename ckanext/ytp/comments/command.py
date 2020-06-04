@@ -54,7 +54,7 @@ class InitNotificationsDB(CkanCommand):
 
 class UpdateDBCommand(CkanCommand):
     """
-    Updates the database tables    
+    Updates the database tables
     """
     summary = __doc__.split('\n')[0]
     usage = __doc__
@@ -71,7 +71,7 @@ class UpdateDBCommand(CkanCommand):
         model.Session.remove()
         model.Session.configure(bind=model.meta.engine)
 
-        from sqlalchemy import Column, types, MetaData, DDL
+        from sqlalchemy import MetaData, DDL
         meta = MetaData(bind=model.Session.get_bind(), reflect=True)
 
         if 'comment' in meta.tables and 'deleted_by_user_id' not in meta.tables['comment'].columns:

@@ -200,7 +200,7 @@ class Comment(Base):
     flagged = Column(types.Boolean, default=False)
 
     deleted_by_user_id = Column(types.UnicodeText, ForeignKey(model.User.id), nullable=True)
-    
+
     comment_user = relationship(model.User, foreign_keys=user_id)
     comment_deleted_by_user = relationship(model.User, foreign_keys=deleted_by_user_id)
 
@@ -235,7 +235,6 @@ class Comment(Base):
             name = self.comment_user.fullname
             user_login_name = self.comment_user.name
             user_state = self.comment_user.state
-
 
         # Hack
         if name == config.get('ckan.site_id', 'ckan_site_user') or not name:

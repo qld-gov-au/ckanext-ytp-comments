@@ -1,6 +1,4 @@
 import ckan.plugins as plugins
-import ckan.model as model
-from ckan.logic import get_action
 from ckan.plugins import implements, toolkit
 
 import helpers

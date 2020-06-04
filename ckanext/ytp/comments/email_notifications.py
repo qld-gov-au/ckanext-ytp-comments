@@ -152,6 +152,7 @@ def get_admins(owner_org, user, content_type, content_item_id):
         users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
     return users
 
+
 @maintain.deprecated('notify_admins is deprecated please use notify_admins_and_comment_notification_recipients')
 def notify_admins(owner_org, user, template, content_type, content_item_id, comment_id):
     """
