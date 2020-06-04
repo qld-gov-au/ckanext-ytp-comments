@@ -6,6 +6,7 @@ import ckan.plugins.toolkit as toolkit
 import logging
 import notification_helpers
 import ckanext.ytp.comments.util as util
+import ckan.lib.maintain as maintain
 
 from ckan.common import config
 from ckan.lib.base import render_jinja2
@@ -152,6 +153,30 @@ def get_admins(owner_org, user, content_type, content_item_id):
     return users
 
 
+@maintain.deprecated('notify_admins is deprecated please use notify_admins_and_comment_notification_recipients')
+def notify_admins(owner_org, user, template, content_type, content_item_id, comment_id):
+    """
+    Warning: this function has been deprecated - please use `notify_admins_and_comment_notification_recipients`
+    :param owner_org: organization.id of the content item owner
+    :param user: c.user_obj of the user who submitted the comment
+    :param template: string indicating which email template to use
+    :param content_type: string dataset or datarequest
+    :param content_item_id: UUID of the content item
+    :param comment_id: ID of the comment submitted (used in URL of email body)
+    :return:
+    """
+    admin_users = get_admins(owner_org, user, content_type, content_item_id)
+
+    if admin_users:
+        send_notification_emails(
+            admin_users,
+            template,
+            {
+                'url': get_content_item_link(content_type, content_item_id, comment_id)
+            }
+        )
+
+
 def notify_admins_and_comment_notification_recipients(owner_org, user, template, content_type, content_item_id, thread_id, parent_id, comment_id, content_item_title, comment):
 
     admin_users = get_admins(owner_org, user, content_type, content_item_id)
@@ -188,7 +213,7 @@ def notify_admins_and_comment_notification_recipients(owner_org, user, template,
             template,
             {
                 'url': get_content_item_link(content_type, content_item_id, comment_id),
-                'content_item_title': content_item_title,
+                'content_item_title': util.remove_HTML_markup(content_item_title),
                 'comment_text': util.remove_HTML_markup(comment)
             }
         )

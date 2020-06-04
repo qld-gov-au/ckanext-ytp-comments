@@ -74,7 +74,7 @@ def check_content_access(content_type, context, data_dict):
 def get_redirect_url(content_type, content_item_id, anchor):
     return '/%s/%s#%s' % (
         'datarequest/comment' if content_type == 'datarequest' else 'dataset',
-        content_item_id + '/comments' if  content_type == 'dataset' and show_comments_tab_page() else content_item_id,
+        content_item_id + '/comments' if content_type == 'dataset' and show_comments_tab_page() else content_item_id,
         anchor
     )
 
@@ -126,4 +126,4 @@ def get_comment_count_for_dataset(dataset_name, content_type='dataset'):
 
 def get_content_type_comments_badge(dataset_name, content_type='dataset'):
     comments_count = get_comment_count_for_dataset(dataset_name, content_type)
-    return toolkit.render_snippet('snippets/count_badge.html',  {'count': comments_count})
+    return toolkit.render_snippet('snippets/count_badge.html', {'count': comments_count})

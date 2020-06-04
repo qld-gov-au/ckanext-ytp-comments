@@ -2,7 +2,7 @@
 Feature: Comments
 
     Scenario: The Add Comment form should not display for a non-logged-in user - instead they see a 'Login to comment' button
-        Given "Unathenticated" as the persona
+        Given "Unauthenticated" as the persona
         When I go to dataset "warandpeace" comments
         Then I take a screenshot
         Then I should see an element with xpath "//a[contains(string(), 'Login to comment')]"
@@ -107,7 +107,7 @@ Feature: Comments
         Then I should not see "This comment was deleted." within 2 seconds
 
     @comment-add
-    Scenario: When a logged-in user submits a comment on a Dataset the page should be scrolled to the highlighted comment I just posted.
+    Scenario: When a logged-in user submits a comment on a Dataset the page should be scrolled to the highlighted comment they just posted.
         Given "CKANUser" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
@@ -153,7 +153,7 @@ Feature: Comments
 
     @comment-tab
     Scenario: Non-logged in users should not see comment form in dataset tab
-        Given "Unathenticated" as the persona
+        Given "Unauthenticated" as the persona
         When I go to dataset "warandpeace"
         Then I take a screenshot
         Then I should not see an element with id "comment_form"
@@ -167,14 +167,14 @@ Feature: Comments
     
     @comment-tab
     Scenario: Users should see comment tab on dataset
-        Given "Unathenticated" as the persona
+        Given "Unauthenticated" as the persona
         Then I go to dataset "warandpeace"
         Then I take a screenshot
         Then I should see an element with xpath "//a[contains(string(), 'Comments')]"
 
     @comment-tab
     Scenario: Users should see comment badge count of 2 on dataset
-        Given "Unathenticated" as the persona
+        Given "Unauthenticated" as the persona
         Then I go to dataset "warandpeace"
         Then I take a screenshot
         Then I should see an element with xpath "//span[contains(@class, 'badge') and contains(string(), '2')]"
