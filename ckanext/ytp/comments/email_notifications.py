@@ -156,6 +156,7 @@ def get_admins(owner_org, user, content_type, content_item_id):
 @maintain.deprecated('notify_admins is deprecated please use notify_admins_and_comment_notification_recipients')
 def notify_admins(owner_org, user, template, content_type, content_item_id, comment_id):
     """
+    Warning: this function has been deprecated - please use `notify_admins_and_comment_notification_recipients`
     :param owner_org: organization.id of the content item owner
     :param user: c.user_obj of the user who submitted the comment
     :param template: string indicating which email template to use
