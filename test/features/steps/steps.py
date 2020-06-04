@@ -31,7 +31,7 @@ def go_to_dataset(context, name):
 
 
 @step(u'I go to dataset "{name}" comments')
-def go_to_data_request_comments(context, name):
+def go_to_dataset_comments(context, name):
     context.execute_steps(u"""
         When I go to dataset "%s"
         And I click the link with text that contains "Comments"
