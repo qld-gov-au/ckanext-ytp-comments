@@ -1,0 +1,14 @@
+<p>
+    <strong>
+        {{ _('This comment was deleted') -}}
+        {%- if comment.deleted_by_user_id %}
+            {{ _('by') }}
+            {% if 'deleted_user_state' in comment and comment.deleted_user_state == 'deleted' %}
+                {{ comment.deleted_user_login_name }}
+            {% else %}
+                {% link_for _(comment.deleted_user_login_name), controller='user', action='read', id=comment.user_id -%}
+            {% endif %}
+        {%- endif -%}
+        .
+    </strong>
+</p>

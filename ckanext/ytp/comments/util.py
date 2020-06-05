@@ -1,4 +1,5 @@
 from lxml.html.clean import Cleaner, autolink_html
+from lxml.html import fromstring
 from ckan import logic
 import logging
 
@@ -23,6 +24,19 @@ def clean_input(comment):
     except Exception, e:
         if type(e).__name__ == "ParserError":
             raise logic.ValidationError("Comment text is required")
+        else:
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(e).__name__, e.args)
+            log.debug(message)
+
+
+def remove_HTML_markup(text):
+    try:
+        # Returns the text content of the element, including the text content of its children, with no HTML markup.
+        return fromstring(text.replace('<br/>', '\n')).text_content()
+    except Exception, e:
+        if type(e).__name__ == "ParserError":
+            raise logic.ValidationError("Text is required")
         else:
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
             message = template.format(type(e).__name__, e.args)

@@ -1,0 +1,8 @@
+{% ckan_extends %}
+
+{% block content_primary_nav %}
+    {{ super() }}
+    {% if h.ytp_comments_show_comments_tab_page() %}   
+        {{ h.build_nav_icon('dataset_comments', _('Comments') + ' ' + h.get_content_type_comments_badge(pkg.name, 'dataset'), dataset_id=pkg.name) }}
+    {% endif %}
+{% endblock %}

@@ -142,7 +142,8 @@ You can point to another word list by setting `ckan.comments.good_words_file` in
 1. Initialise the comment notification recipients database table, e.g.
 
         cd /usr/lib/ckan/default/src/ckanext-ytp-comments # Your PATH may vary
-
+        paster initdb -c /etc/ckan/default/development.ini # Use YOUR path and relevant CKAN .ini file
+        paster updatedb -c /etc/ckan/default/development.ini # Use YOUR path and relevant CKAN .ini file
         paster init_notifications_db -c /etc/ckan/default/development.ini # Use YOUR path and relevant CKAN .ini file
 
     This will create a new table in the CKAN database named `comment_notification_recipient` that holds the status of individual user's follow or mute preferences.
@@ -157,6 +158,8 @@ You can point to another word list by setting `ckan.comments.good_words_file` in
         # Optional
         ckan.comments.bad_words_file = /path/to/blacklist_words.txt
         ckan.comments.good_words_file = /path/to/whitelist_words.txt
+        # To display dataset comments on a datasets tab page instead of below the dataset additional information, set to True
+        ckan.comments.show_comments_tab_page = True # Defaults to False
 
 3. Restart CKAN
 
