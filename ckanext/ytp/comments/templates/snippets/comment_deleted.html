@@ -1,7 +1,7 @@
 <p>
     <strong>
         {{ _('Comment deleted') -}}
-        {%- if comment.deleted_by_user_id %}
+        {%- if show_deleter and comment.deleted_by_user_id %}
             {{ _('by') }}
             {% if 'deleted_user_state' in comment and comment.deleted_user_state == 'deleted' %}
                 {{ comment.deleted_user_login_name }}

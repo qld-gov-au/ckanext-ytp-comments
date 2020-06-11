@@ -43,7 +43,7 @@
             {% if comment.state != 'deleted' %}
                 {{ comment.content|safe }}
             {% else %}
-                {{ _('This comment was deleted.') }}
+                {% snippet "snippets/comment_deleted.html", comment=comment, show_deleter=True %}
             {% endif %}
             {% if comment.state == 'active' %}
             <ul class="links list-inline">
