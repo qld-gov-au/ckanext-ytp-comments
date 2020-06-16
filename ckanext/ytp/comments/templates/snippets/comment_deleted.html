@@ -1,4 +1,4 @@
-{%- set show_deleter = show_deleter or True -%}
+{%- set show_deleter = show_deleter|default(True) -%}
 <p>
     <strong>
         {{ _('Comment deleted') -}}
