@@ -214,7 +214,8 @@ def notify_admins_and_comment_notification_recipients(owner_org, user, template,
             {
                 'url': get_content_item_link(content_type, content_item_id, comment_id),
                 'content_item_title': util.remove_HTML_markup(content_item_title),
-                'comment_text': util.remove_HTML_markup(comment)
+                'comment_text': util.remove_HTML_markup(comment),
+                'content_type': content_type
             }
         )
 
