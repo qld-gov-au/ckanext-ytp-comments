@@ -2,8 +2,8 @@ A comment has been made on the Queensland Government open data portal that may b
 
 To 'Reply' to this comment or to review the thread, follow this link:
 {{ url }}
-
-Dataset title: {{ content_item_title }}
+{% set title_label = 'Dataset title' if content_type == 'dataset' else 'Data request subject' %}
+{{ title_label }}: {{ content_item_title }}
 Comment: {{ comment_text }}
 
 Do not reply to this email.
