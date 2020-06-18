@@ -10,6 +10,8 @@ log = logging.getLogger(__name__)
 
 def comment_delete(context, data_dict):
     model = context['model']
+    user = context['user']
+    userobj = model.User.get(user)
 
     logic.check_access("comment_delete", context, data_dict)
 
@@ -21,6 +23,7 @@ def comment_delete(context, data_dict):
         abort(404)
 
     comment.state = 'deleted'
+    comment.deleted_by_user_id = userobj.id
 
     model.Session.add(comment)
     model.Session.commit()
