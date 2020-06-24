@@ -5,9 +5,6 @@
 {% block admin_form %}
 
     {{ super() }}
-    {#% if h.closing_circumstances_enabled %}
-        {{ form.textarea('ckan.datarequests.closing_circumstances', id='field-ckan.datarequests.closing_circumstances', label=_('Data request closing circumstances'), placeholder=_('eg.\nPartially released|nominate_dataset\nTo be released as open data at a later date|nominate_approximate_date\nData openly available elsewhere'), value=data['ckan.datarequests.closing_circumstances'], error=errors['ckan.datarequests.closing_circumstances']) }}
-    {% endif %#}
 
     {{-
         form.textarea(
