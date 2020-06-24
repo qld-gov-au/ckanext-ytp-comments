@@ -27,12 +27,20 @@ def show_comments_tab_page():
 
 
 def profanity_check(cleaned_comment):
-    more_words = load_bad_words()
-    whitelist_words = load_good_words()
+    custom_profanity_list = config.get('ckan.comments.profanity_list', [])
 
-    pf = ProfanityFilter(extra_censor_list=more_words)
-    for word in whitelist_words:
-        pf.remove_word(word)
+    if custom_profanity_list:
+        pf = ProfanityFilter(custom_censor_list=custom_profanity_list.splitlines())
+    else:
+        # Fall back to original behaviour of built-in Profanity bad words list
+        # combined with bad_words_file and good_words_file
+        more_words = load_bad_words()
+        whitelist_words = load_good_words()
+
+        pf = ProfanityFilter(extra_censor_list=more_words)
+        for word in whitelist_words:
+            pf.remove_word(word)
+
     return pf.is_profane(cleaned_comment)
 
 
