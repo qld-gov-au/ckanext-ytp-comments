@@ -126,7 +126,7 @@ Feature: Comments
         Then I submit a comment with subject "Test Request" and comment "This is a test data request comment"
         Then I take a screenshot
         When I wait for 5 seconds
-        Then I should receive a base64 email at "dr_admin@localhost" containing "Dataset title: Test Request"
+        Then I should receive a base64 email at "dr_admin@localhost" containing "Data request subject: Test Request"
         And I should receive a base64 email at "dr_admin@localhost" containing "Comment: This is a test data request comment"
 
     @comment-delete
