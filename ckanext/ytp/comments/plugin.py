@@ -26,6 +26,16 @@ class YtpCommentsPlugin(plugins.SingletonPlugin):
         toolkit.add_public_directory(config, 'public')
         toolkit.add_resource('public/javascript/', 'comments_js')
 
+    def update_config_schema(self, schema):
+        schema.update({
+            'ckan.comments.profanity_list': [
+                toolkit.get_validator('ignore_missing'),
+                unicode
+            ],
+        })
+
+        return schema
+
     def get_helpers(self):
         return {
             'get_comment_thread': helpers.get_comment_thread,
