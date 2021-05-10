@@ -23,7 +23,7 @@ class CommentNotificationRecipient(object):
 comment_notification_recipient_table = Table('comment_notification_recipient', metadata,
                                              Column('id', types.UnicodeText, primary_key=True,
                                                     default=make_uuid),
-                                             Column('timestamp', types.DateTime, default=datetime.datetime.utcnow()),
+                                             Column('timestamp', types.DateTime, default=datetime.datetime.utcnow),
                                              Column('user_id', types.UnicodeText),
                                              Column('thread_id', types.UnicodeText),
                                              Column('comment_id', types.UnicodeText, default=u''),

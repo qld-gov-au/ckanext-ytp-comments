@@ -1,0 +1,20 @@
+{% ckan_extends %}
+
+{% import 'macros/form.html' as form %}
+
+{% block admin_form %}
+
+    {{ super() }}
+
+    {{-
+        form.textarea(
+            'ckan.comments.profanity_list',
+            id='field-ckan-comments-profanity-list',
+            label=_('Comments - custom profanity list (one word per line)'),
+            placeholder=_('e.g.\nshit\ndick\n'),
+            value=data['ckan.comments.profanity_list'],
+            error=errors['ckan.comments.profanity_list']
+        )
+    -}}
+
+{% endblock %}
