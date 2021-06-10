@@ -5,20 +5,24 @@
 set -e
 
 CKAN_USER_NAME="${CKAN_USER_NAME:-admin}"
+CKAN_DISPLAY_NAME="${CKAN_DISPLAY_NAME:-Administrator}"
 CKAN_USER_PASSWORD="${CKAN_USER_PASSWORD:-password}"
 CKAN_USER_EMAIL="${CKAN_USER_EMAIL:-admin@localhost}"
 
-. /app/ckan/default/bin/activate \
-  && cd /app/ckan/default/src/ckan \
-  && paster db clean -c /app/ckan/default/production.ini \
-  && paster db init -c /app/ckan/default/production.ini \
-  && paster --plugin=ckan user add "${CKAN_USER_NAME}" email="${CKAN_USER_EMAIL}" password="${CKAN_USER_PASSWORD}" -c /app/ckan/default/production.ini \
-  && paster --plugin=ckan sysadmin add "${CKAN_USER_NAME}" -c /app/ckan/default/production.ini
+. ${APP_DIR}/bin/activate
+ckan_cli db clean
+ckan_cli db init
 
 # Initialise the Comments database tables
-paster --plugin=ckanext-ytp-comments initdb --config=/app/ckan/default/production.ini
-paster --plugin=ckanext-ytp-comments updatedb --c /app/ckan/default/production.ini
-paster --plugin=ckanext-ytp-comments init_notifications_db --c /app/ckan/default/production.ini
+PASTER_PLUGIN=ckanext-ytp-comments ckan_cli initdb
+PASTER_PLUGIN=ckanext-ytp-comments ckan_cli updatedb
+PASTER_PLUGIN=ckanext-ytp-comments ckan_cli init_notifications_db
+
+ckan_cli user add "${CKAN_USER_NAME}"\
+ fullname="${CKAN_DISPLAY_NAME}"\
+ email="${CKAN_USER_EMAIL}"\
+ password="${CKAN_USER_PASSWORD}"
+ckan_cli sysadmin add "${CKAN_USER_NAME}"
 
 # Create some base test data
-. /app/scripts/create-test-data.sh
+. $WORKDIR/scripts/create-test-data.sh
