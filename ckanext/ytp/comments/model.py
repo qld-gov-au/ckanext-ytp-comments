@@ -35,7 +35,7 @@ class CommentThread(Base):
 
     id = Column(types.UnicodeText, primary_key=True, default=make_uuid)
     url = Column(types.UnicodeText)
-    creation_date = Column(types.DateTime, default=datetime.datetime.now)
+    creation_date = Column(types.DateTime, default=datetime.datetime.utcnow)
     locked = Column(types.Boolean, default=False)
 
     def __init__(self, **kwargs):
@@ -191,7 +191,7 @@ class Comment(Base):
     subject = Column(types.UnicodeText)
     comment = Column(types.UnicodeText)
 
-    creation_date = Column(types.DateTime, default=datetime.datetime.now)
+    creation_date = Column(types.DateTime, default=datetime.datetime.utcnow)
     modified_date = Column(types.DateTime)
     approval_status = Column(types.UnicodeText)
 
@@ -283,7 +283,7 @@ class CommentBlockedUser(Base):
     id = Column(types.UnicodeText, primary_key=True, default=make_uuid)
     user_id = Column(types.UnicodeText, ForeignKey(model.User.id))
     blocked_by = Column(types.UnicodeText, ForeignKey(model.User.id))
-    creation_date = Column(types.DateTime, default=datetime.datetime.now)
+    creation_date = Column(types.DateTime, default=datetime.datetime.utcnow)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():

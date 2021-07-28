@@ -1,5 +1,9 @@
-# ckanext-ytp-comments
+====================
+ckanext-ytp-comments
+====================
 A custom CKAN extension for Data.Qld
+
+[![Tests](https://github.com/qld-gov-au/ckanext-ytp-comments/actions/workflows/test.yml/badge.svg)](https://github.com/qld-gov-au/ckanext-ytp-comments/actions/workflows/test.yml)
 
 [![CircleCI](https://circleci.com/gh/qld-gov-au/ckanext-ytp-comments/tree/develop.svg?style=shield)](https://circleci.com/gh/qld-gov-au/ckanext-ytp-comments/tree/develop)
 
@@ -8,13 +12,13 @@ A custom CKAN extension for Data.Qld
   - [Docker](https://www.docker.com/)
   - [Pygmy](https://pygmy.readthedocs.io/)
   - [Ahoy](https://github.com/ahoy-cli/ahoy)
-- Make sure that all local web development services are shut down (Apache/Nginx, Mysql, MAMP etc).i.e. ports 80 is open etc
+- Make sure that all local web development services are shut down (Apache/Nginx, Mysql, MAMP etc).
 - Checkout project repository (in one of the [supported Docker directories](https://docs.docker.com/docker-for-mac/osxfs/#access-control)).
 - `pygmy up`
 - `ahoy build`
-- you may need to use sudo on linux
+- You may need to use sudo on linux
 
-Building on ubuntu (optional: behind proxy)
+Building on Ubuntu (optional: behind proxy)
 - composer from compose
   - sudo pip install docker-compose
 - sudo apt-get install composer
@@ -109,14 +113,7 @@ For a list of supported step-definitions, see https://github.com/ggozad/behaving
 In software engineering, continuous integration (CI) is the practice of merging all developer working copies to a shared mainline several times a day.
 Before feature changes can be merged into a shared mainline, a complete build must run and pass all tests on CI server.
 
-This project uses [Circle CI](https://circleci.com/) as a CI server: it imports production backups into fully built codebase and runs code linting and tests.
-When tests pass, a deployment process is triggered for nominated branches (usually, `master` and `develop`).
-
-Add `[skip ci]` to the commit subject to skip CI build. Useful for documentation changes.
-
-### SSH
-Circle CI supports shell access to the build for 120 minutes after the build is finished when the build is started with SSH support.
-Use "Rerun job with SSH" button in Circle CI UI to start build with SSH support.
+This project uses [GitHub Actions](https://github.com/features/actions) as a CI server: it imports production backups into fully built codebase and runs code linting and tests. When tests pass, a deployment process is triggered for nominated branches (usually, `master` and `develop`).
 
 ## Follow / Mute comments
 
@@ -137,7 +134,7 @@ You can point to another word list by setting `ckan.comments.bad_words_file` in 
 Any words from the built-in list that you do *not* wish to block are contained in `ckanext/ytp/comments/good_words.txt` by default.
 You can point to another word list by setting `ckan.comments.good_words_file` in your config.
 
-### Setup
+## Installation
 
 1. Initialise the comment notification recipients database table, e.g.
 

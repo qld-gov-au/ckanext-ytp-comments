@@ -36,7 +36,7 @@ def comment_update(context, data_dict):
 
     comment.subject = data_dict.get('subject')
     comment.comment = cleaned_comment
-    comment.modified_date = datetime.datetime.now()
+    comment.modified_date = datetime.datetime.utcnow()
 
     comment.flagged = data_dict.get('flagged')
 
