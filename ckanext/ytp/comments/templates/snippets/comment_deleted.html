@@ -4,9 +4,9 @@
         {%- if show_deleter and comment.deleted_by_user_id %}
             {{ _('Comment deleted by') }}
             {% if 'deleted_user_state' in comment and comment.deleted_user_state == 'deleted' %}
-                {{ comment.deleted_user_login_name }}
+                {{ comment.deleted_username }}
             {% else %}
-                {% link_for _(comment.deleted_user_login_name), controller='user', action='read', id=comment.user_id -%}
+                {% link_for _(comment.deleted_username), controller='user', action='read', id=comment.user_id -%}
             {% endif %}
         {%- else -%}
             {{ _('This comment was deleted') -}}
