@@ -14,16 +14,16 @@ REMOTE_CHROME_URL = 'http://chrome:4444/wd/hub'
 
 # @see .docker/scripts/init.sh for credentials.
 PERSONAS = {
-    'Admin': dict(
-        name=u'admin',
-        email=u'admin@localhost',
-        password=u'Password123!'
-    ),
-    'Unauthenticated': dict(
-        name=u'',
-        email=u'',
-        password=u''
-    ),
+    'SysAdmin': {
+        'name': u'admin',
+        'email': u'admin@localhost',
+        'password': u'Password123!'
+    },
+    'Unauthenticated': {
+        'name': u'',
+        'email': u'',
+        'password': u''
+    },
     # This user will not be assigned to any organisations
     'CKANUser': {
         'name': u'ckan_user',
