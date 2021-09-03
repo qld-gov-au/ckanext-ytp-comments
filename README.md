@@ -1,4 +1,3 @@
-====================
 ckanext-ytp-comments
 ====================
 A custom CKAN extension for Data.Qld
