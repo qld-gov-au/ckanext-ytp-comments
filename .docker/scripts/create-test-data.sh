@@ -19,10 +19,10 @@ TEST_ORG_TITLE="Test Organisation"
 
 echo "Creating test users for ${TEST_ORG_TITLE} Organisation:"
 
-ckan_cli user add ckan_user email=ckan_user@localhost password=password
-ckan_cli user add test_org_admin email=test_org_admin@localhost password=password
-ckan_cli user add test_org_editor email=test_org_editor@localhost password=password
-ckan_cli user add test_org_member email=test_org_member@localhost password=password
+ckan_cli user add ckan_user email=ckan_user@localhost password=password fullname='CKAN User'
+ckan_cli user add test_org_admin email=test_org_admin@localhost password=password fullname='Test Org Admin'
+ckan_cli user add test_org_editor email=test_org_editor@localhost password=password fullname='Test Org Editor'
+ckan_cli user add test_org_member email=test_org_member@localhost password=password fullname='Test Org Member'
 
 echo "Creating ${TEST_ORG_TITLE} Organisation:"
 
@@ -83,9 +83,9 @@ DR_ORG_TITLE="Open Data Administration (data requests)"
 
 echo "Creating test users for ${DR_ORG_TITLE} Organisation:"
 
-ckan_cli user add dr_admin email=dr_admin@localhost password=password
-ckan_cli user add dr_editor email=dr_editor@localhost password=password
-ckan_cli user add dr_member email=dr_member@localhost password=password
+ckan_cli user add dr_admin email=dr_admin@localhost password=password fullname='DR Admin'
+ckan_cli user add dr_editor email=dr_editor@localhost password=password fullname='DR Editor'
+ckan_cli user add dr_member email=dr_member@localhost password=password fullname='DR Member'
 
 echo "Creating Data Request Organisation:"
 
