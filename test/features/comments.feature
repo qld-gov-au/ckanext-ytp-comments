@@ -138,7 +138,7 @@ Feature: Comments
         Then I should see "Are you sure you want to delete this comment?" within 1 seconds
         Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
         Then I take a screenshot
-        Then I should see "Comment deleted by test_org_admin." within 2 seconds
+        Then I should see "Comment deleted by Test Org Admin." within 2 seconds
 
     @comment-delete
     Scenario: When an Org Admin visits a data request belonging to their organisation, they can delete a comment and the comment will be marked with delete by username.
@@ -149,7 +149,7 @@ Feature: Comments
         Then I should see "Are you sure you want to delete this comment?" within 1 seconds
         Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
         Then I take a screenshot
-        Then I should see "Comment deleted by admin." within 2 seconds
+        Then I should see "Comment deleted by Administrator." within 2 seconds
 
     @comment-tab
     Scenario: Non-logged in users should not see comment form in dataset tab
