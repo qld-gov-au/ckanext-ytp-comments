@@ -85,7 +85,7 @@ Feature: Comments
         Then I should see "This is a reply" within 10 seconds
 
     @comment-delete
-    Scenario: When an Org Admin visits a dataset belonging to their organisation, they can delete a comment and should not see text "This comment was deleted." 
+    Scenario: When an Org Admin visits a dataset belonging to their organisation, they can delete a comment and should not see text 'This comment was deleted.'
         Given "TestOrgAdmin" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
@@ -96,8 +96,8 @@ Feature: Comments
         Then I should not see "This comment was deleted." within 2 seconds
 
     @comment-delete
-    Scenario: When an Org Admin visits a data request belonging to their organisation, they can delete a comment and should not see text "This comment was deleted." 
-        Given "Admin" as the persona
+    Scenario: When an Org Admin visits a data request belonging to their organisation, they can delete a comment and should not see text 'This comment was deleted.'
+        Given "SysAdmin" as the persona
         When I log in
         And I go to data request "Test Request" comments
         And I press the element with xpath "//a[@title='Delete comment']"
@@ -138,11 +138,11 @@ Feature: Comments
         Then I should see "Are you sure you want to delete this comment?" within 1 seconds
         Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
         Then I take a screenshot
-        Then I should see "Comment deleted by Test Org Admin." within 2 seconds
+        Then I should see "Comment deleted by Test Admin." within 2 seconds
 
     @comment-delete
     Scenario: When an Org Admin visits a data request belonging to their organisation, they can delete a comment and the comment will be marked with delete by username.
-        Given "Admin" as the persona
+        Given "SysAdmin" as the persona
         When I log in
         And I go to data request "Test Request" comments
         And I press the element with xpath "//a[@title='Delete comment']"
@@ -164,7 +164,7 @@ Feature: Comments
         When I go to dataset "warandpeace"
         Then I take a screenshot
         Then I should not see an element with id "comment_form"
-    
+
     @comment-tab
     Scenario: Users should see comment tab on dataset
         Given "Unauthenticated" as the persona
