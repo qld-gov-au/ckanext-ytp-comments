@@ -49,7 +49,7 @@ def go_to_dataset_page(context):
     when_i_visit_url(context, '/dataset')
 
 
-@step('I go to dataset "{name}"')
+@step(u'I go to dataset "{name}"')
 def go_to_dataset(context, name):
     when_i_visit_url(context, '/dataset/' + name)
 
@@ -138,9 +138,12 @@ def should_receive_base64_email_containing_text(context, address, text):
     def filter_contents(mail):
         mail = email.message_from_string(mail)
         payload = mail.get_payload()
-        payload += "=" * ((4 - len(payload) % 4) % 4) # do fix the padding error issue
-        decoded_payload = quopri.decodestring(payload).decode('base64')
-        print ('decoded_payload: ', decoded_payload)
+        payload += "=" * ((4 - len(payload) % 4) % 4)  # do fix the padding error issue
+        payload_bytes = quopri.decodestring(payload)
+        if len(payload_bytes) > 0:
+            payload_bytes += b'='  # do fix the padding error issue
+        decoded_payload = payload_bytes.decode('base64')
+        print('decoded_payload: ', decoded_payload)
         return text in decoded_payload
 
     assert context.mail.user_messages(address, filter_contents)
