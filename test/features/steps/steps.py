@@ -71,6 +71,7 @@ def go_to_organisation_page(context):
 def go_to_register_page(context):
     when_i_visit_url(context, '/user/register')
 
+
 @step('I go to the data requests page')
 def go_to_data_requests_page(context):
     when_i_visit_url(context, '/datarequest')
