@@ -14,23 +14,20 @@ def comments():
     pass
 
 
-@click.command()
 @comments.command()
 def initdb():
     command.initdb()
 
 
-@click.command()
 @comments.command()
 def init_notifications_db():
     command.init_notifications_db()
 
 
-@click.command()
 @comments.command()
 def updatedb():
     command.updatedb()
 
 
 def get_commands():
-    return [comments, initdb, init_notifications_db, updatedb]
+    return [comments]

@@ -52,3 +52,38 @@ class UpdateDBCommand(CkanCommand):
     def command(self):
         self._load_config()
         updatedb()
+
+
+class CommentsDBCommand(CkanCommand):
+    """
+    Run commands to set up the Comments database.
+
+    The available commands are:
+
+        initdb - Initialize the database tables for this extension
+
+        init_notifications_db - Initialise database tables for notifying users
+                                of comments relevant to them
+
+        updatedb - Add columns to existing tables to store deletion metadata
+     """
+    summary = __doc__.split('\n')[0]
+    usage = __doc__
+    max_args = 0
+    min_args = 0
+
+    def __init__(self, name):
+        super(CommentsDBCommand, self).__init__(name)
+
+    def command(self):
+        self._load_config()
+
+        cmd = self.args[0]
+        if cmd == 'initdb':
+            initdb()
+        elif cmd == 'init_notifications_db':
+            init_notifications_db()
+        elif cmd == 'updatedb':
+            updatedb()
+        else:
+            self.parser.error('Command not recognized: %r' % cmd)
