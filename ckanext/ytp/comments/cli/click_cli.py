@@ -19,7 +19,8 @@ def initdb():
     command.initdb()
 
 
-@comments.command()
+# explicitly specify name to avoid automagical conversion to dashes
+@comments.command(name="init_notifications_db")
 def init_notifications_db():
     command.init_notifications_db()
 
