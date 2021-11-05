@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+from ckan import model
 from ckan.lib.cli import CkanCommand
 
 from ckanext.ytp.comments.cli.command import initdb, init_notifications_db, updatedb

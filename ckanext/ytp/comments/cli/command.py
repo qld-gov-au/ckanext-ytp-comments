@@ -2,7 +2,7 @@
 
 import logging
 
-import ckan.model as model
+from ckan import model
 
 log = logging.getLogger(__name__)
 
