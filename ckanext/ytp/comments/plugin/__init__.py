@@ -29,9 +29,9 @@ class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
         log.debug("Configuring comments module")
 
     def update_config(self, config):
-        toolkit.add_template_directory(config, "templates")
-        toolkit.add_public_directory(config, 'public')
-        toolkit.add_resource('public/javascript/', 'comments_js')
+        toolkit.add_template_directory(config, "../templates")
+        toolkit.add_public_directory(config, '../public')
+        toolkit.add_resource('../public/javascript/', 'comments_js')
 
     def update_config_schema(self, schema):
         schema.update({
