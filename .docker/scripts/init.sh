@@ -12,9 +12,9 @@ CLICK_ARGS="--yes" ckan_cli db clean
 ckan_cli db init
 
 # Initialise the Comments database tables
-PASTER_PLUGIN=ckanext-ytp-comments ckan_cli initdb
-PASTER_PLUGIN=ckanext-ytp-comments ckan_cli updatedb
-PASTER_PLUGIN=ckanext-ytp-comments ckan_cli init_notifications_db
+PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments initdb
+PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments updatedb
+PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments init_notifications_db
 
 # Create some base test data
 . $APP_DIR/scripts/create-test-data.sh
