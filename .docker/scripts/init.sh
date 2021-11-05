@@ -11,9 +11,11 @@ fi
 CLICK_ARGS="--yes" ckan_cli db clean
 ckan_cli db init
 
-# Initialise the Comments database tables
+echo "Creating comment tables..."
 PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments initdb
+echo "Adding deletion metadata fields..."
 PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments updatedb
+echo "Adding comment notification tables..."
 PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments init_notifications_db
 
 # Create some base test data
