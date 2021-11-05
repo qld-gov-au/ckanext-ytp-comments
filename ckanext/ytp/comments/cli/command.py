@@ -14,8 +14,6 @@ def initdb():
     and thread tables ready for use.
     """
     log.info("starting command")
-    model.Session.remove()
-    model.Session.configure(bind=model.meta.engine)
 
     import ckanext.ytp.comments.model as cmodel
     log.info("Initializing tables")
@@ -26,8 +24,6 @@ def initdb():
 def init_notifications_db():
     """Initialise the comment extension's notifications database tables
     """
-    model.Session.remove()
-    model.Session.configure(bind=model.meta.engine)
 
     from ckanext.ytp.comments import notification_models
     notification_models.init_tables()
@@ -39,9 +35,6 @@ def updatedb():
     Updates the database tables
     """
     log.info("YTP-Comments-UpdateDBCommand: Starting command")
-
-    model.Session.remove()
-    model.Session.configure(bind=model.meta.engine)
 
     from sqlalchemy import MetaData, DDL
     meta = MetaData(bind=model.Session.get_bind(), reflect=True)

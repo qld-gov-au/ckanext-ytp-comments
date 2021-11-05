@@ -77,6 +77,8 @@ class CommentsDBCommand(CkanCommand):
 
     def command(self):
         self._load_config()
+        model.Session.remove()
+        model.Session.configure(bind=model.meta.engine)
 
         cmd = self.args[0]
         if cmd == 'initdb':
