@@ -29,7 +29,7 @@ def init_notifications_db():
     model.Session.remove()
     model.Session.configure(bind=model.meta.engine)
 
-    import notification_models
+    from ckanext.ytp.comments import notification_models
     notification_models.init_tables()
     log.debug("Comment notification preference DB table is setup")
 
