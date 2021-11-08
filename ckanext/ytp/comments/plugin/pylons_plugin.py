@@ -15,7 +15,7 @@ class MixinPlugin(p.SingletonPlugin):
             /dataset/NAME/comments/reply/PARENT_ID
             /dataset/NAME/comments/add
         """
-        controller = 'ckanext.ytp.comments.controller:CommentController'
+        controller = 'ckanext.ytp.comments.controller.pylons_controller:CommentController'
         if helpers.show_comments_tab_page():
             map.connect('dataset_comments', '/dataset/{dataset_id}/comments', controller=controller, action='dataset_comments', ckan_icon='comment')
         map.connect('/dataset/{dataset_id}/comments/add', controller=controller, action='add')
