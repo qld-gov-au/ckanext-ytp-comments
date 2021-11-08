@@ -2,7 +2,7 @@
 
 from ckan.plugins.toolkit import BaseController
 
-from ckanext.ytp.comments.controller import add, edit, reply, delete,\
+from ckanext.ytp.comments.controllers import add, edit, reply, delete,\
     flag, unflag, dataset_comments, follow, mute
 
 
