@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 import logging
+import six
 
 from ckan import plugins
 from ckan.plugins import implements, toolkit
@@ -37,7 +38,7 @@ class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
         schema.update({
             'ckan.comments.profanity_list': [
                 toolkit.get_validator('ignore_missing'),
-                unicode
+                six.text_type
             ],
         })
 
