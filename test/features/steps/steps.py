@@ -126,11 +126,11 @@ def submit_comment_with_subject_and_comment(context, subject, comment):
     :return:
     """
     context.browser.execute_script(
-        "document.querySelector('form#comment_form input[name=\"subject\"]').value = '%s';" % subject)
+        "document.querySelector('form.form input[name=\"subject\"]').value = '%s';" % subject)
     context.browser.execute_script(
-        "document.querySelector('form#comment_form textarea[name=\"comment\"]').value = '%s';" % comment)
+        "document.querySelector('form.form textarea[name=\"comment\"]').value = '%s';" % comment)
     context.browser.execute_script(
-        "document.querySelector('form#comment_form .form-actions input[type=\"submit\"]').click();")
+        "document.querySelector('form.form .form-actions input[type=\"submit\"]').click();")
 
 
 @step(u'I submit a reply with comment "{comment}"')
