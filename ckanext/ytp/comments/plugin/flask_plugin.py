@@ -2,10 +2,17 @@
 
 import ckan.plugins as p
 from ckanext.ytp.comments.cli import click_cli
+from ckanext.ytp.comments.controllers import blueprints
 
 
 class MixinPlugin(p.SingletonPlugin):
+    p.implements(p.IBluePrint)
     p.implements(p.IClick)
+
+    # IBlueprint
+
+    def get_blueprint(self):
+        return blueprints.get_blueprints()
 
     # IClick
 
