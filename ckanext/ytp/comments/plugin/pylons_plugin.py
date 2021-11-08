@@ -20,12 +20,16 @@ class MixinPlugin(p.SingletonPlugin):
             map.connect('dataset_comments', '/dataset/{dataset_id}/comments', controller=controller, action='dataset_comments', ckan_icon='comment')
         map.connect('/{dataset_id}/comments/add', controller=controller, action='add')
         map.connect('/{content_type}/{dataset_id}/comments/add', controller=controller, action='add')
+        map.connect('/{content_item_id}/comments/{comment_id}/edit', controller=controller, action='edit')
         map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/edit', controller=controller, action='edit')
+        map.connect('/{dataset_id}/comments/{parent_id}/reply', controller=controller, action='reply')
         map.connect('/{content_type}/{dataset_id}/comments/{parent_id}/reply', controller=controller, action='reply')
+        map.connect('/{content_item_id}/comments/{comment_id}/delete', controller=controller, action='delete')
         map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/delete', controller=controller, action='delete')
         # Flag a comment as inappropriate
         map.connect('/comment/{comment_id}/flag', controller=controller, action='flag')
         # Un-flag a comment as inappropriate
+        map.connect('/{content_item_id}/comments/{comment_id}/unflag', controller=controller, action='unflag')
         map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/unflag', controller=controller, action='unflag')
         # Routes for following and muting comment notifications
         notification_controller = 'ckanext.ytp.comments.controllers.pylons_controllers:NotificationController'
