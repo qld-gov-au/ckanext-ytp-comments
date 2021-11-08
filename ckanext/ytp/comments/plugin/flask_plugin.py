@@ -6,7 +6,7 @@ from ckanext.ytp.comments.controllers import blueprints
 
 
 class MixinPlugin(p.SingletonPlugin):
-    p.implements(p.IBluePrint)
+    p.implements(p.IBlueprint)
     p.implements(p.IClick)
 
     # IBlueprint
