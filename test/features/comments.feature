@@ -5,20 +5,20 @@ Feature: Comments
         Given "Unauthenticated" as the persona
         When I go to dataset "warandpeace" comments
         Then I should see an element with xpath "//a[contains(string(), 'Login to comment')]"
-        And I should not see "Add a comment"
+        And I should not see the add comment form
 
     Scenario: Logged-in users see the add comment form
         Given "CKANUser" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
-        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
+        Then I should see the add comment form
 
     @comment-add
     Scenario: When a logged-in user submits a comment on a Dataset the comment should display within 10 seconds
         Given "CKANUser" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
-        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
+        Then I should see the add comment form
         Then I submit a comment with subject "Test subject" and comment "This is a test comment"
         Then I should see "This is a test comment" within 10 seconds
         And I should see an element with xpath "//div[contains(@class, 'comment-wrapper highlight') and contains(string(), 'This is a test comment')]"
@@ -28,7 +28,7 @@ Feature: Comments
         Given "CKANUser" as the persona
         When I log in
         And I go to data request "Test Request" comments
-        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
+        Then I should see the add comment form
         Then I submit a comment with subject "Test subject" and comment "This is a test comment"
         Then I should see "This is a test comment" within 10 seconds
 
@@ -37,7 +37,7 @@ Feature: Comments
         Given "CKANUser" as the persona
         When I log in
         And I go to data request "Test Request" comments
-        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
+        Then I should see the add comment form
         Then I submit a comment with subject "Test Request" and comment "This is a test data request comment"
         When I wait for 5 seconds
         Then I should receive a base64 email at "test_org_admin@localhost" containing "Data request subject: Test Request"
@@ -48,7 +48,7 @@ Feature: Comments
         Given "CKANUser" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
-        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
+        Then I should see the add comment form
         Then I submit a comment with subject "Test subject" and comment "sex"
         Then I should see "sex" within 10 seconds
 
@@ -57,8 +57,8 @@ Feature: Comments
         Given "CKANUser" as the persona
         When I log in
         And I go to data request "Test Request" comments
-        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
-        Then I submit a comment with subject "Test subject" and comment "Go fuck yourself!"
+        Then I should see the add comment form
+        Then I submit a comment with subject "Test subject" and comment "Soccer balls"
         Then I should see "Comment blocked due to profanity" within 5 seconds
 
     @comment-report
