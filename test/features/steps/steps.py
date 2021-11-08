@@ -129,6 +129,7 @@ def submit_comment_with_subject_and_comment(context, subject, comment):
         "document.querySelector('form.form input[name=\"subject\"]').value = '%s';" % subject)
     context.browser.execute_script(
         "document.querySelector('form.form textarea[name=\"comment\"]').value = '%s';" % comment)
+    context.execute_steps("I take a screenshot")
     context.browser.execute_script(
         "document.querySelector('form.form .form-actions input[type=\"submit\"]').click();")
 
