@@ -20,6 +20,7 @@
 
 
 
+{% set content_type = content_type or 'dataset' %}
 {% set thread = h.get_comment_thread(pkg_name) %}
 
 {% macro comment_thread(thread) %}
@@ -78,7 +79,7 @@
 
 {% if userobj %}
 
-<form class="form" action="{{ pkg_id }}/comments/add" method="POST">
+<form class="form" action="/{{ content_type }}/{{ pkg_id }}/comments/add" method="POST">
     <div class="form-controls">
         <label for="subject">{{ _('Subject') }}</label>
         <input type="text" class="form-control" name="subject"/>
