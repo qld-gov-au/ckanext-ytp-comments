@@ -3,8 +3,7 @@
 from ckan.plugins.toolkit import BaseController
 
 from ckanext.ytp.comments.controller import add, edit, reply, delete,\
-    flag, unflag, dataset_comments, valid_request_and_user,\
-    contains_invalid_chars, follow, mute
+    flag, unflag, dataset_comments, follow, mute
 
 
 class CommentController(BaseController):
@@ -32,12 +31,6 @@ class CommentController(BaseController):
 
 
 class NotificationController(BaseController):
-
-    def valid_request_and_user(self, thread_or_comment_id):
-        return valid_request_and_user(thread_or_comment_id)
-
-    def contains_invalid_chars(self, value):
-        return contains_invalid_chars(value)
 
     def follow(self, thread_or_comment_id=None):
         return follow(thread_or_comment_id)
