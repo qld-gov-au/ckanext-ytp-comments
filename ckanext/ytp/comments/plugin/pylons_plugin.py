@@ -28,7 +28,7 @@ class MixinPlugin(p.SingletonPlugin):
         # Un-flag a comment as inappropriate
         map.connect('/{content_type}/{content_item_id}/comments/{comment_id}/unflag', controller=controller, action='unflag')
         # Routes for following and muting comment notifications
-        notification_controller = 'ckanext.ytp.comments.notification_controller:NotificationController'
+        notification_controller = 'ckanext.ytp.comments.controller.pylons_controller:NotificationController'
         map.connect('/comments/{thread_or_comment_id}/follow', controller=notification_controller, action='follow')
         map.connect('/comments/{thread_or_comment_id}/mute', controller=notification_controller, action='mute')
         return map
