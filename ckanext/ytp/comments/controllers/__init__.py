@@ -147,7 +147,7 @@ def reply(content_type, dataset_id, parent_id):
 def _add_or_reply(comment_type, content_item_id, content_type, parent_id=None):
     """
     Allows the user to add a comment to an existing dataset or datarequest
-    :param comment_type:
+    :param comment_type: Either 'new' or 'reply'
     :param content_item_id:
     :param content_type: string 'dataset' or 'datarequest'
     :return:
