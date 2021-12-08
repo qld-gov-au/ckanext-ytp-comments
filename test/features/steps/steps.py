@@ -124,12 +124,16 @@ def submit_comment_with_subject_and_comment(context, subject, comment):
     :param comment:
     :return:
     """
-    context.browser.execute_script(
-        "document.querySelector('form.form input[name=\"subject\"]').value = '%s';" % subject)
-    context.browser.execute_script(
-        "document.querySelector('form.form textarea[name=\"comment\"]').value = '%s';" % comment)
-    context.browser.execute_script(
-        "document.querySelector('form.form .form-actions input[type=\"submit\"]').click();")
+    context.browser.execute_script("""
+        subject_field = document.querySelector('form input[name="subject"]');
+        if (subject_field) { subject_field.value = '%s'; }
+        """ % subject)
+    context.browser.execute_script("""
+        document.querySelector('form textarea[name="comment"]').value = '%s';
+        """ % comment)
+    context.browser.execute_script("""
+        document.querySelector('form .btn-primary[type="submit"]').click();
+        """)
 
 
 @step(u'I submit a reply with comment "{comment}"')
@@ -141,10 +145,12 @@ def submit_reply_with_comment(context, comment):
     :param comment:
     :return:
     """
-    context.browser.execute_script(
-        "document.querySelector('.comment-wrapper form textarea[name=\"comment\"]').value = '%s';" % comment)
-    context.browser.execute_script(
-        "document.querySelector('.comment-wrapper form .form-actions input[type=\"submit\"]').click();")
+    context.browser.execute_script("""
+        document.querySelector('.comment-wrapper form textarea[name="comment"]').value = '%s';
+        """ % comment)
+    context.browser.execute_script("""
+        document.querySelector('.comment-wrapper form .btn-primary[type="submit"]').click();
+        """)
 
 
 # The default behaving step does not convert base64 emails
