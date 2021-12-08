@@ -19,6 +19,7 @@ Feature: Comments
         When I log in
         Then I go to dataset "warandpeace" comments
         Then I should see the add comment form
+        Then I take a screenshot
         Then I submit a comment with subject "Test subject" and comment "This is a test comment"
         Then I should see "This is a test comment" within 10 seconds
         And I should see an element with xpath "//div[contains(@class, 'comment-wrapper highlight') and contains(string(), 'This is a test comment')]"
@@ -49,6 +50,7 @@ Feature: Comments
         When I log in
         Then I go to dataset "warandpeace" comments
         Then I should see the add comment form
+        Then I take a screenshot
         Then I submit a comment with subject "Test subject" and comment "sex"
         Then I should see "sex" within 10 seconds
 
@@ -86,6 +88,7 @@ Feature: Comments
         Given "CKANUser" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
+        Then I take a screenshot
         Then I submit a reply with comment "This is a reply"
         Then I should see "This is a reply" within 10 seconds
 
@@ -94,8 +97,10 @@ Feature: Comments
         Given "TestOrgAdmin" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
+        Then I take a screenshot
         And I press the element with xpath "//a[@title='Delete comment']"
         Then I should see "Are you sure you want to delete this comment?" within 1 seconds
+        Then I take a screenshot
         Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
         Then I should not see "This comment was deleted." within 2 seconds
         And I should see "Comment deleted by Test Admin." within 2 seconds

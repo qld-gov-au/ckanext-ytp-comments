@@ -131,6 +131,7 @@ def submit_comment_with_subject_and_comment(context, subject, comment):
     context.browser.execute_script("""
         document.querySelector('form textarea[name="comment"]').value = '%s';
         """ % comment)
+    context.execute_steps('Then I take a screenshot')
     context.browser.execute_script("""
         document.querySelector('form .btn-primary[type="submit"]').click();
         """)
@@ -148,6 +149,7 @@ def submit_reply_with_comment(context, comment):
     context.browser.execute_script("""
         document.querySelector('.comment-wrapper form textarea[name="comment"]').value = '%s';
         """ % comment)
+    context.execute_steps('Then I take a screenshot')
     context.browser.execute_script("""
         document.querySelector('.comment-wrapper form .btn-primary[type="submit"]').click();
         """)
