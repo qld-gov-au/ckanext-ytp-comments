@@ -54,11 +54,11 @@
 
                 {% if userobj and comment.user_id == userobj.id %}
                     <li><a onclick="ShowCommentForm('edit_{{ comment.id }}')">{{ _('Edit') }}</a></li>
-                    {{ comment_form(comment, prefix='edit_', action='edit') }}
+                    {{ comment_form(comment, values={'id': comment.id}, prefix='edit_', action='edit') }}
                 {% endif %}
                 {% if userobj %}
                     <li><a onclick="ShowCommentForm('reply_{{ comment.id }}')">{{ _('Reply') }}</a> </li>
-                    {{ comment_form(comment, empty=True, prefix='reply_', action='reply') }}
+                    {{ comment_form(comment, values={'id': comment.id}, empty=True, prefix='reply_', action='reply') }}
                 {% endif %}
 
             </ul>
