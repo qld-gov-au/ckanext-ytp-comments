@@ -99,11 +99,7 @@ Feature: Comments
         Then I go to dataset "warandpeace" comments
         Then I take a screenshot
         And I press the element with xpath "//a[contains(@href, '/delete')]"
-        Then I should see "Are you sure you want to delete this comment?" within 1 seconds
-        Then I take a screenshot
-        Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
-        Then I should not see "This comment was deleted." within 2 seconds
-        And I should see "Comment deleted by Test Admin." within 2 seconds
+        Then I should see "This comment was deleted." within 2 seconds
 
     @comment-delete @datarequest
     Scenario: When an Org Admin visits a data request belonging to their organisation, they can delete a comment and should not see text 'This comment was deleted.'
@@ -111,10 +107,7 @@ Feature: Comments
         When I log in
         And I go to data request "Test Request" comments
         And I press the element with xpath "//a[contains(@href, '/delete')]/i[contains(@class, 'icon-remove')]"
-        Then I should see "Are you sure you want to delete this comment?" within 1 seconds
-        Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
-        Then I should not see "This comment was deleted." within 2 seconds
-        And I should see "Comment deleted by Test Admin." within 2 seconds
+        Then I should see "This comment was deleted." within 2 seconds
 
     @comment-tab
     Scenario: Non-logged in users should not see comment form in dataset tab
