@@ -98,7 +98,7 @@ Feature: Comments
         When I log in
         Then I go to dataset "warandpeace" comments
         Then I take a screenshot
-        And I press the element with xpath "//a[@title='Delete comment']"
+        And I press the element with xpath "//a[contains(@href, '/delete')]"
         Then I should see "Are you sure you want to delete this comment?" within 1 seconds
         Then I take a screenshot
         Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
