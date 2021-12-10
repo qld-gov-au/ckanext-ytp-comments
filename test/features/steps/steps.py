@@ -146,12 +146,13 @@ def submit_reply_with_comment(context, comment):
     :param comment:
     :return:
     """
+    context.execute_steps(u'Then I click the link with text that contains "Reply"')
     context.browser.execute_script("""
-        document.querySelector('.comment-wrapper form textarea[name="comment"]').value = '%s';
+        document.querySelector('.comment-wrapper form.comment-reply textarea[name="comment"]').value = '%s';
         """ % comment)
     context.execute_steps(u'Then I take a screenshot')
     context.browser.execute_script("""
-        document.querySelector('.comment-wrapper form .btn-primary[type="submit"]').click();
+        document.querySelector('.comment-wrapper form.comment-reply .btn-primary[type="submit"]').click();
         """)
 
 
