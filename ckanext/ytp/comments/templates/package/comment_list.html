@@ -80,7 +80,7 @@
 
 {% if userobj %}
 
-<form class="form" action="/{{ content_type }}/{{ pkg_id }}/comments/add" method="POST">
+<form id="comment-add" class="form" action="/{{ content_type }}/{{ pkg_id }}/comments/add" method="POST">
     <div class="form-controls">
         <label for="subject">{{ _('Subject') }}</label>
         <input type="text" class="form-control" name="subject"/>
