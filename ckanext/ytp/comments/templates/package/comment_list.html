@@ -3,6 +3,7 @@
 {% resource "comments_js/comments.js" %}
 
 {% macro comment_form(values={}, empty=False, hidden=True, prefix="", action="add") %}
+    &lt;form id="{{ prefix + values.id }}" class="form comment-{{ action }} {% if hidden %}hidden{% endif %}" action="{{ pkg_id }}/comments/{% if values.id %}{{ values.id }}/{% endif %}{{ action }}" method="POST"&gt;
     <form id="{{ prefix + values.id }}" class="form comment-{{ action }} {% if hidden %}hidden{% endif %}" action="{{ pkg_id }}/comments/{% if values.id %}{{ values.id }}/{% endif %}{{ action }}" method="POST">
         <div class="form-controls">
             <label for="subject">{{ _('Subject') }}</label>
