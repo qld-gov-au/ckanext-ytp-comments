@@ -324,4 +324,5 @@ def dataset_comments(dataset_id):
         helpers.get_content_item(content_type, context, data_dict)
     except:
         abort(403)
+    log.debug("pkg: %s, pkg_dict: %s", c.pkg, c.pkg_dict)
     return toolkit.render('package/comments.html')
