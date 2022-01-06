@@ -16,7 +16,7 @@ from ckan.plugins import toolkit
 from ckan.plugins.toolkit import _, abort, c, get_action, h, request, ValidationError
 
 from ckanext.ytp.comments import email_notifications, helpers,\
-    model as comment_model, notification_helpers
+    model as comment_model, notification_helpers, request_helpers
 
 
 log = logging.getLogger(__name__)
@@ -107,7 +107,7 @@ def edit(content_type, content_item_id, comment_id):
 
     if request.method == 'POST':
         data_dict = clean_dict(unflatten(
-            tuplize_dict(parse_params(request.POST))))
+            tuplize_dict(parse_params(request_helpers.RequestHelper(request).get_post_params()))))
         data_dict['id'] = comment_id
         data_dict['content_type'] = content_type
         data_dict['content_item_id'] = content_item_id
@@ -175,7 +175,7 @@ def _add_or_reply(comment_type, content_item_id, content_type, parent_id=None):
 
     if request.method == 'POST':
         data_dict = clean_dict(unflatten(
-            tuplize_dict(parse_params(request.POST))))
+            tuplize_dict(parse_params(request_helpers.RequestHelper(request).get_post_params()))))
         data_dict['parent_id'] = c.parent.id if c.parent else None
 
         data_dict['url'] = '/%s/%s' % (content_type, content_item_id if content_type == 'datarequest' else c.pkg.name)
