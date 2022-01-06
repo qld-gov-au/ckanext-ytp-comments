@@ -44,11 +44,11 @@ class RequestHelper():
         if not, then the Pylons param attribute will be used.
         """
         if hasattr(self.request, flask_attr):
-            param_object = self.request.getattr(flask_attr)
+            param_object = getattr(self.request, flask_attr)
             if field_name:
                 return param_object.getlist(field_name)
         else:
-            param_object = self.request.getattr(pylons_attr)
+            param_object = getattr(self.request, pylons_attr)
             if field_name:
                 return param_object.getall(field_name)
         return param_object
