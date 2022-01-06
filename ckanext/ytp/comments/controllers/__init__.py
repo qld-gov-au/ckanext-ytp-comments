@@ -60,12 +60,12 @@ def _follow_or_mute(thread_or_comment_id, action):
     :return:
     """
     if not _valid_request_and_user(thread_or_comment_id):
-        toolkit.abort(404)
+        abort(404)
 
     thread, comment = notification_helpers.get_thread_comment_or_both(thread_or_comment_id)
 
     if not thread or (comment and not thread):
-        toolkit.abort(404)
+        abort(404)
 
     notification_level = 'content_item' if not comment else 'top_level_comment'
 
