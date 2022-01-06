@@ -1,5 +1,11 @@
 # encoding: utf-8
 
+""" Common functions used by both Pylons and Flask-based routing.
+
+These functions should do the heavy lifting, with Pylons and Flask
+specific modules just providing the integration hooks.
+"""
+
 import logging
 import re
 
