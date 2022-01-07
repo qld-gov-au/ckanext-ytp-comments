@@ -88,7 +88,8 @@ def get_redirect_url(content_type, content_item_id, anchor):
 
 def render_content_template(content_type):
     return render(
-        'datarequests/comment.html' if content_type == 'datarequest' else "package/read.html"
+        'datarequests/comment.html' if content_type == 'datarequest' else "package/read.html",
+        extra_vars={'pkg': c.pkg, 'pkg_dict': c.pkg_dict}
     )
 
 
