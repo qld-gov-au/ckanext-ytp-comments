@@ -1,5 +1,8 @@
-import uuid
+# encoding: utf-8
+
 import datetime
+import six
+import uuid
 
 from sqlalchemy import Column, MetaData, ForeignKey, func
 from sqlalchemy import types
@@ -19,7 +22,7 @@ COMMENT_PENDING = "pending"
 
 
 def make_uuid():
-    return unicode(uuid.uuid4())
+    return six.text_type(uuid.uuid4())
 
 
 def acceptable_comment_on(objtype):

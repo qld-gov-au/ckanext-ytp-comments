@@ -2,7 +2,6 @@ from behave import step
 from behaving.personas.steps import *  # noqa: F401, F403
 from behaving.web.steps import *  # noqa: F401, F403
 from behaving.web.steps.url import when_i_visit_url
-from behaving.mail.steps import *
 import email
 import quopri
 
@@ -62,6 +61,22 @@ def go_to_dataset_comments(context, name):
     """ % (name))
 
 
+@step(u'I should see the add comment form')
+def comment_form_visible(context):
+    context.execute_steps(u"""
+        Then I should see an element with xpath "//input[@name='subject']"
+        And I should see an element with xpath "//textarea[@name='comment']"
+    """)
+
+
+@step(u'I should not see the add comment form')
+def comment_form_not_visible(context):
+    context.execute_steps(u"""
+        Then I should not see an element with xpath "//input[@name='subject']"
+        And I should not see an element with xpath "//textarea[@name='comment']"
+    """)
+
+
 @step('I go to organisation page')
 def go_to_organisation_page(context):
     when_i_visit_url(context, '/organization')
@@ -70,6 +85,7 @@ def go_to_organisation_page(context):
 @step('I go to register page')
 def go_to_register_page(context):
     when_i_visit_url(context, '/user/register')
+
 
 @step('I go to the data requests page')
 def go_to_data_requests_page(context):
@@ -108,12 +124,17 @@ def submit_comment_with_subject_and_comment(context, subject, comment):
     :param comment:
     :return:
     """
-    context.browser.execute_script(
-        "document.querySelector('form#comment_form input[name=\"subject\"]').value = '%s';" % subject)
-    context.browser.execute_script(
-        "document.querySelector('form#comment_form textarea[name=\"comment\"]').value = '%s';" % comment)
-    context.browser.execute_script(
-        "document.querySelector('form#comment_form .form-actions input[type=\"submit\"]').click();")
+    context.browser.execute_script("""
+        subject_field = document.querySelector('form input[name="subject"]');
+        if (subject_field) { subject_field.value = '%s'; }
+        """ % subject)
+    context.browser.execute_script("""
+        document.querySelector('form#comment-add textarea[name="comment"]').value = '%s';
+        """ % comment)
+    context.execute_steps(u'Then I take a screenshot')
+    context.browser.execute_script("""
+        document.querySelector('form#comment-add .btn-primary[type="submit"]').click();
+        """)
 
 
 @step(u'I submit a reply with comment "{comment}"')
@@ -125,10 +146,14 @@ def submit_reply_with_comment(context, comment):
     :param comment:
     :return:
     """
-    context.browser.execute_script(
-        "document.querySelector('.comment-wrapper form textarea[name=\"comment\"]').value = '%s';" % comment)
-    context.browser.execute_script(
-        "document.querySelector('.comment-wrapper form .form-actions input[type=\"submit\"]').click();")
+    context.execute_steps(u'Then I click the link with text that contains "Reply"')
+    context.browser.execute_script("""
+        document.querySelector('.comment-wrapper form.comment-reply textarea[name="comment"]').value = '%s';
+        """ % comment)
+    context.execute_steps(u'Then I take a screenshot')
+    context.browser.execute_script("""
+        document.querySelector('.comment-wrapper form.comment-reply .btn-primary[type="submit"]').click();
+        """)
 
 
 # The default behaving step does not convert base64 emails
