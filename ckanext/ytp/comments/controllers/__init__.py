@@ -126,7 +126,7 @@ def edit(content_type, content_item_id, comment_id):
             log.debug(e)
             abort(403)
 
-        h.redirect_to(
+        return h.redirect_to(
             helpers.get_redirect_url(
                 content_type,
                 content_item_id if content_type == 'datarequest' else c.pkg.name,
@@ -217,7 +217,7 @@ def _add_or_reply(comment_type, content_item_id, content_type, parent_id=None):
                     # Add the user who submitted the comment notifications for this new thread
                     notification_helpers.add_commenter_to_comment_notifications(toolkit.c.userobj.id, res['thread_id'], res['id'])
 
-        h.redirect_to(
+        return h.redirect_to(
             helpers.get_redirect_url(
                 content_type,
                 content_item_id if content_type == 'datarequest' else c.pkg.name,
@@ -302,11 +302,11 @@ def unflag(content_type, content_item_id, comment_id):
 
     if content_type == 'datarequest':
         c.datarequest = get_action('show_datarequest')(context, data_dict)
-        h.redirect_to(str('/datarequest/comment/%s#comment_%s' % (content_item_id, comment_id)))
+        return h.redirect_to(str('/datarequest/comment/%s#comment_%s' % (content_item_id, comment_id)))
     else:
         c.pkg_dict = get_action('package_show')(context, data_dict)
         c.pkg = context['package']
-        h.redirect_to(str('/dataset/%s#comment_%s' % (content_item_id, comment_id)))
+        return h.redirect_to(str('/dataset/%s#comment_%s' % (content_item_id, comment_id)))
 
     return helpers.render_content_template(content_type)
 
