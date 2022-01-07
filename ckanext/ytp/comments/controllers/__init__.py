@@ -251,14 +251,12 @@ def delete(content_type, content_item_id, comment_id):
             msg = str(e)
         h.flash_error(msg)
 
-    h.redirect_to(
+    return h.redirect_to(
         helpers.get_redirect_url(
             content_type,
             content_item_id if content_type == 'datarequest' else c.pkg.name,
             'comment_' + str(comment_id)
         ))
-
-    return helpers.render_content_template(content_type)
 
 
 def flag(comment_id):
