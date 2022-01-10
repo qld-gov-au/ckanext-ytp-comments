@@ -86,28 +86,6 @@ def go_to_register_page(context):
     when_i_visit_url(context, '/user/register')
 
 
-@step('I go to the data requests page')
-def go_to_data_requests_page(context):
-    when_i_visit_url(context, '/datarequest')
-
-
-@step(u'I go to data request "{subject}"')
-def go_to_data_request(context, subject):
-    context.execute_steps(u"""
-        When I go to the data requests page
-        And I click the link with text "%s"
-        Then I should see "%s" within 5 seconds
-    """ % (subject, subject))
-
-
-@step(u'I go to data request "{subject}" comments')
-def go_to_data_request_comments(context, subject):
-    context.execute_steps(u"""
-        When I go to data request "%s"
-        And I click the link with text that contains "Comments"
-    """ % (subject))
-
-
 @step(u'I set persona var "{key}" to "{value}"')
 def set_persona_var(context, key, value):
     context.persona[key] = value
