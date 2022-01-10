@@ -48,7 +48,10 @@ setup(
     namespace_packages=['ckanext'],
 
     install_requires=[
-        # -*- Extra requirements: -*-
+        # CKAN extensions should not list dependencies here, but in a separate
+        # ``requirements.txt`` file.
+        #
+        # http://docs.ckan.org/en/latest/extensions/best-practices.html#add-third-party-libraries-to-requirements-txt
     ],
 
     # If there are data files included in your packages that need to be
@@ -84,8 +87,10 @@ setup(
         ytp_comments=ckanext.ytp.comments.plugin:YtpCommentsPlugin
 
         [paste.paster_command]
-        initdb = ckanext.ytp.comments.command:InitDBCommand
-        init_notifications_db = ckanext.ytp.comments.command:InitNotificationsDB
-        updatedb = ckanext.ytp.comments.command:UpdateDBCommand
+        comments = ckanext.ytp.comments.cli.paster_cli:CommentsDBCommand
+
+        initdb = ckanext.ytp.comments.cli.paster_cli:InitDBCommand
+        init_notifications_db = ckanext.ytp.comments.cli.paster_cli:InitNotificationsDB
+        updatedb = ckanext.ytp.comments.cli.paster_cli:UpdateDBCommand
     ''',
 )

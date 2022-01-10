@@ -1,29 +1,27 @@
-import ckan.plugins.toolkit as toolkit
+# encoding: utf-8
+
 import logging
 import sqlalchemy
 
-from ckan.common import config
+from ckan import model
+from ckan.plugins.toolkit import asbool, c, h, config,\
+    check_access, get_action, render, render_snippet
 from profanityfilter import ProfanityFilter
-from ckan.common import c
-from ckan.lib.base import render
-from ckan.logic import check_access, get_action
-from ckanext.datarequests import actions
-import ckan.model as model
 
 _and_ = sqlalchemy.and_
 log = logging.getLogger(__name__)
 
 
 def threaded_comments_enabled():
-    return toolkit.asbool(config.get('ckan.comments.threaded_comments', False))
+    return asbool(config.get('ckan.comments.threaded_comments', False))
 
 
 def users_can_edit():
-    return toolkit.asbool(config.get('ckan.comments.users_can_edit', False))
+    return asbool(config.get('ckan.comments.users_can_edit', False))
 
 
 def show_comments_tab_page():
-    return toolkit.asbool(config.get('ckan.comments.show_comments_tab_page', False))
+    return asbool(config.get('ckan.comments.show_comments_tab_page', False))
 
 
 def profanity_check(cleaned_comment):
@@ -68,6 +66,7 @@ def load_good_words():
 
 def get_content_item(content_type, context, data_dict):
     if content_type == 'datarequest':
+        from ckanext.datarequests import actions
         c.datarequest = actions.show_datarequest(context, data_dict)
     else:
         data_dict['include_tracking'] = True
@@ -89,12 +88,13 @@ def get_redirect_url(content_type, content_item_id, anchor):
 
 def render_content_template(content_type):
     return render(
-        'datarequests/comment.html' if content_type == 'datarequest' else "package/read.html"
+        'datarequests/comment.html' if content_type == 'datarequest' else "package/read.html",
+        extra_vars={'pkg': c.pkg, 'pkg_dict': c.pkg_dict}
     )
 
 
 def user_can_edit_comment(comment_user_id):
-    user = toolkit.c.userobj
+    user = c.userobj
     if user and comment_user_id == user.id and users_can_edit():
         return True
     return False
@@ -102,9 +102,9 @@ def user_can_edit_comment(comment_user_id):
 
 def user_can_manage_comments(content_type, content_item_id):
     if content_type == 'datarequest':
-        return toolkit.h.check_access('update_datarequest', {'id': content_item_id})
+        return h.check_access('update_datarequest', {'id': content_item_id})
     elif content_type == 'dataset':
-        return toolkit.h.check_access('package_update', {'id': content_item_id})
+        return h.check_access('package_update', {'id': content_item_id})
     return False
 
 
@@ -117,7 +117,7 @@ def get_content_item_id(content_type):
 
 
 def get_user_id():
-    user = toolkit.c.userobj
+    user = c.userobj
     return user.id
 
 
@@ -134,4 +134,4 @@ def get_comment_count_for_dataset(dataset_name, content_type='dataset'):
 
 def get_content_type_comments_badge(dataset_name, content_type='dataset'):
     comments_count = get_comment_count_for_dataset(dataset_name, content_type)
-    return toolkit.render_snippet('snippets/count_badge.html', {'count': comments_count})
+    return render_snippet('snippets/count_badge.html', {'count': comments_count})

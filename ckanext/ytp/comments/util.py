@@ -21,7 +21,7 @@ def clean_input(comment):
                           remove_unknown_tags=False)
         content = cleaner.clean_html(data).replace('\n', '<br/>')
         return content
-    except Exception, e:
+    except Exception as e:
         if type(e).__name__ == "ParserError":
             raise logic.ValidationError("Comment text is required")
         else:
@@ -34,7 +34,7 @@ def remove_HTML_markup(text):
     try:
         # Returns the text content of the element, including the text content of its children, with no HTML markup.
         return fromstring(text.replace('<br/>', '\n')).text_content()
-    except Exception, e:
+    except Exception as e:
         if type(e).__name__ == "ParserError":
             raise logic.ValidationError("Text is required")
         else:

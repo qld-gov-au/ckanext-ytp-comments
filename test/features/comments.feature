@@ -4,31 +4,32 @@ Feature: Comments
     Scenario: The Add Comment form should not display for a non-logged-in user - instead they see a 'Login to comment' button
         Given "Unauthenticated" as the persona
         When I go to dataset "warandpeace" comments
-        Then I should see an element with xpath "//a[contains(string(), 'Login to comment')]"
-        And I should not see "Add a comment"
+        Then I should see "Login to comment" within 1 seconds
+        And I should not see the add comment form
 
     Scenario: Logged-in users see the add comment form
         Given "CKANUser" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
-        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
+        Then I should see the add comment form
 
     @comment-add
     Scenario: When a logged-in user submits a comment on a Dataset the comment should display within 10 seconds
         Given "CKANUser" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
-        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
+        Then I should see the add comment form
+        Then I take a screenshot
         Then I submit a comment with subject "Test subject" and comment "This is a test comment"
         Then I should see "This is a test comment" within 10 seconds
-        And I should see an element with xpath "//div[contains(@class, 'comment-wrapper highlight') and contains(string(), 'This is a test comment')]"
+        And I should see an element with xpath "//div[contains(@class, 'comment-wrapper') and contains(string(), 'This is a test comment')]"
 
     @comment-add @datarequest
     Scenario: When a logged-in user submits a comment on a Data Request the comment should then be visible on the Comments tab of the Data Request
         Given "CKANUser" as the persona
         When I log in
         And I go to data request "Test Request" comments
-        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
+        Then I should see the add comment form
         Then I submit a comment with subject "Test subject" and comment "This is a test comment"
         Then I should see "This is a test comment" within 10 seconds
 
@@ -37,7 +38,7 @@ Feature: Comments
         Given "CKANUser" as the persona
         When I log in
         And I go to data request "Test Request" comments
-        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
+        Then I should see the add comment form
         Then I submit a comment with subject "Test Request" and comment "This is a test data request comment"
         When I wait for 5 seconds
         Then I should receive a base64 email at "test_org_admin@localhost" containing "Data request subject: Test Request"
@@ -48,7 +49,8 @@ Feature: Comments
         Given "CKANUser" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
-        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
+        Then I should see the add comment form
+        Then I take a screenshot
         Then I submit a comment with subject "Test subject" and comment "sex"
         Then I should see "sex" within 10 seconds
 
@@ -57,8 +59,8 @@ Feature: Comments
         Given "CKANUser" as the persona
         When I log in
         And I go to data request "Test Request" comments
-        Then I should see an element with xpath "//h3[contains(string(), 'Add a comment')]"
-        Then I submit a comment with subject "Test subject" and comment "Go fuck yourself!"
+        Then I should see the add comment form
+        Then I submit a comment with subject "Test subject" and comment "Soccer balls"
         Then I should see "Comment blocked due to profanity" within 5 seconds
 
     @comment-report
@@ -86,6 +88,7 @@ Feature: Comments
         Given "CKANUser" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
+        Then I take a screenshot
         Then I submit a reply with comment "This is a reply"
         Then I should see "This is a reply" within 10 seconds
 
@@ -94,22 +97,17 @@ Feature: Comments
         Given "TestOrgAdmin" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
-        And I press the element with xpath "//a[@title='Delete comment']"
-        Then I should see "Are you sure you want to delete this comment?" within 1 seconds
-        Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
-        Then I should not see "This comment was deleted." within 2 seconds
-        And I should see "Comment deleted by Test Admin." within 2 seconds
+        Then I take a screenshot
+        And I press the element with xpath "//a[contains(@href, '/delete')]"
+        Then I should see "This comment was deleted." within 2 seconds
 
     @comment-delete @datarequest
     Scenario: When an Org Admin visits a data request belonging to their organisation, they can delete a comment and should not see text 'This comment was deleted.'
         Given "TestOrgAdmin" as the persona
         When I log in
         And I go to data request "Test Request" comments
-        And I press the element with xpath "//a[@title='Delete comment']"
-        Then I should see "Are you sure you want to delete this comment?" within 1 seconds
-        Then I press the element with xpath "//button[contains(string(), 'Confirm')]"
-        Then I should not see "This comment was deleted." within 2 seconds
-        And I should see "Comment deleted by Test Admin." within 2 seconds
+        And I press the element with xpath "//a[contains(@href, '/delete')]/i[contains(@class, 'icon-remove')]"
+        Then I should see "This comment was deleted." within 2 seconds
 
     @comment-tab
     Scenario: Non-logged in users should not see comment form in dataset tab

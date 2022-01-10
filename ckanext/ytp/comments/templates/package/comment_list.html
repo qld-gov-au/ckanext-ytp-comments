@@ -3,7 +3,7 @@
 {% resource "comments_js/comments.js" %}
 
 {% macro comment_form(values={}, empty=False, hidden=True, prefix="", action="add") %}
-    <form id="{{ prefix + values.id }}" class="form {% if hidden %}hidden{% endif %}" action="{{ pkg_id }}/comments/{% if values.id %}{{ values.id }}/{% endif %}{{ action }}" method="POST">
+    <form id="{{ prefix + values.id }}" class="form comment-{{ action }} {% if hidden %}hidden{% endif %}" action="/{{ content_type }}/{{ pkg_id }}/comments/{% if values.id %}{{ values.id }}/{% endif %}{{ action }}" method="POST">
         <div class="form-controls">
             <label for="subject">{{ _('Subject') }}</label>
             <input type="text" class="form-control" name="subject" {% if not empty %}value="{{ values.subject }}" {% endif %}/>
@@ -20,6 +20,7 @@
 
 
 
+{% set content_type = content_type or 'dataset' %}
 {% set thread = h.get_comment_thread(pkg_name) %}
 
 {% macro comment_thread(thread) %}
@@ -48,7 +49,7 @@
             {% if comment.state == 'active' %}
             <ul class="links list-inline">
                 {% if h.check_access('package_update', {'id': pkg_id }) %}
-                    <li><a href="/dataset/{{ pkg_id }}/comments/{{ comment.id }}/delete">{{ _('Delete') }}</a> </li>
+                    <li><a href="/{{ content_type }}/{{ pkg_id }}/comments/{{ comment.id }}/delete">{{ _('Delete') }}</a> </li>
                 {% endif %}
 
                 {% if userobj and comment.user_id == userobj.id %}
@@ -78,7 +79,7 @@
 
 {% if userobj %}
 
-<form class="form" action="{{ pkg_id }}/comments/add" method="POST">
+<form id="comment-add" class="form" action="/{{ content_type }}/{{ pkg_id }}/comments/add" method="POST">
     <div class="form-controls">
         <label for="subject">{{ _('Subject') }}</label>
         <input type="text" class="form-control" name="subject"/>
