@@ -64,8 +64,7 @@ def go_to_dataset_comments(context, name):
 @step(u'I should see the add comment form')
 def comment_form_visible(context):
     context.execute_steps(u"""
-        Then I should see an element with xpath "//input[@name='subject']"
-        And I should see an element with xpath "//textarea[@name='comment']"
+        Then I should see an element with xpath "//textarea[@name='comment']"
     """)
 
 

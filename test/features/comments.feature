@@ -55,7 +55,7 @@ Feature: Comments
         Then I should see "sex" within 10 seconds
 
     @comment-add @comment-profane @datarequest
-    Scenario: When a logged-in user submits a comment containing profanity on a Data Request they should receive an error message and the commment will not appear
+    Scenario: When a logged-in user submits a comment containing profanity on a Data Request they should receive an error message and the comment will not appear
         Given "CKANUser" as the persona
         When I log in
         And I go to data request "Test Request" comments
