@@ -128,12 +128,12 @@ def submit_comment_with_subject_and_comment(context, subject, comment):
         if (subject_field) { subject_field.value = '%s'; }
         """ % subject)
     context.browser.execute_script("""
-        document.querySelector('form#comment-add textarea[name="comment"]').value = '%s';
+        form = document.querySelector('form#comment-add')
+        if (!form) { form = document.querySelector('form#comment_form') }
+        if (!form) { form = document.querySelector('form.dataset-form') }
+        form.querySelector('textarea[name="comment"]').value = '%s';
+        form.querySelector('.btn-primary[type="submit"]').click();
         """ % comment)
-    context.execute_steps(u'Then I take a screenshot')
-    context.browser.execute_script("""
-        document.querySelector('form#comment-add .btn-primary[type="submit"]').click();
-        """)
 
 
 @step(u'I submit a reply with comment "{comment}"')
