@@ -134,7 +134,7 @@ def submit_reply_with_comment(context, comment):
 
 
 # The default behaving step does not convert base64 emails
-# Modifed the default step to decode the payload from base64
+# Modified the default step to decode the payload from base64
 @step(u'I should receive a base64 email at "{address}" containing "{text}"')
 def should_receive_base64_email_containing_text(context, address, text):
     def filter_contents(mail):
