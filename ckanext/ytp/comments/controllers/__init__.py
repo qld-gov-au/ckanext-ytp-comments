@@ -66,12 +66,12 @@ def _follow_or_mute(thread_or_comment_id, action):
     :return:
     """
     if not _valid_request_and_user(thread_or_comment_id):
-        abort(404)
+        return abort(404)
 
     thread, comment = notification_helpers.get_thread_comment_or_both(thread_or_comment_id)
 
     if not thread or (comment and not thread):
-        abort(404)
+        return abort(404)
 
     notification_level = 'content_item' if not comment else 'top_level_comment'
 
@@ -103,7 +103,7 @@ def edit(content_type, content_item_id, comment_id):
         # Load the content item
         helpers.get_content_item(content_type, context, data_dict)
     except:
-        abort(403)
+        return abort(403)
 
     if request.method == 'POST':
         data_dict = clean_dict(unflatten(
@@ -124,7 +124,7 @@ def edit(content_type, content_item_id, comment_id):
             h.flash_error(msg)
         except Exception as e:
             log.debug(e)
-            abort(403)
+            return abort(403)
 
         return h.redirect_to(
             helpers.get_redirect_url(
@@ -145,7 +145,7 @@ def reply(content_type, dataset_id, parent_id):
                                                    data)
         c.parent = data['comment']
     except:
-        abort(404)
+        return abort(404)
 
     return _add_or_reply('reply', dataset_id, content_type, parent_id)
 
@@ -171,7 +171,7 @@ def _add_or_reply(comment_type, content_item_id, content_type, parent_id=None):
         # Load the content item
         helpers.get_content_item(content_type, context, data_dict)
     except:
-        abort(403)
+        return abort(403)
 
     if request.method == 'POST':
         data_dict = clean_dict(unflatten(
@@ -193,7 +193,7 @@ def _add_or_reply(comment_type, content_item_id, content_type, parent_id=None):
             h.flash_error(msg)
         except Exception as e:
             log.debug(e)
-            abort(403)
+            return abort(403)
 
         if success:
             email_notifications.notify_admins_and_comment_notification_recipients(
@@ -238,7 +238,7 @@ def delete(content_type, content_item_id, comment_id):
         # Load the content item
         helpers.get_content_item(content_type, context, data_dict)
     except:
-        abort(403)
+        return abort(403)
 
     try:
         data_dict = {'id': comment_id, 'content_type': content_type, 'content_item_id': content_item_id}
@@ -268,6 +268,7 @@ def flag(comment_id):
             model.Session.add(comment)
             model.Session.commit()
             email_notifications.flagged_comment_notification(comment)
+    return ""
 
 
 def unflag(content_type, content_item_id, comment_id):
@@ -287,7 +288,7 @@ def unflag(content_type, content_item_id, comment_id):
             or not comment.flagged \
             or not authz.auth_is_loggedin_user() \
             or not helpers.user_can_manage_comments(content_type, content_item_id):
-        abort(403)
+        return abort(403)
 
     comment.flagged = False
 
@@ -321,6 +322,6 @@ def dataset_comments(dataset_id):
         # Load the content item
         helpers.get_content_item(content_type, context, data_dict)
     except:
-        abort(403)
+        return abort(403)
     return toolkit.render('package/comments.html', extra_vars={
         'pkg': c.pkg, 'pkg_dict': c.pkg_dict})

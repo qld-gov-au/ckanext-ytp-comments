@@ -9,6 +9,3 @@ flake8==3.8.3
 mock
 pytest-ckan
 splinter>=0.13.0,<0.17
-
--e git+https://github.com/ckan/ckanext-scheming@release-1.2.0#egg=ckanext-scheming
--e git+https://github.com/qld-gov-au/ckanext-datarequests@2.2.0-qgov#egg=ckanext-datarequests

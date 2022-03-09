@@ -96,50 +96,6 @@ package_owner_org_update=$( \
 )
 echo ${package_owner_org_update}
 
-##
-# BEGIN: Create a Data Request organisation with test users for admin, editor and member and default data requests
-#
-# Data Requests requires a specific organisation to exist in order to create DRs for Data.Qld
-DR_ORG_NAME=open-data-administration-data-requests
-DR_ORG_TITLE="Open Data Administration (data requests)"
-
-echo "Creating test users for ${DR_ORG_TITLE} Organisation:"
-
-add_user_if_needed dr_admin "Data Request Admin" dr_admin@localhost
-add_user_if_needed dr_editor "Data Request Editor" dr_editor@localhost
-add_user_if_needed dr_member "Data Request Member" dr_member@localhost
-
-echo "Creating ${DR_ORG_TITLE} Organisation:"
-
-DR_ORG=$( \
-    curl -LsH "Authorization: ${API_KEY}" \
-    --data "name=${DR_ORG_NAME}&title=${DR_ORG_TITLE}" \
-    ${CKAN_ACTION_URL}/organization_create
-)
-
-DR_ORG_ID=$(echo $DR_ORG | sed -r 's/^(.*)"id": "(.*)",(.*)/\2/')
-
-echo "Assigning test users to ${DR_ORG_TITLE} Organisation:"
-
-curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=${DR_ORG_ID}&object=dr_admin&object_type=user&capacity=admin" \
-    ${CKAN_ACTION_URL}/member_create
-
-curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=${DR_ORG_ID}&object=dr_editor&object_type=user&capacity=editor" \
-    ${CKAN_ACTION_URL}/member_create
-
-curl -LsH "Authorization: ${API_KEY}" \
-    --data "id=${DR_ORG_ID}&object=dr_member&object_type=user&capacity=member" \
-    ${CKAN_ACTION_URL}/member_create
-
-
-echo "Creating test Data Request:"
-
-curl -LsH "Authorization: ${API_KEY}" \
-    --data "title=Test Request&description=This is an example&organization_id=${TEST_ORG_ID}" \
-    ${CKAN_ACTION_URL}/create_datarequest
-
 if [ "$VENV_DIR" != "" ]; then
   deactivate
 fi

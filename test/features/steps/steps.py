@@ -64,8 +64,7 @@ def go_to_dataset_comments(context, name):
 @step(u'I should see the add comment form')
 def comment_form_visible(context):
     context.execute_steps(u"""
-        Then I should see an element with xpath "//input[@name='subject']"
-        And I should see an element with xpath "//textarea[@name='comment']"
+        Then I should see an element with xpath "//textarea[@name='comment']"
     """)
 
 
@@ -85,28 +84,6 @@ def go_to_organisation_page(context):
 @step('I go to register page')
 def go_to_register_page(context):
     when_i_visit_url(context, '/user/register')
-
-
-@step('I go to the data requests page')
-def go_to_data_requests_page(context):
-    when_i_visit_url(context, '/datarequest')
-
-
-@step(u'I go to data request "{subject}"')
-def go_to_data_request(context, subject):
-    context.execute_steps(u"""
-        When I go to the data requests page
-        And I click the link with text "%s"
-        Then I should see "%s" within 5 seconds
-    """ % (subject, subject))
-
-
-@step(u'I go to data request "{subject}" comments')
-def go_to_data_request_comments(context, subject):
-    context.execute_steps(u"""
-        When I go to data request "%s"
-        And I click the link with text that contains "Comments"
-    """ % (subject))
 
 
 @step(u'I set persona var "{key}" to "{value}"')
@@ -129,12 +106,12 @@ def submit_comment_with_subject_and_comment(context, subject, comment):
         if (subject_field) { subject_field.value = '%s'; }
         """ % subject)
     context.browser.execute_script("""
-        document.querySelector('form#comment-add textarea[name="comment"]').value = '%s';
+        form = document.querySelector('form#comment-add')
+        if (!form) { form = document.querySelector('form#comment_form') }
+        if (!form) { form = document.querySelector('form.dataset-form') }
+        form.querySelector('textarea[name="comment"]').value = '%s';
+        form.querySelector('.btn-primary[type="submit"]').click();
         """ % comment)
-    context.execute_steps(u'Then I take a screenshot')
-    context.browser.execute_script("""
-        document.querySelector('form#comment-add .btn-primary[type="submit"]').click();
-        """)
 
 
 @step(u'I submit a reply with comment "{comment}"')
@@ -157,7 +134,7 @@ def submit_reply_with_comment(context, comment):
 
 
 # The default behaving step does not convert base64 emails
-# Modifed the default step to decode the payload from base64
+# Modified the default step to decode the payload from base64
 @step(u'I should receive a base64 email at "{address}" containing "{text}"')
 def should_receive_base64_email_containing_text(context, address, text):
     def filter_contents(mail):
