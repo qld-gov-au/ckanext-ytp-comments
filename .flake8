@@ -15,7 +15,7 @@ max-complexity = 10
 
 # List ignore rules one per line.
 ignore =
-    E501
     C901
+    E501
     E722
     W503

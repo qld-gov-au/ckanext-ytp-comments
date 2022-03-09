@@ -24,26 +24,6 @@ Feature: Comments
         Then I should see "This is a test comment" within 10 seconds
         And I should see an element with xpath "//div[contains(@class, 'comment-wrapper') and contains(string(), 'This is a test comment')]"
 
-    @comment-add @datarequest
-    Scenario: When a logged-in user submits a comment on a Data Request the comment should then be visible on the Comments tab of the Data Request
-        Given "CKANUser" as the persona
-        When I log in
-        And I go to data request "Test Request" comments
-        Then I should see the add comment form
-        Then I submit a comment with subject "Test subject" and comment "This is a test comment"
-        Then I should see "This is a test comment" within 10 seconds
-
-    @comment-add @datarequest @comment-email
-    Scenario: When a logged-in user submits a comment on a Data Request the email should contain title and comment
-        Given "CKANUser" as the persona
-        When I log in
-        And I go to data request "Test Request" comments
-        Then I should see the add comment form
-        Then I submit a comment with subject "Test Request" and comment "This is a test data request comment"
-        When I wait for 5 seconds
-        Then I should receive a base64 email at "test_org_admin@localhost" containing "Data request subject: Test Request"
-        And I should receive a base64 email at "test_org_admin@localhost" containing "Comment: This is a test data request comment"
-
     @comment-add @comment-profane
     Scenario: When a logged-in user submits a comment containing whitelisted profanity on a Dataset the comment should display within 10 seconds
         Given "CKANUser" as the persona
@@ -54,30 +34,11 @@ Feature: Comments
         Then I submit a comment with subject "Test subject" and comment "sex"
         Then I should see "sex" within 10 seconds
 
-    @comment-add @comment-profane @datarequest
-    Scenario: When a logged-in user submits a comment containing profanity on a Data Request they should receive an error message and the commment will not appear
-        Given "CKANUser" as the persona
-        When I log in
-        And I go to data request "Test Request" comments
-        Then I should see the add comment form
-        Then I submit a comment with subject "Test subject" and comment "Soccer balls"
-        Then I should see "Comment blocked due to profanity" within 5 seconds
-
     @comment-report
     Scenario: When a logged-in user reports a comment on a Dataset the comment should be marked as reported and an email sent to the admins of the organisation
         Given "CKANUser" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
-        And I press the element with xpath "//a[contains(string(), 'Report')]"
-        Then I should see "Reported" within 5 seconds
-        When I wait for 3 seconds
-        Then I should receive a base64 email at "test_org_admin@localhost" containing "This comment has been flagged as inappropriate by a user"
-
-    @comment-report @datarequest
-    Scenario: When a logged-in user reports a comment on a Data Request the comment should be marked as reported and an email notification sent to the organisation admins
-        Given "CKANUser" as the persona
-        When I log in
-        And I go to data request "Test Request" comments
         And I press the element with xpath "//a[contains(string(), 'Report')]"
         Then I should see "Reported" within 5 seconds
         When I wait for 3 seconds
@@ -99,14 +60,6 @@ Feature: Comments
         Then I go to dataset "warandpeace" comments
         Then I take a screenshot
         And I press the element with xpath "//a[contains(@href, '/delete')]"
-        Then I should see "This comment was deleted." within 2 seconds
-
-    @comment-delete @datarequest
-    Scenario: When an Org Admin visits a data request belonging to their organisation, they can delete a comment and should not see text 'This comment was deleted.'
-        Given "TestOrgAdmin" as the persona
-        When I log in
-        And I go to data request "Test Request" comments
-        And I press the element with xpath "//a[contains(@href, '/delete')]/i[contains(@class, 'icon-remove')]"
         Then I should see "This comment was deleted." within 2 seconds
 
     @comment-tab
