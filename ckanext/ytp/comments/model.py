@@ -3,7 +3,7 @@
 import datetime
 import six
 import uuid
-import six.moves.urllib.parse as urlparse
+from six.moves.urllib.parse import urlparse
 
 from sqlalchemy import Column, MetaData, ForeignKey, func
 from sqlalchemy import types
