@@ -1,10 +1,13 @@
-import ckan.model as model
+# encoding: utf-8
+
 import logging
 import sqlalchemy
 
-from ckan.common import config
-from model import Comment, CommentThread
-from notification_models import CommentNotificationRecipient
+from ckan import model
+from ckan.plugins.toolkit import config
+
+from .model import Comment, CommentThread
+from .notification_models import CommentNotificationRecipient
 
 _and_ = sqlalchemy.and_
 log = logging.getLogger(__name__)
