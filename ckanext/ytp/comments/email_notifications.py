@@ -4,9 +4,9 @@ import logging
 
 from ckan import authz, model
 from ckan.lib import maintain
-from ckan.lib.mailer import MailerException
+from ckan.lib.mailer import mail_recipient, MailerException
 from ckan.plugins.toolkit import asbool, config, enqueue_job, get_action, \
-    get_or_bust, mail_recipient, render, url_for, ObjectNotFound
+    get_or_bust, render, url_for, ObjectNotFound
 
 from . import notification_helpers, util
 
