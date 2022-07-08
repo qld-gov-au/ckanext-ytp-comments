@@ -2,9 +2,9 @@
 
 import logging
 
+from ckan.plugins.toolkit import abort, check_access, get_or_bust
+
 import ckanext.ytp.comments.model as comment_model
-from ckan.lib.base import abort
-from ckan import logic
 
 log = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ def thread_show(context, data_dict):
         return abort(404)
 
     data_dict['thread'] = thread
-    # logic.check_access("thread_show", context, data_dict)
+    # check_access("thread_show", context, data_dict)
 
     # Dictize the thread and all the comments within it.
     thread_dict = thread.as_dict()
@@ -73,11 +73,11 @@ def thread_show(context, data_dict):
 
 
 def comment_show(context, data_dict):
-    id = logic.get_or_bust(data_dict, 'id')
+    id = get_or_bust(data_dict, 'id')
     comment = comment_model.Comment.get(id)
     if not comment:
         abort(404)
-    logic.check_access("comment_show", context, data_dict)
+    check_access("comment_show", context, data_dict)
     data_dict['comment'] = comment
 
     return comment.as_dict()
@@ -86,7 +86,7 @@ def comment_show(context, data_dict):
 def comment_count(context, data_dict):
 
     # For now everybody is allowed to view count
-    # logic.check_access('comment_count', context, data_dict)
+    # check_access('comment_count', context, data_dict)
     url = data_dict.get('url')
     id = data_dict.get('id')
     count = None

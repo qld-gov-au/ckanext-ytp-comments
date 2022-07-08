@@ -1,11 +1,11 @@
+# encoding: utf-8
+
 import datetime
-import ckan.plugins.toolkit as toolkit
-import ckanext.ytp.comments.model as comment_model
-import ckanext.ytp.comments.util as util
-from ckan import logic
-from ckan.common import config
-from ckanext.ytp.comments import helpers
 import logging
+
+from ckan.plugins.toolkit import asbool, check_access, config, ValidationError
+
+from ckanext.ytp.comments import helpers, model as comment_model, util
 
 log = logging.getLogger(__name__)
 
@@ -16,11 +16,11 @@ def comment_create(context, data_dict):
 
     userobj = model.User.get(user)
 
-    logic.check_access("comment_create", context, data_dict)
+    check_access("comment_create", context, data_dict)
 
     # Validate that we have the required fields.
     if not all([data_dict.get('comment')]):
-        raise logic.ValidationError("Comment text is required")
+        raise ValidationError("Comment text is required")
 
     thread_id = data_dict.get('thread_id')
 
@@ -31,15 +31,15 @@ def comment_create(context, data_dict):
             thread_id = thread.id if thread else None
 
     if not thread_id:
-        raise logic.ValidationError("Thread identifier or URL is required")
+        raise ValidationError("Thread identifier or URL is required")
 
     # Cleanup the comment
     cleaned_comment = util.clean_input(data_dict.get('comment'))
 
     # Run profanity check
-    if toolkit.asbool(config.get('ckan.comments.check_for_profanity', False)) \
+    if asbool(config.get('ckan.comments.check_for_profanity', False)) \
             and (helpers.profanity_check(cleaned_comment) or helpers.profanity_check(data_dict.get('subject', ''))):
-        raise logic.ValidationError({"message": "Comment blocked due to profanity."})
+        raise ValidationError({"message": "Comment blocked due to profanity."})
 
     # Create the object
     cmt = comment_model.Comment(thread_id=thread_id,

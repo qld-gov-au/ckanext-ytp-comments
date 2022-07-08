@@ -1,19 +1,17 @@
-import ckan.authz as authz
-import ckan.lib.mailer as mailer
-import ckan.logic as logic
-import ckan.model as model
-import ckan.plugins.toolkit as toolkit
-import logging
-import notification_helpers
-import ckanext.ytp.comments.util as util
-import ckan.lib.maintain as maintain
+# encoding: utf-8
 
-from ckan.common import config
-from ckan.lib.base import render_jinja2
+import logging
+
+from ckan import authz, model
+from ckan.lib import maintain
+from ckan.lib.mailer import MailerException
+from ckan.plugins.toolkit import asbool, config, enqueue_job, get_action, \
+    get_or_bust, mail_recipient, render, url_for, ObjectNotFound
+
+from . import notification_helpers, util
 
 
 log1 = logging.getLogger(__name__)
-NotFound = logic.NotFound
 
 
 def get_member_list(context, data_dict=None):
@@ -30,14 +28,14 @@ def get_member_list(context, data_dict=None):
 
     :rtype: list of (id, type, capacity) tuples
 
-    :raises: :class:`ckan.logic.NotFound`: if the group doesn't exist
+    :raises: :class:`ckan.logic.ObjectNotFound`: if the group doesn't exist
 
     '''
     model = context['model']
 
-    group = model.Group.get(logic.get_or_bust(data_dict, 'id'))
+    group = model.Group.get(get_or_bust(data_dict, 'id'))
     if not group:
-        raise NotFound
+        raise ObjectNotFound
 
     obj_type = data_dict.get('object_type', None)
     capacity = data_dict.get('capacity', None)
@@ -97,7 +95,7 @@ def get_dataset_author_email(dataset_id):
     :return: string of dataset author email address
     """
     context = {'model': model}
-    dataset = logic.get_action('package_show')(context, {'id': dataset_id})
+    dataset = get_action('package_show')(context, {'id': dataset_id})
 
     return dataset.get('author_email', None) if dataset else None
 
@@ -121,8 +119,8 @@ def send_email(to, subject, msg):
     }
 
     try:
-        mailer.mail_recipient(**mail_dict)
-    except mailer.MailerException:
+        mail_recipient(**mail_dict)
+    except MailerException:
         log1.error(u'Cannot send email notification to %s.', to, exc_info=1)
 
 
@@ -136,11 +134,11 @@ def send_notification_emails(users, template, extra_vars):
     :return:
     """
     if users:
-        subject = render_jinja2('emails/subjects/{0}.txt'.format(template), extra_vars)
-        body = render_jinja2('emails/bodies/{0}.txt'.format(template), extra_vars)
+        subject = render('emails/subjects/{0}.txt'.format(template), extra_vars)
+        body = render('emails/bodies/{0}.txt'.format(template), extra_vars)
 
         for user in users:
-            toolkit.enqueue_job(send_email, [user, subject, body], title=u'Comment Email')
+            enqueue_job(send_email, [user, subject, body], title=u'Comment Email')
 
 
 def get_admins(owner_org, user, content_type, content_item_id):
@@ -230,10 +228,10 @@ def get_content_item_link(content_type, content_item_id, comment_id=None):
     :return:
     """
     # Default to the dataset route as this is the way `ckanext-ytp-comments` always worked
-    url = toolkit.url_for('dataset_read', id=content_item_id, qualified=True)
+    url = url_for('dataset_read', id=content_item_id, qualified=True)
     if content_type == 'datarequest':
-        url = toolkit.url_for('comment_datarequest', id=content_item_id, qualified=True)
-    elif toolkit.asbool(config.get('ckan.comments.show_comments_tab_page', False)):
+        url = url_for('comment_datarequest', id=content_item_id, qualified=True)
+    elif asbool(config.get('ckan.comments.show_comments_tab_page', False)):
         # Not sure why `url_for` won't recognise "dataset_comments" as a named route, even though it is named in
         # the plugins.py "before_map" function as such, so we do this:
         url += '/comments'
@@ -260,10 +258,10 @@ def get_content_type_and_org_id(context, thread_url, content_item_id):
         else:
             content_type = 'dataset'
             action = 'package_show'
-        content_item = logic.get_action(action)(context, data_dict)
+        content_item = get_action(action)(context, data_dict)
         if content_item:
             org_id = content_item['organization_id'] if content_type == 'datarequest' else content_item['owner_org']
-    except NotFound:
+    except ObjectNotFound:
         log1.error('Content item (%s) with ID %s not found' % (content_type, content_item_id))
 
     return content_type, org_id
@@ -277,7 +275,7 @@ def flagged_comment_notification(comment):
     :return:
     """
     context = {'model': model}
-    thread = logic.get_action('thread_show')(context, {'id': comment.thread_id})
+    thread = get_action('thread_show')(context, {'id': comment.thread_id})
 
     if thread:
         # Last fragment contains the UUID of the content item

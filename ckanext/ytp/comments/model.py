@@ -3,6 +3,7 @@
 import datetime
 import six
 import uuid
+import six.moves.urllib.parse urlparse as urlparse
 
 from sqlalchemy import Column, MetaData, ForeignKey, func
 from sqlalchemy import types
@@ -10,7 +11,7 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
 from ckan.plugins import toolkit
-from ckan.lib.base import model, config
+from ckan.lib.base import model
 
 log = __import__('logging').getLogger(__name__)
 
@@ -51,7 +52,6 @@ class CommentThread(Base):
         We are only interested in the path, so we will strip out
         everything else
         """
-        from urlparse import urlparse
         parsed = urlparse(incoming)
 
         # Perhaps check on acceptable_comment_on()?
@@ -211,13 +211,12 @@ class Comment(Base):
             setattr(self, k, v)
 
         # Auto-set some values based on configuration
-        from pylons import config
-        if toolkit.asbool(config.get('ckan.comments.moderation', 'true')):
+        if toolkit.asbool(toolkit.config.get('ckan.comments.moderation', 'true')):
             self.approval_status = COMMENT_PENDING
         else:
             # If user wants first comment moderated and the user who wrote this hasn't
             # got another comment, put it into moderation, otherwise approve
-            if toolkit.asbool(config.get('ckan.comments.moderation.first_only', 'true')) and \
+            if toolkit.asbool(toolkit.config.get('ckan.comments.moderation.first_only', 'true')) and \
                     Comment.count_for_user(self.user, COMMENT_APPROVED) == 0:
                 self.approval_status = COMMENT_PENDING
             else:
@@ -239,7 +238,7 @@ class Comment(Base):
             user_state = self.comment_user.state
 
         # Hack
-        if name == config.get('ckan.site_id', 'ckan_site_user') or not name:
+        if name == toolkit.config.get('ckan.site_id', 'ckan_site_user') or not name:
             name = 'anonymous'
 
         d = {}
