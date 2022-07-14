@@ -1,11 +1,10 @@
+# encoding: utf-8
+
 import logging
-from pylons.i18n import _
 
-import ckan.authz as authz
-from ckan import logic
-import ckanext.ytp.comments.model as comment_model
+from ckan.plugins.toolkit import _, get_or_bust
 
-from ckanext.ytp.comments import helpers
+from ckanext.ytp.comments import helpers, model as comment_model
 
 
 log = logging.getLogger(__name__)
@@ -17,10 +16,10 @@ def comment_delete(context, data_dict):
 
     userobj = model.User.get(user)
     # If sysadmin.
-    if authz.is_sysadmin(user):
+    if userobj and userobj.sysadmin:
         return {'success': True}
 
-    cid = logic.get_or_bust(data_dict, 'id')
+    cid = get_or_bust(data_dict, 'id')
 
     comment = comment_model.Comment.get(cid)
     if not comment:
