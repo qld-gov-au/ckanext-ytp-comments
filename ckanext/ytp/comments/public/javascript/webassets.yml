@@ -1,0 +1,7 @@
+comments-js:
+  contents:
+    - comments.js
+  output: data_qld/%(version)s_comments.js
+  extra:
+    preload:
+      - vendor/jquery

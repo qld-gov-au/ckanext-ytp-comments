@@ -1,6 +1,9 @@
 
-
-{% resource "comments_js/comments.js" %}
+{% if h.ckan_version() > '2.9' %}
+    {% snippet "snippets/comments-js_asset.html" %}
+{% else %}
+    {% snippet "snippets/comments-js_resource.html" %}
+{% endif %}
 
 {% macro comment_form(values={}, empty=False, hidden=True, prefix="", action="add") %}
     <form id="{{ prefix + values.id }}" class="form comment-{{ action }} {% if hidden %}hidden{% endif %}" action="/{{ content_type }}/{{ pkg_id }}/comments/{% if values.id %}{{ values.id }}/{% endif %}{{ action }}" method="POST">
