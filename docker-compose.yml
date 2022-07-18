@@ -52,16 +52,6 @@ services:
     environment:
       <<: *default-environment
 
-  postgres-datastore:
-    image: amazeeio/postgres-ckan
-    ports:
-      - "5432"
-    networks:
-      - amazeeio-network
-      - default
-    environment:
-      <<: *default-environment
-
   redis:
     image: redis:6-alpine
     environment:

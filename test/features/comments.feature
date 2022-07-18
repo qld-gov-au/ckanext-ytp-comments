@@ -19,7 +19,6 @@ Feature: Comments
         When I log in
         Then I go to dataset "warandpeace" comments
         Then I should see the add comment form
-        Then I take a screenshot
         Then I submit a comment with subject "Test subject" and comment "This is a test comment"
         Then I should see "This is a test comment" within 10 seconds
         And I should see an element with xpath "//div[contains(@class, 'comment-wrapper') and contains(string(), 'This is a test comment')]"
@@ -30,7 +29,6 @@ Feature: Comments
         When I log in
         Then I go to dataset "warandpeace" comments
         Then I should see the add comment form
-        Then I take a screenshot
         Then I submit a comment with subject "Test subject" and comment "sex"
         Then I should see "sex" within 10 seconds
 
@@ -54,11 +52,10 @@ Feature: Comments
         Then I should see "This is a reply" within 10 seconds
 
     @comment-delete
-    Scenario: When an Org Admin visits a dataset belonging to their organisation, they can delete a comment and should not see text 'This comment was deleted.'
+    Scenario: When an Org Admin visits a dataset belonging to their organisation, they can delete a comment and should see deletion text for the user responsible.
         Given "TestOrgAdmin" as the persona
         When I log in
         Then I go to dataset "warandpeace" comments
-        Then I take a screenshot
         And I press the element with xpath "//a[contains(@href, '/delete')]"
         Then I should see "This comment was deleted." within 2 seconds
 
