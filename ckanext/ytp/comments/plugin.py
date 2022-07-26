@@ -6,7 +6,7 @@ import six
 from ckan import plugins
 from ckan.plugins import implements, toolkit
 
-from ckanext.ytp.comments import helpers, notification_helpers
+from . import helpers, notification_helpers
 
 log = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 if helpers.is_ckan_29():
     from .plugin_mixins.flask_plugin import MixinPlugin
 else:
-    from ckanext.ytp.comments.plugin.pylons_plugin import MixinPlugin
+    from .plugin_mixins.pylons_plugin import MixinPlugin
 
 
 class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
@@ -30,9 +30,9 @@ class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
         log.debug("Configuring comments module")
 
     def update_config(self, config):
-        toolkit.add_template_directory(config, "../templates")
-        toolkit.add_public_directory(config, '../public')
-        toolkit.add_resource('../public/javascript/', 'comments_js')
+        toolkit.add_template_directory(config, "templates")
+        toolkit.add_public_directory(config, 'public')
+        toolkit.add_resource('public/javascript/', 'comments_js')
 
     def update_config_schema(self, schema):
         schema.update({

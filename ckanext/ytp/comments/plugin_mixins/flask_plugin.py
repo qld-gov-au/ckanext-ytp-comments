@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 import ckan.plugins as p
+
 from ckanext.ytp.comments.cli import click_cli
 from ckanext.ytp.comments.controllers import blueprints
 
