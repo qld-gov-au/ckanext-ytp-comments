@@ -46,7 +46,7 @@ PERSONAS = {
         'name': u'test_org_member',
         'email': u'test_org_member@localhost',
         'password': u'Password123!'
-    }
+    },
 }
 
 

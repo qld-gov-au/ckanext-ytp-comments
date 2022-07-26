@@ -21,7 +21,7 @@ services:
   ckan:
     build:
       context: .
-      dockerfile: .docker/Dockerfile.ckan
+      dockerfile: .docker/Dockerfile-${PYTHON_VERSION}.ckan
       args:
         SITE_URL: "http://${PROJECT}.docker.amazee.io"
         CKAN_REPO:
@@ -43,16 +43,6 @@ services:
       AMAZEEIO_URL: "${PROJECT}.docker.amazee.io"
 
   postgres:
-    image: amazeeio/postgres-ckan
-    ports:
-      - "5432"
-    networks:
-      - amazeeio-network
-      - default
-    environment:
-      <<: *default-environment
-
-  postgres-datastore:
     image: amazeeio/postgres-ckan
     ports:
       - "5432"
