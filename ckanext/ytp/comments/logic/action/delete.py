@@ -1,7 +1,8 @@
-import logging
-import ckan.logic as logic
+# encoding: utf-8
 
-from ckan.lib.base import abort
+import logging
+
+from ckan.plugins.toolkit import abort, check_access, get_or_bust
 
 import ckanext.ytp.comments.model as comment_model
 
@@ -13,14 +14,14 @@ def comment_delete(context, data_dict):
     user = context['user']
     userobj = model.User.get(user)
 
-    logic.check_access("comment_delete", context, data_dict)
+    check_access("comment_delete", context, data_dict)
 
     # Comment should either be set state=='deleted' if no children,
     # otherwise content should be set to withdrawn text
-    id = logic.get_or_bust(data_dict, 'id')
+    id = get_or_bust(data_dict, 'id')
     comment = comment_model.Comment.get(id)
     if not comment:
-        abort(404)
+        return abort(404)
 
     comment.state = 'deleted'
     comment.deleted_by_user_id = userobj.id
