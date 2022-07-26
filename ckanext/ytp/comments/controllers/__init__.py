@@ -102,7 +102,7 @@ def edit(content_type, content_item_id, comment_id):
     try:
         # Load the content item
         helpers.get_content_item(content_type, context, data_dict)
-    except:
+    except Exception:
         return abort(403)
 
     if request.method == 'POST':
@@ -144,7 +144,7 @@ def reply(content_type, dataset_id, parent_id):
         c.parent_dict = get_action("comment_show")({'model': model, 'user': c.user},
                                                    data)
         c.parent = data['comment']
-    except:
+    except Exception:
         return abort(404)
 
     return _add_or_reply('reply', dataset_id, content_type, parent_id)
@@ -170,7 +170,7 @@ def _add_or_reply(comment_type, content_item_id, content_type, parent_id=None):
     try:
         # Load the content item
         helpers.get_content_item(content_type, context, data_dict)
-    except:
+    except Exception:
         return abort(403)
 
     if request.method == 'POST':
@@ -237,7 +237,7 @@ def delete(content_type, content_item_id, comment_id):
     try:
         # Load the content item
         helpers.get_content_item(content_type, context, data_dict)
-    except:
+    except Exception:
         return abort(403)
 
     try:
@@ -321,7 +321,7 @@ def dataset_comments(dataset_id):
     try:
         # Load the content item
         helpers.get_content_item(content_type, context, data_dict)
-    except:
+    except Exception:
         return abort(403)
     return toolkit.render('package/comments.html', extra_vars={
         'pkg': c.pkg, 'pkg_dict': c.pkg_dict})
