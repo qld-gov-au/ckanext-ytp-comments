@@ -11,8 +11,8 @@ from ckanext.ytp.comments import helpers, notification_helpers
 log = logging.getLogger(__name__)
 
 
-if toolkit.check_ckan_version("2.9"):
-    from ckanext.ytp.comments.plugin.flask_plugin import MixinPlugin
+if helpers.is_ckan_29():
+    from .plugin_mixins.flask_plugin import MixinPlugin
 else:
     from ckanext.ytp.comments.plugin.pylons_plugin import MixinPlugin
 
@@ -50,6 +50,7 @@ class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
         return {
             'get_comment_thread': helpers.get_comment_thread,
             'get_content_type_comments_badge': helpers.get_content_type_comments_badge,
+            'is_ckan_29': helpers.is_ckan_29,
             'threaded_comments_enabled': helpers.threaded_comments_enabled,
             'users_can_edit': helpers.users_can_edit,
             'user_can_edit_comment': helpers.user_can_edit_comment,
