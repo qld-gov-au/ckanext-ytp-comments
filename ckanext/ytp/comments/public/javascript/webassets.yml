@@ -1,7 +1,24 @@
 comments-js:
   contents:
     - comments.js
-  output: data_qld/%(version)s_comments.js
+  output: comments_js/%(version)s_comments.js
+  extra:
+    preload:
+      - vendor/jquery
+
+comments-validation-js:
+  contents:
+    - comments_validation.js
+  output: comments_js/%(version)s_comments_validation.js
+  extra:
+    preload:
+      - comments_js/comments-js
+
+follow_or_mute-js:
+  contents:
+    - follow_or_mute_notifications.js
+    - confirm_mute_content_item.js
+  output: comments_js/%(version)s_follow_or_mute_notifications.js
   extra:
     preload:
       - vendor/jquery
