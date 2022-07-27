@@ -22,7 +22,7 @@ def comment_update(context, data_dict):
     cid = get_or_bust(data_dict, 'id')
     comment = comment_model.Comment.get(cid)
     if not comment:
-        abort(404)
+        return abort(404)
 
     # Validate that we have the required fields.
     if not all([data_dict.get('comment')]):
