@@ -30,12 +30,6 @@ if [ "$API_KEY" = "None" ]; then
     API_KEY=$(ckan_cli user token add "${CKAN_USER_NAME}" test_setup |grep -v '^API Token created' | tr -d '[:space:]')
 fi
 
-# Creating test data hierarchy which creates organisations assigned to datasets
-ckan_cli create-test-data hierarchy
-
-# Creating basic test data which has datasets with resources
-ckan_cli create-test-data basic
-
 ##
 # BEGIN: Create a test organisation with test users for admin, editor and member
 #
@@ -75,6 +69,12 @@ curl -LsH "Authorization: ${API_KEY}" \
 ##
 # END.
 #
+
+# Creating test data hierarchy which creates organisations assigned to datasets
+ckan_cli create-test-data hierarchy
+
+# Creating basic test data which has datasets with resources
+ckan_cli create-test-data basic
 
 # Datasets need to be assigned to an organisation
 
