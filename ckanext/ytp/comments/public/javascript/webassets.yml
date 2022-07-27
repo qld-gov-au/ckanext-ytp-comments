@@ -6,10 +6,10 @@ comments-js:
     preload:
       - vendor/jquery
 
-comments-validation-js:
+comment-validation-js:
   contents:
-    - comments_validation.js
-  output: comments_js/%(version)s_comments_validation.js
+    - comment_validation.js
+  output: comments_js/%(version)s_comment_validation.js
   extra:
     preload:
       - comments_js/comments-js
