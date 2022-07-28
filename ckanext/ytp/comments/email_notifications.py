@@ -8,7 +8,7 @@ from ckan.lib.mailer import mail_recipient, MailerException
 from ckan.plugins.toolkit import asbool, config, enqueue_job, get_action, \
     get_or_bust, render, url_for, ObjectNotFound
 
-from . import notification_helpers, util
+from . import helpers, notification_helpers, util
 
 
 log1 = logging.getLogger(__name__)
@@ -227,14 +227,16 @@ def get_content_item_link(content_type, content_item_id, comment_id=None):
     :param comment_id: string `comment`.`id`
     :return:
     """
-    # Default to the dataset route as this is the way `ckanext-ytp-comments` always worked
-    url = url_for('dataset_read', id=content_item_id, qualified=True)
     if content_type == 'datarequest':
-        url = url_for('comment_datarequest', id=content_item_id, qualified=True)
+        route_name = 'datarequest.comment' \
+            if helpers.is_ckan_29() else 'comment_datarequest'
     elif asbool(config.get('ckan.comments.show_comments_tab_page', False)):
-        # Not sure why `url_for` won't recognise "dataset_comments" as a named route, even though it is named in
-        # the plugins.py "before_map" function as such, so we do this:
-        url += '/comments'
+        route_name = 'comments.list' \
+            if helpers.is_ckan_29() else 'dataset_comments'
+    else:
+        route_name = 'dataset.read' \
+            if helpers.is_ckan_29() else 'dataset_read'
+    url = url_for(route_name, id=content_item_id, qualified=True)
     if comment_id:
         url += '#comment_' + str(comment_id)
     return url
