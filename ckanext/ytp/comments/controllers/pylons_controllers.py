@@ -26,8 +26,8 @@ class CommentController(BaseController):
     def unflag(self, content_type, content_item_id, comment_id):
         return unflag(content_type, content_item_id, comment_id)
 
-    def dataset_comments(self, dataset_id):
-        return dataset_comments(dataset_id)
+    def dataset_comments(self, id):
+        return dataset_comments(id)
 
 
 class NotificationController(BaseController):

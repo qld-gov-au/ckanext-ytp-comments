@@ -13,7 +13,7 @@ commenting = Blueprint(
 )
 
 if helpers.show_comments_tab_page():
-    commenting.add_url_rule('/dataset/<dataset_id>/comments', 'list', view_func=dataset_comments)
+    commenting.add_url_rule('/dataset/<id>/comments', 'list', view_func=dataset_comments)
 commenting.add_url_rule('/<dataset_id>/comments/add', view_func=add, methods=('GET', 'POST'))
 commenting.add_url_rule('/<content_type>/<dataset_id>/comments/add', view_func=add, methods=('GET', 'POST'))
 commenting.add_url_rule('/<content_item_id>/comments/<comment_id>/edit', view_func=edit, methods=('GET', 'POST'))
