@@ -310,10 +310,10 @@ def unflag(content_type, content_item_id, comment_id):
     return helpers.render_content_template(content_type)
 
 
-def dataset_comments(dataset_id):
+def dataset_comments(id):
     context = {'model': model, 'user': c.user}
 
-    data_dict = {'id': dataset_id}
+    data_dict = {'id': id}
     content_type = 'dataset'
     # Auth check to make sure the user can see this content item
     helpers.check_content_access(content_type, context, data_dict)
