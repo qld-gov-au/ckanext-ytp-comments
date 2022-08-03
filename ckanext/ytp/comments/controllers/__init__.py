@@ -87,6 +87,9 @@ def _follow_or_mute(thread_or_comment_id, action):
     elif action == 'mute':
         notification_helpers.process_mute_request(user_id, thread, comment, existing_record, notification_level)
 
+    # this should be called via AJAX, so we don't need to return a page
+    return ""
+
 
 def add(dataset_id, content_type='dataset'):
     return _add_or_reply('new', dataset_id, content_type)
@@ -306,8 +309,6 @@ def unflag(content_type, content_item_id, comment_id):
         c.pkg_dict = get_action('package_show')(context, data_dict)
         c.pkg = context['package']
         return h.redirect_to(str('/dataset/%s#comment_%s' % (content_item_id, comment_id)))
-
-    return helpers.render_content_template(content_type)
 
 
 def dataset_comments(id):
