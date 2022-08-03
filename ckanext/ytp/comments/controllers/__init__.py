@@ -12,8 +12,8 @@ import re
 from ckan import authz, model
 from ckan.lib.navl.dictization_functions import unflatten
 from ckan.logic import clean_dict, tuplize_dict, parse_params
-from ckan.plugins import toolkit
-from ckan.plugins.toolkit import _, abort, c, get_action, h, request, ValidationError
+from ckan.plugins.toolkit import _, abort, c, get_action, h, request, \
+    render, ValidationError
 
 from ckanext.ytp.comments import email_notifications, helpers,\
     model as comment_model, notification_helpers, request_helpers
@@ -28,9 +28,9 @@ def _valid_request_and_user(thread_or_comment_id):
     :param thread_or_comment_id:
     :return:
     """
-    return False if not authz.auth_is_loggedin_user() \
-        or not id \
-        or _contains_invalid_chars(thread_or_comment_id) else True
+    return authz.auth_is_loggedin_user() \
+        and thread_or_comment_id \
+        and not _contains_invalid_chars(thread_or_comment_id)
 
 
 def _contains_invalid_chars(value):
@@ -87,6 +87,9 @@ def _follow_or_mute(thread_or_comment_id, action):
     elif action == 'mute':
         notification_helpers.process_mute_request(user_id, thread, comment, existing_record, notification_level)
 
+    # this should be called via AJAX, so we don't need to return a page
+    return ""
+
 
 def add(dataset_id, content_type='dataset'):
     return _add_or_reply('new', dataset_id, content_type)
@@ -105,35 +108,36 @@ def edit(content_type, content_item_id, comment_id):
     except Exception:
         return abort(403)
 
-    if request.method == 'POST':
-        data_dict = clean_dict(unflatten(
-            tuplize_dict(parse_params(request_helpers.RequestHelper(request).get_post_params()))))
-        data_dict['id'] = comment_id
-        data_dict['content_type'] = content_type
-        data_dict['content_item_id'] = content_item_id
-        success = False
-        try:
-            get_action('comment_update')(context, data_dict)
-            success = True
-        except ValidationError as ve:
-            log.debug(ve)
-            if ve.error_dict and ve.error_dict.get('message'):
-                msg = ve.error_dict['message']
-            else:
-                msg = str(ve)
-            h.flash_error(msg)
-        except Exception as e:
-            log.debug(e)
-            return abort(403)
+    if request.method != 'POST':
+        # get the form
+        return helpers.render_content_template(content_type)
 
-        return h.redirect_to(
-            helpers.get_redirect_url(
-                content_type,
-                content_item_id if content_type == 'datarequest' else c.pkg.name,
-                'comment_' + str(comment_id) if success else 'edit_' + str(comment_id)
-            ))
+    data_dict = clean_dict(unflatten(
+        tuplize_dict(parse_params(request_helpers.RequestHelper(request).get_post_params()))))
+    data_dict['id'] = comment_id
+    data_dict['content_type'] = content_type
+    data_dict['content_item_id'] = content_item_id
+    success = False
+    try:
+        get_action('comment_update')(context, data_dict)
+        success = True
+    except ValidationError as ve:
+        log.debug(ve)
+        if ve.error_dict and ve.error_dict.get('message'):
+            msg = ve.error_dict['message']
+        else:
+            msg = str(ve)
+        h.flash_error(msg)
+    except Exception as e:
+        log.debug(e)
+        return abort(403)
 
-    return helpers.render_content_template(content_type)
+    return h.redirect_to(
+        helpers.get_redirect_url(
+            content_type,
+            content_item_id if content_type == 'datarequest' else c.pkg.name,
+            'comment_' + str(comment_id) if success else 'edit_' + str(comment_id)
+        ))
 
 
 def reply(content_type, dataset_id, parent_id):
@@ -173,58 +177,59 @@ def _add_or_reply(comment_type, content_item_id, content_type, parent_id=None):
     except Exception:
         return abort(403)
 
-    if request.method == 'POST':
-        data_dict = clean_dict(unflatten(
-            tuplize_dict(parse_params(request_helpers.RequestHelper(request).get_post_params()))))
-        data_dict['parent_id'] = c.parent.id if 'parent' in dir(c) else None
+    if request.method != 'POST':
+        # get the form
+        return helpers.render_content_template(content_type)
 
-        data_dict['url'] = '/%s/%s' % (content_type, content_item_id if content_type == 'datarequest' else c.pkg.name)
+    data_dict = clean_dict(unflatten(
+        tuplize_dict(parse_params(request_helpers.RequestHelper(request).get_post_params()))))
+    data_dict['parent_id'] = c.parent.id if 'parent' in dir(c) else None
 
-        success = False
-        try:
-            res = get_action('comment_create')(context, data_dict)
-            success = True
-        except ValidationError as ve:
-            log.debug(ve)
-            if ve.error_dict and ve.error_dict.get('message'):
-                msg = ve.error_dict['message']
+    data_dict['url'] = '/%s/%s' % (content_type, content_item_id if content_type == 'datarequest' else c.pkg.name)
+
+    success = False
+    try:
+        res = get_action('comment_create')(context, data_dict)
+        success = True
+    except ValidationError as ve:
+        log.debug(ve)
+        if ve.error_dict and ve.error_dict.get('message'):
+            msg = ve.error_dict['message']
+        else:
+            msg = str(ve)
+        h.flash_error(msg)
+    except Exception as e:
+        log.debug(e)
+        return abort(403)
+
+    if success:
+        email_notifications.notify_admins_and_comment_notification_recipients(
+            helpers.get_org_id(content_type),
+            c.userobj,
+            'notification-new-comment',
+            content_type,
+            helpers.get_content_item_id(content_type),
+            res['thread_id'],
+            res['parent_id'] if comment_type == 'reply' else None,
+            res['id'],
+            c.pkg_dict['title'] if content_type == 'dataset' else c.datarequest['title'],
+            res['content']  # content is the comment that has been cleaned up in the action comment_create
+        )
+
+        if notification_helpers.comment_notification_recipients_enabled():
+            if comment_type == 'reply':
+                # Add the user who submitted the reply to comment notifications for this thread
+                notification_helpers.add_commenter_to_comment_notifications(c.userobj.id, res['thread_id'], res['parent_id'])
             else:
-                msg = str(ve)
-            h.flash_error(msg)
-        except Exception as e:
-            log.debug(e)
-            return abort(403)
+                # Add the user who submitted the comment notifications for this new thread
+                notification_helpers.add_commenter_to_comment_notifications(c.userobj.id, res['thread_id'], res['id'])
 
-        if success:
-            email_notifications.notify_admins_and_comment_notification_recipients(
-                helpers.get_org_id(content_type),
-                toolkit.c.userobj,
-                'notification-new-comment',
-                content_type,
-                helpers.get_content_item_id(content_type),
-                res['thread_id'],
-                res['parent_id'] if comment_type == 'reply' else None,
-                res['id'],
-                c.pkg_dict['title'] if content_type == 'dataset' else c.datarequest['title'],
-                res['content']  # content is the comment that has been cleaned up in the action comment_create
-            )
-
-            if notification_helpers.comment_notification_recipients_enabled():
-                if comment_type == 'reply':
-                    # Add the user who submitted the reply to comment notifications for this thread
-                    notification_helpers.add_commenter_to_comment_notifications(toolkit.c.userobj.id, res['thread_id'], res['parent_id'])
-                else:
-                    # Add the user who submitted the comment notifications for this new thread
-                    notification_helpers.add_commenter_to_comment_notifications(toolkit.c.userobj.id, res['thread_id'], res['id'])
-
-        return h.redirect_to(
-            helpers.get_redirect_url(
-                content_type,
-                content_item_id if content_type == 'datarequest' else c.pkg.name,
-                'comment_' + str(res['id']) if success else ('comment_form' if comment_type == 'new' else 'reply_' + str(parent_id))
-            ))
-
-    return helpers.render_content_template(content_type)
+    return h.redirect_to(
+        helpers.get_redirect_url(
+            content_type,
+            content_item_id if content_type == 'datarequest' else c.pkg.name,
+            'comment_' + str(res['id']) if success else ('comment_form' if comment_type == 'new' else 'reply_' + str(parent_id))
+        ))
 
 
 def delete(content_type, content_item_id, comment_id):
@@ -307,8 +312,6 @@ def unflag(content_type, content_item_id, comment_id):
         c.pkg = context['package']
         return h.redirect_to(str('/dataset/%s#comment_%s' % (content_item_id, comment_id)))
 
-    return helpers.render_content_template(content_type)
-
 
 def dataset_comments(id):
     context = {'model': model, 'user': c.user}
@@ -323,5 +326,5 @@ def dataset_comments(id):
         helpers.get_content_item(content_type, context, data_dict)
     except Exception:
         return abort(403)
-    return toolkit.render('package/comments.html', extra_vars={
+    return render('package/comments.html', extra_vars={
         'pkg': c.pkg, 'pkg_dict': c.pkg_dict})
