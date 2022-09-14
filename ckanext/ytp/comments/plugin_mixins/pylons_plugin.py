@@ -17,8 +17,8 @@ class MixinPlugin(p.SingletonPlugin):
         """
         controller = 'ckanext.ytp.comments.controllers.pylons_controllers:CommentController'
         if helpers.show_comments_tab_page():
-            map.connect('comments.list', '/dataset/{id}/comments', controller=controller, action='dataset_comments', ckan_icon='comment')
-            map.connect('dataset_comments', '/dataset/{id}/comments', controller=controller, action='dataset_comments', ckan_icon='comment')
+            map.connect('comments.list', '/{content_type}/{id}/comments', controller=controller, action='dataset_comments', ckan_icon='comment')
+            map.connect('dataset_comments', '/{content_type}/{id}/comments', controller=controller, action='dataset_comments', ckan_icon='comment')
         map.connect('/{dataset_id}/comments/add', controller=controller, action='add')
         map.connect('/{content_type}/{dataset_id}/comments/add', controller=controller, action='add')
         map.connect('/{content_item_id}/comments/{comment_id}/edit', controller=controller, action='edit')

@@ -313,7 +313,7 @@ def unflag(content_type, content_item_id, comment_id):
         return h.redirect_to(str('/dataset/%s#comment_%s' % (content_item_id, comment_id)))
 
 
-def dataset_comments(id):
+def dataset_comments(content_type, id):
     context = {'model': model, 'user': c.user}
 
     data_dict = {'id': id}

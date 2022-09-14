@@ -142,12 +142,17 @@ def send_notification_emails(users, template, extra_vars):
 
 
 def get_admins(owner_org, user, content_type, content_item_id):
-    if content_type == 'dataset':
-        author_email = get_dataset_author_email(content_item_id)
-        users = [author_email] if author_email else []
-    else:
+    if content_type == 'datarequest':
         # Get all the org admin users (excluding the user who made the comment)
         users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
+    else:
+        try:
+            author_email = get_dataset_author_email(content_item_id)
+            users = [author_email] if author_email else []
+        except ObjectNotFound:
+            log1.warn("No accounts found to notify for %s: %s",
+                      content_type, content_item_id)
+            users = []
     return users
 
 
@@ -227,16 +232,17 @@ def get_content_item_link(content_type, content_item_id, comment_id=None):
     :param comment_id: string `comment`.`id`
     :return:
     """
+    kwargs = {'id': content_item_id, 'qualified': True}
     if content_type == 'datarequest':
         route_name = 'datarequest.comment' \
             if helpers.is_ckan_29() else 'comment_datarequest'
     elif asbool(config.get('ckan.comments.show_comments_tab_page', False)):
         route_name = 'comments.list' \
             if helpers.is_ckan_29() else 'dataset_comments'
+        kwargs['content_type'] = content_type
     else:
-        route_name = 'dataset.read' \
-            if helpers.is_ckan_29() else 'dataset_read'
-    url = url_for(route_name, id=content_item_id, qualified=True)
+        route_name = ('%s.read' if helpers.is_ckan_29() else '%_read') % content_type
+    url = url_for(route_name, **kwargs)
     if comment_id:
         url += '#comment_' + str(comment_id)
     return url
