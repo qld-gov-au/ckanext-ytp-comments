@@ -133,10 +133,11 @@ def edit(content_type, content_item_id, comment_id):
         return abort(403)
 
     return h.redirect_to(
-        helpers.get_redirect_url(
+        helpers.get_content_item_link(
             content_type,
             content_item_id if content_type == 'datarequest' else c.pkg.name,
-            'comment_' + str(comment_id) if success else 'edit_' + str(comment_id)
+            comment_id,
+            'comment_' if success else 'edit_'
         ))
 
 
@@ -222,11 +223,20 @@ def _add_or_reply(comment_type, content_item_id, content_type='dataset', parent_
                 # Add the user who submitted the comment notifications for this new thread
                 notification_helpers.add_commenter_to_comment_notifications(c.userobj.id, res['thread_id'], res['id'])
 
+    if success:
+        comment_id = res['id']
+        anchor_prefix = 'comment_'
+    elif comment_type == 'new':
+        comment_id = None
+        anchor_prefix = 'comment_form'
+    else:
+        comment_id = parent_id
+        anchor_prefix = 'reply_'
     return h.redirect_to(
-        helpers.get_redirect_url(
+        helpers.get_content_item_link(
             content_type,
             content_item_id if content_type == 'datarequest' else c.pkg.name,
-            'comment_' + str(res['id']) if success else ('comment_form' if comment_type == 'new' else 'reply_' + str(parent_id))
+            comment_id, anchor_prefix
         ))
 
 
@@ -255,10 +265,10 @@ def delete(content_type, content_item_id, comment_id):
         h.flash_error(msg)
 
     return h.redirect_to(
-        helpers.get_redirect_url(
+        helpers.get_content_item_link(
             content_type,
             content_item_id if content_type == 'datarequest' else c.pkg.name,
-            'comment_' + str(comment_id)
+            comment_id
         ))
 
 
@@ -307,7 +317,12 @@ def unflag(content_type, content_item_id, comment_id):
     else:
         c.pkg_dict = get_action('package_show')(context, data_dict)
         c.pkg = context['package']
-    return h.redirect_to(helpers.get_redirect_url(content_type, content_item_id, 'comment_%s' % comment_id))
+    return h.redirect_to(
+        helpers.get_content_item_link(
+            content_type,
+            content_item_id if content_type == 'datarequest' else c.pkg.name,
+            comment_id
+        ))
 
 
 def dataset_comments(content_type, id):
