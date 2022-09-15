@@ -154,7 +154,7 @@ def reply(content_type, dataset_id, parent_id):
     return _add_or_reply('reply', dataset_id, content_type, parent_id)
 
 
-def _add_or_reply(comment_type, content_item_id, content_type, parent_id=None):
+def _add_or_reply(comment_type, content_item_id, content_type='dataset', parent_id=None):
     """
     Allows the user to add a comment to an existing dataset or datarequest
     :param comment_type: Either 'new' or 'reply'
@@ -162,8 +162,6 @@ def _add_or_reply(comment_type, content_item_id, content_type, parent_id=None):
     :param content_type: string 'dataset' or 'datarequest'
     :return:
     """
-    content_type = 'dataset' if 'content_type' not in vars() else content_type
-
     context = {'model': model, 'user': c.user}
 
     data_dict = {'id': content_item_id}
@@ -212,7 +210,7 @@ def _add_or_reply(comment_type, content_item_id, content_type, parent_id=None):
             res['thread_id'],
             res['parent_id'] if comment_type == 'reply' else None,
             res['id'],
-            c.pkg_dict['title'] if content_type == 'dataset' else c.datarequest['title'],
+            c.datarequest['title'] if content_type == 'datarequest' else c.pkg_dict['title'],
             res['content']  # content is the comment that has been cleaned up in the action comment_create
         )
 
@@ -306,18 +304,17 @@ def unflag(content_type, content_item_id, comment_id):
 
     if content_type == 'datarequest':
         c.datarequest = get_action('show_datarequest')(context, data_dict)
-        return h.redirect_to(str('/datarequest/comment/%s#comment_%s' % (content_item_id, comment_id)))
     else:
         c.pkg_dict = get_action('package_show')(context, data_dict)
         c.pkg = context['package']
-        return h.redirect_to(str('/dataset/%s#comment_%s' % (content_item_id, comment_id)))
+    return h.redirect_to(helpers.get_redirect_url(content_type, content_item_id, 'comment_%s' % comment_id))
 
 
 def dataset_comments(content_type, id):
     context = {'model': model, 'user': c.user}
 
     data_dict = {'id': id}
-    content_type = 'dataset'
+    content_type = content_type or 'dataset'
     # Auth check to make sure the user can see this content item
     helpers.check_content_access(content_type, context, data_dict)
 
@@ -327,4 +324,4 @@ def dataset_comments(content_type, id):
     except Exception:
         return abort(403)
     return render('package/comments.html', extra_vars={
-        'pkg': c.pkg, 'pkg_dict': c.pkg_dict})
+        'pkg': c.pkg, 'pkg_dict': c.pkg_dict, 'content_type': content_type})

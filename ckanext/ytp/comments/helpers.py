@@ -79,11 +79,13 @@ def check_content_access(content_type, context, data_dict):
 
 
 def get_redirect_url(content_type, content_item_id, anchor):
-    return '/%s/%s#%s' % (
-        'datarequest/comment' if content_type == 'datarequest' else 'dataset',
-        content_item_id + '/comments' if content_type == 'dataset' and show_comments_tab_page() else content_item_id,
-        anchor
-    )
+    if content_type == 'datarequest':
+        url_pattern = '/{}/comment/{}#{}'
+    elif show_comments_tab_page():
+        url_pattern = '/{}/{}/comments#{}'
+    else:
+        url_pattern = '/{}/{}#{}'
+    return url_pattern.format(content_type, content_item_id, anchor)
 
 
 def render_content_template(content_type):
@@ -101,11 +103,9 @@ def user_can_edit_comment(comment_user_id):
 
 
 def user_can_manage_comments(content_type, content_item_id):
-    if content_type == 'datarequest':
-        return h.check_access('update_datarequest', {'id': content_item_id})
-    elif content_type == 'dataset':
-        return h.check_access('package_update', {'id': content_item_id})
-    return False
+    return h.check_access(
+        'update_datarequest' if content_type == 'datarequest' else 'package_update',
+        {'id': content_item_id})
 
 
 def get_org_id(content_type):
