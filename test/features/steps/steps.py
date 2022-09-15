@@ -1,9 +1,11 @@
 from behave import step
 from behaving.personas.steps import *  # noqa: F401, F403
+from behaving.mail.steps import *  # noqa: F401, F403
 from behaving.web.steps import *  # noqa: F401, F403
 from behaving.web.steps.url import when_i_visit_url
 import email
 import quopri
+import six
 
 
 @step(u'I get the current URL')
@@ -68,6 +70,33 @@ def go_to_dataset_page(context):
 @step(u'I go to dataset "{name}"')
 def go_to_dataset(context, name):
     when_i_visit_url(context, '/dataset/' + name)
+
+
+@step(u'I should receive a base64 email at "{address}" containing "{text}"')
+def should_receive_base64_email_containing_text(context, address, text):
+    should_receive_base64_email_containing_texts(context, address, text, None)
+
+
+@step(u'I should receive a base64 email at "{address}" containing both "{text}" and "{text2}"')
+def should_receive_base64_email_containing_texts(context, address, text, text2):
+    # The default behaving step does not convert base64 emails
+    # Modified the default step to decode the payload from base64
+    def filter_contents(mail):
+        mail = email.message_from_string(mail)
+        payload = mail.get_payload()
+        payload += "=" * ((4 - len(payload) % 4) % 4)  # do fix the padding error issue
+        payload_bytes = quopri.decodestring(payload)
+        if len(payload_bytes) > 0:
+            payload_bytes += b'='  # do fix the padding error issue
+        if six.PY2:
+            decoded_payload = payload_bytes.decode('base64')
+        else:
+            import base64
+            decoded_payload = six.ensure_text(base64.b64decode(six.ensure_binary(payload_bytes)))
+        print('decoded_payload: ', decoded_payload)
+        return text in decoded_payload and (not text2 or text2 in decoded_payload)
+
+    assert context.mail.user_messages(address, filter_contents)
 
 
 @step(u'I go to dataset "{name}" comments')
@@ -143,21 +172,3 @@ def submit_reply_with_comment(context, comment):
     context.browser.execute_script("""
         document.querySelector('.comment-wrapper form.comment-reply .btn-primary[type="submit"]').click();
         """)
-
-
-# The default behaving step does not convert base64 emails
-# Modified the default step to decode the payload from base64
-@step(u'I should receive a base64 email at "{address}" containing "{text}"')
-def should_receive_base64_email_containing_text(context, address, text):
-    def filter_contents(mail):
-        mail = email.message_from_string(mail)
-        payload = mail.get_payload()
-        payload += "=" * ((4 - len(payload) % 4) % 4)  # do fix the padding error issue
-        payload_bytes = quopri.decodestring(payload)
-        if len(payload_bytes) > 0:
-            payload_bytes += b'='  # do fix the padding error issue
-        decoded_payload = payload_bytes.decode('base64')
-        print('decoded_payload: ', decoded_payload)
-        return text in decoded_payload
-
-    assert context.mail.user_messages(address, filter_contents)

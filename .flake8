@@ -3,13 +3,13 @@
 
 exclude =
     ckan
-    scripts
 
 # Extended output format.
 format = pylint
 
 # Show the source of errors.
 show_source = True
+statistics = True
 
 max-complexity = 10
 max-line-length = 127

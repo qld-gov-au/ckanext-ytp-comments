@@ -4,8 +4,8 @@ import logging
 import sqlalchemy
 
 from ckan import model
-from ckan.plugins.toolkit import asbool, c, h, config,\
-    check_access, check_ckan_version, get_action, render, render_snippet
+from ckan.plugins.toolkit import asbool, c, h, config, check_access, \
+    check_ckan_version, get_action, render, render_snippet, url_for
 from profanityfilter import ProfanityFilter
 
 _and_ = sqlalchemy.and_
@@ -78,12 +78,31 @@ def check_content_access(content_type, context, data_dict):
     check_access('show_datarequest' if content_type == 'datarequest' else 'package_show', context, data_dict)
 
 
-def get_redirect_url(content_type, content_item_id, anchor):
-    return '/%s/%s#%s' % (
-        'datarequest/comment' if content_type == 'datarequest' else 'dataset',
-        content_item_id + '/comments' if content_type == 'dataset' and show_comments_tab_page() else content_item_id,
-        anchor
-    )
+def get_content_item_link(content_type, content_item_id, comment_id=None, anchor_prefix='comment_'):
+    """
+    Get a fully qualified URL to the content item being commented on.
+
+    :param content_type: string Currently only supports 'dataset' or 'datarequest'
+    :param content_item_id: string Package name, or Data Request ID
+    :param comment_id: string `comment`.`id`
+    :return:
+    """
+    kwargs = {'id': content_item_id, 'qualified': True}
+    if content_type == 'datarequest':
+        route_name = 'datarequest.comment' \
+            if is_ckan_29() else 'comment_datarequest'
+    elif asbool(config.get('ckan.comments.show_comments_tab_page', False)):
+        route_name = 'comments.list' \
+            if is_ckan_29() else 'dataset_comments'
+        kwargs['content_type'] = content_type
+    else:
+        route_name = ('{}.read' if is_ckan_29() else '{]_read').format(content_type)
+    url = url_for(route_name, **kwargs)
+    if comment_id:
+        url = '{}#{}{}'.format(url, anchor_prefix, comment_id)
+    elif anchor_prefix != 'comment_':
+        url = '{}#{}'.format(url, anchor_prefix)
+    return url
 
 
 def render_content_template(content_type):
@@ -101,11 +120,9 @@ def user_can_edit_comment(comment_user_id):
 
 
 def user_can_manage_comments(content_type, content_item_id):
-    if content_type == 'datarequest':
-        return h.check_access('update_datarequest', {'id': content_item_id})
-    elif content_type == 'dataset':
-        return h.check_access('package_update', {'id': content_item_id})
-    return False
+    return h.check_access(
+        'update_datarequest' if content_type == 'datarequest' else 'package_update',
+        {'id': content_item_id})
 
 
 def get_org_id(content_type):

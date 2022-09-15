@@ -11,35 +11,29 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ckan-version: [ckan-2.8.8, ckan-2.9.5]
-        python-version: [py2, py3]
-        exclude:
-          - ckan-version: ckan-2.8.8
-            python-version: py3
+        ckan-version: [2.9, 2.9-py2, 2.8]
 
-    name: Continuous Integration build on CKAN ${{ matrix.ckan-version }} ${{ matrix.python-version }}
+    name: Test on CKAN ${{ matrix.ckan-version }}
     runs-on: ubuntu-latest
     container: integratedexperts/ci-builder
     env:
-      CKAN_REPO: ckan/ckan
       CKAN_VERSION: ${{ matrix.ckan-version }}
-      PYTHON_VERSION: ${{ matrix.python-version }}
 
     steps:
       - uses: actions/checkout@v2
         timeout-minutes: 2
 
       - name: Build
-        run: .circleci/build.sh
+        run: bin/build.sh
         timeout-minutes: 15
 
       - name: Test
-        run: .circleci/test.sh
-        timeout-minutes: 20
+        run: bin/test.sh
+        timeout-minutes: 30
 
       - name: Retrieve screenshots
         if: failure()
-        run: .circleci/process-artifacts.sh
+        run: bin/process-artifacts.sh
         timeout-minutes: 1
 
       - name: Upload screenshots

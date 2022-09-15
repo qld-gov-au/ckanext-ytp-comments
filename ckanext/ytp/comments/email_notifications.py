@@ -5,8 +5,8 @@ import logging
 from ckan import authz, model
 from ckan.lib import maintain
 from ckan.lib.mailer import mail_recipient, MailerException
-from ckan.plugins.toolkit import asbool, config, enqueue_job, get_action, \
-    get_or_bust, render, url_for, ObjectNotFound
+from ckan.plugins.toolkit import config, enqueue_job, get_action, \
+    get_or_bust, render, ObjectNotFound
 
 from . import helpers, notification_helpers, util
 
@@ -142,12 +142,17 @@ def send_notification_emails(users, template, extra_vars):
 
 
 def get_admins(owner_org, user, content_type, content_item_id):
-    if content_type == 'dataset':
-        author_email = get_dataset_author_email(content_item_id)
-        users = [author_email] if author_email else []
-    else:
+    if content_type == 'datarequest':
         # Get all the org admin users (excluding the user who made the comment)
         users = get_users_for_org_by_capacity(owner_org, 'admin', [user.email])
+    else:
+        try:
+            author_email = get_dataset_author_email(content_item_id)
+            users = [author_email] if author_email else []
+        except ObjectNotFound:
+            log1.warn("No accounts found to notify for %s: %s",
+                      content_type, content_item_id)
+            users = []
     return users
 
 
@@ -170,7 +175,7 @@ def notify_admins(owner_org, user, template, content_type, content_item_id, comm
             admin_users,
             template,
             {
-                'url': get_content_item_link(content_type, content_item_id, comment_id)
+                'url': helpers.get_content_item_link(content_type, content_item_id, comment_id)
             }
         )
 
@@ -210,36 +215,12 @@ def notify_admins_and_comment_notification_recipients(owner_org, user, template,
             users,
             template,
             {
-                'url': get_content_item_link(content_type, content_item_id, comment_id),
+                'url': helpers.get_content_item_link(content_type, content_item_id, comment_id),
                 'content_item_title': util.remove_HTML_markup(content_item_title),
                 'comment_text': util.remove_HTML_markup(comment),
                 'content_type': content_type
             }
         )
-
-
-def get_content_item_link(content_type, content_item_id, comment_id=None):
-    """
-    Get a fully qualified URL to the content item being commented on.
-
-    :param content_type: string Currently only supports 'dataset' or 'datarequest'
-    :param content_item_id: string Package name, or Data Request ID
-    :param comment_id: string `comment`.`id`
-    :return:
-    """
-    if content_type == 'datarequest':
-        route_name = 'datarequest.comment' \
-            if helpers.is_ckan_29() else 'comment_datarequest'
-    elif asbool(config.get('ckan.comments.show_comments_tab_page', False)):
-        route_name = 'comments.list' \
-            if helpers.is_ckan_29() else 'dataset_comments'
-    else:
-        route_name = 'dataset.read' \
-            if helpers.is_ckan_29() else 'dataset_read'
-    url = url_for(route_name, id=content_item_id, qualified=True)
-    if comment_id:
-        url += '#comment_' + str(comment_id)
-    return url
 
 
 def get_content_type_and_org_id(context, thread_url, content_item_id):
@@ -295,6 +276,6 @@ def flagged_comment_notification(comment):
                 get_users_for_org_by_capacity(org_id, 'admin'),
                 'notification-flagged-comment',
                 {
-                    'url': get_content_item_link(content_type, content_item_id, comment.id)
+                    'url': helpers.get_content_item_link(content_type, content_item_id, comment.id)
                 }
             )
