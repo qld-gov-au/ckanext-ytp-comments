@@ -10,8 +10,8 @@ from sqlalchemy import types
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
+from ckan import model
 from ckan.plugins import toolkit
-from ckan.lib.base import model
 
 log = __import__('logging').getLogger(__name__)
 
