@@ -37,7 +37,8 @@ def updatedb():
     log.info("YTP-Comments-UpdateDBCommand: Starting command")
 
     from sqlalchemy import MetaData, DDL
-    meta = MetaData(bind=model.Session.get_bind(), reflect=True)
+    meta = MetaData()
+    meta.reflect(bind=model.Session.get_bind())
 
     if 'comment' in meta.tables and 'deleted_by_user_id' not in meta.tables['comment'].columns:
         log.info("YTP-Comments-UpdateDBCommand: 'deleted_by_user_id' field does not exist, adding...")
