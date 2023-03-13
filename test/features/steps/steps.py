@@ -99,6 +99,8 @@ def should_receive_base64_email_containing_texts(context, address, text, text2):
     assert context.mail.user_messages(address, filter_contents)
 
 
+# ckanext-ytp-comments
+
 @step(u'I go to dataset "{name}" comments')
 def go_to_dataset_comments(context, name):
     context.execute_steps(u"""
