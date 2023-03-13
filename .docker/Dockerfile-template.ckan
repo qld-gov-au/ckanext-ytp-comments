@@ -12,7 +12,8 @@ RUN apk add --no-cache build-base \
     && curl -sL https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz \
         | tar -C /usr/local/bin -xzvf -
 
-# Install CKAN.
+# Update urllib3 to fix urlopen bug
+RUN pip install -U urllib3
 
 COPY .docker/test.ini $CKAN_INI
 
