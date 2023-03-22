@@ -11,16 +11,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ckan-version: [2.9, 2.9-py2, 2.8]
+        ckan-version: ["2.10", 2.9, 2.9-py2, 2.8]
 
     name: Test on CKAN ${{ matrix.ckan-version }}
     runs-on: ubuntu-latest
-    container: integratedexperts/ci-builder
+    container: drevops/ci-builder
     env:
       CKAN_VERSION: ${{ matrix.ckan-version }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         timeout-minutes: 2
 
       - name: Build
