@@ -9,11 +9,11 @@ specific modules just providing the integration hooks.
 import logging
 import re
 
-from ckan import authz, model
+from ckan import model
 from ckan.lib.navl.dictization_functions import unflatten
 from ckan.logic import clean_dict, tuplize_dict, parse_params
-from ckan.plugins.toolkit import _, abort, c, get_action, h, request, \
-    render, ValidationError
+from ckan.plugins.toolkit import _, abort, c, check_ckan_version, get_action, \
+    h, request, render, ValidationError
 
 from ckanext.ytp.comments import email_notifications, helpers,\
     model as comment_model, notification_helpers, request_helpers
@@ -22,13 +22,22 @@ from ckanext.ytp.comments import email_notifications, helpers,\
 log = logging.getLogger(__name__)
 
 
+def _is_logged_in():
+    if check_ckan_version('2.9'):
+        from ckan.plugins.toolkit import g
+        return g.user
+    else:
+        from ckan import authz
+        return authz.auth_is_loggedin_user()
+
+
 def _valid_request_and_user(thread_or_comment_id):
     """
     Check user logged in and perform simple validation of id provided in request
     :param thread_or_comment_id:
     :return:
     """
-    return authz.auth_is_loggedin_user() \
+    return _is_logged_in() \
         and thread_or_comment_id \
         and not _contains_invalid_chars(thread_or_comment_id)
 
@@ -273,7 +282,7 @@ def delete(content_type, content_item_id, comment_id):
 
 
 def flag(comment_id):
-    if authz.auth_is_loggedin_user():
+    if _is_logged_in():
         # Using the comment model rather than the update action because update action updates modified timestamp
         comment = comment_model.Comment.get(comment_id)
         if comment and not comment.flagged:
@@ -299,7 +308,7 @@ def unflag(content_type, content_item_id, comment_id):
 
     if not comment \
             or not comment.flagged \
-            or not authz.auth_is_loggedin_user() \
+            or not _is_logged_in() \
             or not helpers.user_can_manage_comments(content_type, content_item_id):
         return abort(403)
 
