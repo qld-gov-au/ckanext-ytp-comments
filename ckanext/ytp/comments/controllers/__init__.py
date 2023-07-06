@@ -198,7 +198,7 @@ def _add_or_reply(comment_type, content_item_id, content_type='dataset', parent_
 
     success = False
     try:
-        captcha.check_recaptcha(request)
+            captcha.check_recaptcha(request)
             res = get_action('comment_create')(context, data_dict)
             success = True
         except ValidationError as ve:
