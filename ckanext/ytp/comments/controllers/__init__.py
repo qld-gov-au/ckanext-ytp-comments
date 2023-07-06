@@ -10,6 +10,7 @@ import logging
 import re
 
 from ckan import model
+from ckan.lib import captcha
 from ckan.lib.navl.dictization_functions import unflatten
 from ckan.logic import clean_dict, tuplize_dict, parse_params
 from ckan.plugins.toolkit import _, abort, c, check_ckan_version, get_action, \
@@ -197,15 +198,19 @@ def _add_or_reply(comment_type, content_item_id, content_type='dataset', parent_
 
     success = False
     try:
-        res = get_action('comment_create')(context, data_dict)
-        success = True
-    except ValidationError as ve:
-        log.debug(ve)
-        if ve.error_dict and ve.error_dict.get('message'):
-            msg = ve.error_dict['message']
-        else:
-            msg = str(ve)
-        h.flash_error(msg)
+        captcha.check_recaptcha(request)
+            res = get_action('comment_create')(context, data_dict)
+            success = True
+        except ValidationError as ve:
+            log.debug(ve)
+            if ve.error_dict and ve.error_dict.get('message'):
+                msg = ve.error_dict['message']
+            else:
+                msg = str(ve)
+            h.flash_error(msg)
+        except captcha.CaptchaError:
+            error_msg = _(u'Bad Captcha. Please try again.')
+            h.flash_error(error_msg)
     except Exception as e:
         log.debug(e)
         return abort(403)
