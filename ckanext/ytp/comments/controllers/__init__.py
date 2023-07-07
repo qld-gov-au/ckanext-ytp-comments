@@ -10,14 +10,14 @@ import logging
 import re
 
 from ckan import model
+from ckan.lib import captcha
 from ckan.lib.navl.dictization_functions import unflatten
 from ckan.logic import clean_dict, tuplize_dict, parse_params
 from ckan.plugins.toolkit import _, abort, c, check_ckan_version, get_action, \
     h, request, render, ValidationError
 
-from ckanext.ytp.comments import email_notifications, helpers,\
+from ckanext.ytp.comments import email_notifications, helpers, \
     model as comment_model, notification_helpers, request_helpers
-
 
 log = logging.getLogger(__name__)
 
@@ -197,6 +197,7 @@ def _add_or_reply(comment_type, content_item_id, content_type='dataset', parent_
 
     success = False
     try:
+        captcha.check_recaptcha(request)
         res = get_action('comment_create')(context, data_dict)
         success = True
     except ValidationError as ve:
@@ -206,6 +207,9 @@ def _add_or_reply(comment_type, content_item_id, content_type='dataset', parent_
         else:
             msg = str(ve)
         h.flash_error(msg)
+    except captcha.CaptchaError:
+        error_msg = _(u'Bad Captcha. Please try again.')
+        h.flash_error(error_msg)
     except Exception as e:
         log.debug(e)
         return abort(403)
@@ -227,7 +231,8 @@ def _add_or_reply(comment_type, content_item_id, content_type='dataset', parent_
         if notification_helpers.comment_notification_recipients_enabled():
             if comment_type == 'reply':
                 # Add the user who submitted the reply to comment notifications for this thread
-                notification_helpers.add_commenter_to_comment_notifications(c.userobj.id, res['thread_id'], res['parent_id'])
+                notification_helpers.add_commenter_to_comment_notifications(c.userobj.id, res['thread_id'],
+                                                                            res['parent_id'])
             else:
                 # Add the user who submitted the comment notifications for this new thread
                 notification_helpers.add_commenter_to_comment_notifications(c.userobj.id, res['thread_id'], res['id'])

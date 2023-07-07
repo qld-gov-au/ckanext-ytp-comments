@@ -10,6 +10,9 @@
             {% set unescaped_content = values.content.split('<br/>') %}
             <textarea name="comment" class="form-control" rows="10">{% if not empty %}{% for line in unescaped_content %}{{ line | striptags }}{{'\n'}}{% endfor %}{% endif %}</textarea>
         </div>
+        {% if g.recaptcha_publickey %}
+            {% snippet "user/snippets/recaptcha.html", public_key=g.recaptcha_publickey %}
+        {% endif %}
         <div class="form-actions">
             <input type="submit" class="btn btn-primary" value="{{ _('Save') }}"/>
             <input type="reset" class="btn" value="{{ _('Clear') }}"/>
@@ -86,6 +89,9 @@
         <label for="comment">{{ _('Comment') }}</label>
         <textarea name="comment" class="form-control" rows="10"></textarea>
     </div>
+    {% if g.recaptcha_publickey %}
+        {% snippet "user/snippets/recaptcha.html", public_key=g.recaptcha_publickey %}
+    {% endif %}
     <div class="form-actions">
         <input type="submit" class="btn btn-primary" value="{{ _('Save') }}"/>
         <input type="reset" class="btn" value="{{ _('Clear') }}"/>
