@@ -38,8 +38,8 @@ def _valid_request_and_user(thread_or_comment_id):
     :return:
     """
     return _is_logged_in() \
-           and thread_or_comment_id \
-           and not _contains_invalid_chars(thread_or_comment_id)
+        and thread_or_comment_id \
+        and not _contains_invalid_chars(thread_or_comment_id)
 
 
 def _contains_invalid_chars(value):
