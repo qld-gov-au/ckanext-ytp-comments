@@ -9,7 +9,7 @@ from ckan.plugins.toolkit import abort, asbool, check_access, config, get_or_bus
 import ckanext.ytp.comments.model as comment_model
 import ckanext.ytp.comments.util as util
 
-from ckanext.ytp.comments import helpers
+from ckanext.ytp.comments import helpers, signals
 
 log = logging.getLogger(__name__)
 
@@ -45,4 +45,7 @@ def comment_update(context, data_dict):
     model.Session.add(comment)
     model.Session.commit()
 
-    return comment.as_dict()
+    comment_dict = comment.as_dict()
+    signals.updated.send(comment_dict["thread_id"], comment=comment_dict)
+
+    return comment_dict

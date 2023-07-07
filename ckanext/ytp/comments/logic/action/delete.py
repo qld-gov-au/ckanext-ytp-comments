@@ -5,6 +5,7 @@ import logging
 from ckan.plugins.toolkit import abort, check_access, get_or_bust
 
 import ckanext.ytp.comments.model as comment_model
+import ckanext.ytp.comments.signals as signals
 
 log = logging.getLogger(__name__)
 
@@ -28,5 +29,8 @@ def comment_delete(context, data_dict):
 
     model.Session.add(comment)
     model.Session.commit()
+
+    comment_dict = comment.as_dict()
+    signals.deleted.send(comment_dict["thread_id"], comment=comment_dict)
 
     return {'success': True}
