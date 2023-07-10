@@ -3,7 +3,7 @@
 import datetime
 import logging
 
-from ckan.plugins.toolkit import abort, asbool, check_access, config, get_or_bust, \
+from ckan.plugins.toolkit import abort, asbool, check_access, check_ckan_version, config, get_or_bust, \
     ValidationError
 
 import ckanext.ytp.comments.model as comment_model
@@ -46,6 +46,7 @@ def comment_update(context, data_dict):
     model.Session.commit()
 
     comment_dict = comment.as_dict()
-    signals.updated.send(comment_dict["thread_id"], comment=comment_dict)
+    if check_ckan_version('2.10'):
+        signals.updated.send(comment_dict["thread_id"], comment=comment_dict)
 
     return comment_dict

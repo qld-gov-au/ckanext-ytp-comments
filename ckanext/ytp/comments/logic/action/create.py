@@ -3,7 +3,7 @@
 import datetime
 import logging
 
-from ckan.plugins.toolkit import asbool, check_access, config, ValidationError
+from ckan.plugins.toolkit import asbool, check_access, check_ckan_version, config, ValidationError
 
 from ckanext.ytp.comments import helpers, model as comment_model, util, signals
 
@@ -65,6 +65,7 @@ def comment_create(context, data_dict):
     model.Session.commit()
 
     comment_dict = cmt.as_dict()
-    signals.created.send(thread_id, comment=comment_dict)
+    if check_ckan_version('2.10'):
+        signals.created.send(thread_id, comment=comment_dict)
 
     return comment_dict

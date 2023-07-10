@@ -2,7 +2,7 @@
 
 import logging
 
-from ckan.plugins.toolkit import abort, check_access, get_or_bust
+from ckan.plugins.toolkit import abort, check_access, check_ckan_version, get_or_bust
 
 import ckanext.ytp.comments.model as comment_model
 import ckanext.ytp.comments.signals as signals
@@ -31,6 +31,7 @@ def comment_delete(context, data_dict):
     model.Session.commit()
 
     comment_dict = comment.as_dict()
-    signals.deleted.send(comment_dict["thread_id"], comment=comment_dict)
+    if check_ckan_version('2.10'):
+        signals.deleted.send(comment_dict["thread_id"], comment=comment_dict)
 
     return {'success': True}
