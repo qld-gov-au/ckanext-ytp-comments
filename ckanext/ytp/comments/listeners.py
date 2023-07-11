@@ -40,6 +40,7 @@ def _trigger_package_index_on_comment(thread_id):
     package = _get_package_object(entity_id)
 
     if not package:
+        log.warn("Could not find package [%s] for comment thread [%s]!", entity_id, thread_id)
         return
 
     index = search.PackageSearchIndex()
