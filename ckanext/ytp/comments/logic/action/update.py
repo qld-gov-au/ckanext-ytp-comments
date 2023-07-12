@@ -47,7 +47,9 @@ def comment_update(context, data_dict):
 
     comment_dict = comment.as_dict()
     if check_ckan_version('2.10'):
+        thread_id = comment_dict["thread_id"]
+        log.debug("Notifying subscribers of comment update on thread [%s]", thread_id)
         from ckanext.ytp.comments import signals
-        signals.updated.send(comment_dict["thread_id"], comment=comment_dict)
+        signals.updated.send(thread_id, comment=comment_dict)
 
     return comment_dict

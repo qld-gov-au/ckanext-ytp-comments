@@ -66,6 +66,7 @@ def comment_create(context, data_dict):
 
     comment_dict = cmt.as_dict()
     if check_ckan_version('2.10'):
+        log.debug("Notifying subscribers of comment creation on thread [%s]", thread_id)
         from ckanext.ytp.comments import signals
         signals.created.send(thread_id, comment=comment_dict)
 
