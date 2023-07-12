@@ -74,6 +74,40 @@ if tk.check_ckan_version('2.9'):
     def resource():
         return ResourceFactory()
 
+    class Comment(factory.Factory):
+        """A factory class for creating ytp comment. It must accept user_id and
+        package_name, because I don't want to create extra entities in database
+        during tests"""
+
+        class Meta:
+            model = ytp_model.Comment
+
+        user_id = None
+        entity_type = "dataset"
+        entity_name = None
+
+        subject = "comment-subject"
+        comment = "comment-text"
+
+        @classmethod
+        def _build(cls, target_class, *args, **kwargs):
+            raise NotImplementedError(".build() isn't supported in CKAN")
+
+        @classmethod
+        def _create(cls, target_class, *args, **kwargs):
+            if args:
+                assert False, "Positional args aren't supported, use keyword args."
+
+            kwargs["url"] = "/{}/{}".format(kwargs["entity_type"], kwargs["entity_name"])
+
+            return helpers.call_action(
+                "comment_create", context={"user": kwargs["user_id"], "ignore_auth": True}, **kwargs
+            )
+
+    @pytest.fixture
+    def comment_factory():
+        return Comment
+
 
 def _get_test_file():
     file_path = os.path.join(os.path.dirname(__file__), 'data/test.csv')
@@ -111,39 +145,3 @@ def clean_db(reset_db):
 def mock_storage(monkeypatch, ckan_config, tmpdir):
     monkeypatch.setitem(ckan_config, u'ckan.storage_path', str(tmpdir))
     monkeypatch.setattr(uploader, u'get_storage_path', lambda: str(tmpdir))
-
-
-class Comment(factory.Factory):
-    """A factory class for creating ytp comment. It must accept user_id and
-    package_name, because I don't want to create extra entities in database
-    during tests"""
-
-    class Meta:
-        model = ytp_model.Comment
-
-    user_id = None
-    entity_type = "dataset"
-    entity_name = None
-
-    subject = "comment-subject"
-    comment = "comment-text"
-
-    @classmethod
-    def _build(cls, target_class, *args, **kwargs):
-        raise NotImplementedError(".build() isn't supported in CKAN")
-
-    @classmethod
-    def _create(cls, target_class, *args, **kwargs):
-        if args:
-            assert False, "Positional args aren't supported, use keyword args."
-
-        kwargs["url"] = "/{}/{}".format(kwargs["entity_type"], kwargs["entity_name"])
-
-        return helpers.call_action(
-            "comment_create", context={"user": kwargs["user_id"], "ignore_auth": True}, **kwargs
-        )
-
-
-@pytest.fixture
-def comment_factory():
-    return Comment
