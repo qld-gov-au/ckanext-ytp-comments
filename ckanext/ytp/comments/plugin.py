@@ -94,11 +94,11 @@ class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
 
     # IPackageController
 
-    def before_view(self, pkg_dict):
+    def before_dataset_view(self, pkg_dict):
         # TODO: append comments from model to pkg_dict
         return pkg_dict
 
-    def before_index(self, pkg_dict):
+    def before_dataset_index(self, pkg_dict):
         """Index dataset comments to make them searchable via package_search"""
         thread = self._get_comment_thread(pkg_dict["name"], pkg_dict["type"])
 
