@@ -37,12 +37,13 @@ def _trigger_package_index_on_comment(thread_id):
     if content_type == "datarequest":
         return
 
-    package = _get_package_object(entity_id)
-
-    if not package:
+    try:
+        package = tk.get_action("package_show")({"ignore_auth": True}, {"id": entity_id})
+    except tk.ObjectNotFound:
         log.warn("Could not find package [%s] for comment thread [%s]!", entity_id, thread_id)
         return
 
+    log.debug("Adding package [%s] comments to search index", package)
     index = search.PackageSearchIndex()
     index.update_dict(package)
 
@@ -55,10 +56,3 @@ def _parse_thread_content(thread):
          /dataset/test-ds-1
     """
     return thread.url.strip("/").split("/")
-
-
-def _get_package_object(package_id):
-    try:
-        return tk.get_action("package_show")({"ignore_auth": True}, {"id": package_id})
-    except tk.ObjectNotFound:
-        return
