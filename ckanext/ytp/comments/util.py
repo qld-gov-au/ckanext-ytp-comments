@@ -1,9 +1,10 @@
 # encoding: utf-8
 
 import logging
+import re
 from lxml.html.clean import Cleaner, autolink_html
 from lxml.html import fromstring
-
+from bs4 import BeautifulSoup
 from ckan.plugins.toolkit import ValidationError
 
 log = logging.getLogger(__name__)
@@ -44,3 +45,32 @@ def remove_HTML_markup(text):
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
             message = template.format(type(e).__name__, e.args)
             log.debug(message)
+
+
+def get_comments_data_for_index(thread):
+    chunks = []
+
+    for comment in thread["comments"]:
+        if comment["state"] != "active":
+            continue
+
+        chunks.append(strip_html_tags(comment["content"]))
+        chunks.append(comment["subject"])
+
+    return _munge_to_string(set(chunks))
+
+
+def strip_html_tags(text):
+    soup = BeautifulSoup(text, "html.parser")
+
+    return re.sub("\r", " ", soup.get_text()).strip()
+
+
+def _munge_to_string(chunks):
+    unique_words = set()
+
+    for chunk in chunks:
+        words = chunk.split()
+        unique_words.update(words)
+
+    return " ".join(unique_words)

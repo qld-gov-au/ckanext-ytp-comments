@@ -5,7 +5,7 @@ import logging
 
 from ckan.plugins.toolkit import asbool, check_access, check_ckan_version, config, ValidationError
 
-from ckanext.ytp.comments import helpers, model as comment_model, util, signals
+from ckanext.ytp.comments import helpers, model as comment_model, util
 
 log = logging.getLogger(__name__)
 
@@ -66,6 +66,8 @@ def comment_create(context, data_dict):
 
     comment_dict = cmt.as_dict()
     if check_ckan_version('2.10'):
+        log.debug("Notifying subscribers of comment creation on thread [%s]", thread_id)
+        from ckanext.ytp.comments import signals
         signals.created.send(thread_id, comment=comment_dict)
 
     return comment_dict
