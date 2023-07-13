@@ -92,6 +92,16 @@ class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
 
     # IPackageController
 
+    # CKAN < 2.10
+
+    def before_view(self, pkg_dict):
+        return self.before_dataset_view(pkg_dict)
+
+    def before_index(self, pkg_dict):
+        return self.before_dataset_index(pkg_dict)
+
+    # CKAN 2.10
+
     def before_dataset_view(self, pkg_dict):
         # TODO: append comments from model to pkg_dict
         return pkg_dict
