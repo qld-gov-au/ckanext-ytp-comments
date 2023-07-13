@@ -7,9 +7,7 @@ set -e
 echo "==> Lint code"
 ahoy lint
 
-echo "==> Run Unit tests"
 ahoy test-unit
 
-echo "==> Run BDD tests"
 ahoy install-site
 ahoy test-bdd
