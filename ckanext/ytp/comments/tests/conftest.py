@@ -136,12 +136,6 @@ def user_factory():
 
 
 @pytest.fixture
-def clean_db(reset_db):
-    reset_db()
-    ytp_model.init_tables()
-
-
-@pytest.fixture
 def mock_storage(monkeypatch, ckan_config, tmpdir):
     monkeypatch.setitem(ckan_config, u'ckan.storage_path', str(tmpdir))
     monkeypatch.setattr(uploader, u'get_storage_path', lambda: str(tmpdir))

@@ -8,8 +8,6 @@ from ckan.plugins import implements, toolkit
 from ckanext.ytp.comments.model import CommentThread, Comment, COMMENT_APPROVED
 
 from . import helpers, notification_helpers, util
-if toolkit.check_ckan_version('2.10'):
-    from . import listeners # type: ignore # noqa # side-effect # isort: skip
 
 log = logging.getLogger(__name__)
 

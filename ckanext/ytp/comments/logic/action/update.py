@@ -3,13 +3,11 @@
 import datetime
 import logging
 
-from ckan.plugins.toolkit import abort, asbool, check_access, check_ckan_version, config, get_or_bust, \
+from ckan.plugins.toolkit import abort, asbool, check_access, config, get_or_bust, \
     ValidationError
 
-import ckanext.ytp.comments.model as comment_model
-import ckanext.ytp.comments.util as util
-
-from ckanext.ytp.comments import helpers
+from ckanext.ytp.comments import helpers, model as comment_model, util
+from . import _trigger_package_index_on_comment
 
 log = logging.getLogger(__name__)
 
@@ -45,11 +43,6 @@ def comment_update(context, data_dict):
     model.Session.add(comment)
     model.Session.commit()
 
-    comment_dict = comment.as_dict()
-    if check_ckan_version('2.10'):
-        thread_id = comment_dict["thread_id"]
-        log.debug("Notifying subscribers of comment update on thread [%s]", thread_id)
-        from ckanext.ytp.comments import signals
-        signals.updated.send(thread_id, comment=comment_dict)
+    _trigger_package_index_on_comment(comment.thread_id)
 
-    return comment_dict
+    return comment.as_dict()

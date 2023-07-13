@@ -3,9 +3,10 @@
 import datetime
 import logging
 
-from ckan.plugins.toolkit import asbool, check_access, check_ckan_version, config, ValidationError
+from ckan.plugins.toolkit import asbool, check_access, config, ValidationError
 
 from ckanext.ytp.comments import helpers, model as comment_model, util
+from . import _trigger_package_index_on_comment
 
 log = logging.getLogger(__name__)
 
@@ -64,10 +65,6 @@ def comment_create(context, data_dict):
     model.Session.add(cmt)
     model.Session.commit()
 
-    comment_dict = cmt.as_dict()
-    if check_ckan_version('2.10'):
-        log.debug("Notifying subscribers of comment creation on thread [%s]", thread_id)
-        from ckanext.ytp.comments import signals
-        signals.created.send(thread_id, comment=comment_dict)
+    _trigger_package_index_on_comment(thread_id)
 
-    return comment_dict
+    return cmt.as_dict()
