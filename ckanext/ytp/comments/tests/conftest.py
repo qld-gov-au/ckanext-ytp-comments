@@ -1,112 +1,64 @@
 # encoding: utf-8
 
-import ckan.plugins.toolkit as tk
-
 import os
 import six
-from datetime import datetime as dt
 
 import pytest
 import factory
 from werkzeug.datastructures import FileStorage as MockFileStorage
 
 from ckan.lib import uploader
-import ckan.tests.helpers as helpers
-from ckan.tests import factories
+from ckan.tests import factories, helpers
 
 from ckanext.ytp.comments import model as ytp_model
 
-if tk.check_ckan_version('2.9'):
-    from faker import Faker
 
-    fake = Faker()
+@pytest.fixture
+def dataset():
+    return factories.Dataset(owner_org=factories.Organization()['id'])
 
-    class OrganizationFactory(factories.Organization):
-        name = factory.LazyAttribute(
-            lambda _: fake.slug() + "" + dt.now().strftime("%Y%m%d-%H%M%S"))
 
-    class DatasetFactory(factories.Dataset):
-        name = factory.LazyAttribute(
-            lambda _: fake.slug() + "" + dt.now().strftime("%Y%m%d-%H%M%S"))
-        author_email = factory.LazyAttribute(lambda _: fake.email())
-        version = "1.0"
-        license_id = "other-open"
-        owner_org = factory.LazyAttribute(lambda _: OrganizationFactory()["id"])
-        validation_options = ""
-        validation_status = ""
-        validation_timestamp = ""
+@pytest.fixture
+def resource():
+    return factories.Resource()
 
-    @pytest.fixture
-    def dataset_factory():
-        return DatasetFactory
 
-    @pytest.fixture
-    def dataset():
-        return DatasetFactory()
+class Comment(factory.Factory):
+    """A factory class for creating ytp comment. It must accept user_id and
+    package_name, because I don't want to create extra entities in database
+    during tests"""
 
-    class ResourceFactory(factories.Resource):
-        id = factory.LazyAttribute(lambda _: fake.uuid4())
-        description = factory.LazyAttribute(lambda _: fake.sentence())
-        name = factory.LazyAttribute(
-            lambda _: fake.slug() + "" + dt.now().strftime("%Y%m%d-%H%M%S"))
-        last_modified = factory.LazyAttribute(lambda _: str(dt.now()))
+    FACTORY_FOR = ytp_model.Comment
 
-        upload = factory.LazyAttribute(lambda _: _get_test_file())
-        format = "CSV"
-        url_type = "upload"
-        url = None
+    class Meta:
+        model = ytp_model.Comment
 
-        package_id = factory.LazyAttribute(lambda _: DatasetFactory()["id"])
+    user_id = None
+    entity_type = "dataset"
+    entity_name = None
 
-        @classmethod
-        def _create(cls, target_class, *args, **kwargs):
-            if args:
-                assert False, "Positional args aren't supported, use keyword args."
+    subject = "comment-subject"
+    comment = "comment-text"
 
-            kwargs.setdefault("context", {})
-            return helpers.call_action("resource_create", **kwargs)
+    @classmethod
+    def _build(cls, target_class, *args, **kwargs):
+        raise NotImplementedError(".build() isn't supported in CKAN")
 
-    @pytest.fixture
-    def resource_factory():
-        return ResourceFactory
+    @classmethod
+    def _create(cls, target_class, *args, **kwargs):
+        if args:
+            assert False, "Positional args aren't supported, use keyword args."
 
-    @pytest.fixture
-    def resource():
-        return ResourceFactory()
+        kwargs["url"] = "/{}/{}".format(kwargs["entity_type"], kwargs["entity_name"])
 
-    class Comment(factory.Factory):
-        """A factory class for creating ytp comment. It must accept user_id and
-        package_name, because I don't want to create extra entities in database
-        during tests"""
+        return helpers.call_action(
+            "comment_create", context={"user": kwargs["user_id"], "ignore_auth": True}, **kwargs
+        )
 
-        class Meta:
-            model = ytp_model.Comment
 
-        user_id = None
-        entity_type = "dataset"
-        entity_name = None
-
-        subject = "comment-subject"
-        comment = "comment-text"
-
-        @classmethod
-        def _build(cls, target_class, *args, **kwargs):
-            raise NotImplementedError(".build() isn't supported in CKAN")
-
-        @classmethod
-        def _create(cls, target_class, *args, **kwargs):
-            if args:
-                assert False, "Positional args aren't supported, use keyword args."
-
-            kwargs["url"] = "/{}/{}".format(kwargs["entity_type"], kwargs["entity_name"])
-
-            return helpers.call_action(
-                "comment_create", context={"user": kwargs["user_id"], "ignore_auth": True}, **kwargs
-            )
-
-    @pytest.fixture
-    def comment_factory():
-        return Comment
+@pytest.fixture
+def comment_factory():
+    return Comment
 
 
 def _get_test_file():
@@ -128,11 +80,6 @@ def sysadmin():
 @pytest.fixture
 def user():
     return factories.User()
-
-
-@pytest.fixture
-def user_factory():
-    return factories.User
 
 
 @pytest.fixture
