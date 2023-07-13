@@ -8,8 +8,6 @@ from ckan.plugins import implements, toolkit
 from ckanext.ytp.comments.model import CommentThread, Comment, COMMENT_APPROVED
 
 from . import helpers, notification_helpers, util
-if toolkit.check_ckan_version('2.10'):
-    from . import listeners # type: ignore # noqa # side-effect # isort: skip
 
 log = logging.getLogger(__name__)
 
@@ -93,6 +91,16 @@ class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
         }
 
     # IPackageController
+
+    # CKAN < 2.10
+
+    def before_view(self, pkg_dict):
+        return self.before_dataset_view(pkg_dict)
+
+    def before_index(self, pkg_dict):
+        return self.before_dataset_index(pkg_dict)
+
+    # CKAN 2.10
 
     def before_dataset_view(self, pkg_dict):
         # TODO: append comments from model to pkg_dict

@@ -2,9 +2,10 @@
 
 import logging
 
-from ckan.plugins.toolkit import abort, check_access, check_ckan_version, get_or_bust
+from ckan.plugins.toolkit import abort, check_access, get_or_bust
 
 import ckanext.ytp.comments.model as comment_model
+from . import _trigger_package_index_on_comment
 
 log = logging.getLogger(__name__)
 
@@ -29,11 +30,6 @@ def comment_delete(context, data_dict):
     model.Session.add(comment)
     model.Session.commit()
 
-    comment_dict = comment.as_dict()
-    if check_ckan_version('2.10'):
-        thread_id = comment_dict["thread_id"]
-        log.debug("Notifying subscribers of comment deletion on thread [%s]", thread_id)
-        from ckanext.ytp.comments import signals
-        signals.deleted.send(thread_id, comment=comment_dict)
+    _trigger_package_index_on_comment(comment.thread_id)
 
     return {'success': True}
