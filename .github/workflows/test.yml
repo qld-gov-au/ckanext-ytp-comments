@@ -7,13 +7,28 @@ on:
       - master
 
 jobs:
+  # Quick check so we don't waste minutes if there's a Flake8 error
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install requirements
+        run: pip install flake8 pycodestyle
+      - name: Check syntax
+        run: flake8
+
   test:
+    needs: lint
     strategy:
       fail-fast: false
       matrix:
         ckan-version: ["2.10", 2.9, 2.9-py2, 2.8]
 
-    name: Test on CKAN ${{ matrix.ckan-version }}
+    name: CKAN ${{ matrix.ckan-version }}
     runs-on: ubuntu-latest
     container: drevops/ci-builder
     env:
@@ -27,9 +42,24 @@ jobs:
         run: bin/build.sh
         timeout-minutes: 15
 
-      - name: Test
-        run: bin/test.sh
-        timeout-minutes: 30
+      - name: Lint
+        run: ahoy lint
+        timeout-minutes: 2
+
+      - name: Unit test
+        run: ahoy test-unit
+        timeout-minutes: 5
+
+      - name: Scenario test
+        run: |
+          ahoy install-site
+          ahoy test-bdd
+        timeout-minutes: 20
+
+      - name: Retrieve logs
+        if: failure()
+        run: ahoy logs
+        timeout-minutes: 5
 
       - name: Retrieve screenshots
         if: failure()

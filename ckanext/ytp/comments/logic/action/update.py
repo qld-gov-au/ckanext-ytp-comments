@@ -6,10 +6,8 @@ import logging
 from ckan.plugins.toolkit import abort, asbool, check_access, config, get_or_bust, \
     ValidationError
 
-import ckanext.ytp.comments.model as comment_model
-import ckanext.ytp.comments.util as util
-
-from ckanext.ytp.comments import helpers, signals
+from ckanext.ytp.comments import helpers, model as comment_model, util
+from . import _trigger_package_index_on_comment
 
 log = logging.getLogger(__name__)
 
@@ -45,7 +43,6 @@ def comment_update(context, data_dict):
     model.Session.add(comment)
     model.Session.commit()
 
-    comment_dict = comment.as_dict()
-    signals.updated.send(comment_dict["thread_id"], comment=comment_dict)
+    _trigger_package_index_on_comment(comment.thread_id)
 
-    return comment_dict
+    return comment.as_dict()

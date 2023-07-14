@@ -15,6 +15,3 @@ echo "Adding deletion metadata fields..."
 PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments updatedb
 echo "Adding comment notification tables..."
 PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments init_notifications_db
-
-# Create some base test data
-. $APP_DIR/bin/create-test-data.sh

@@ -2,10 +2,12 @@
 
 import logging
 
-from ckan import plugins
+from ckan import model, plugins
 from ckan.plugins import implements, toolkit
 
-from . import helpers, notification_helpers
+from ckanext.ytp.comments.model import CommentThread, Comment, COMMENT_APPROVED
+
+from . import helpers, notification_helpers, util
 
 log = logging.getLogger(__name__)
 
@@ -90,6 +92,48 @@ class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
 
     # IPackageController
 
+    # CKAN < 2.10
+
     def before_view(self, pkg_dict):
+        return self.before_dataset_view(pkg_dict)
+
+    def before_index(self, pkg_dict):
+        return self.before_dataset_index(pkg_dict)
+
+    # CKAN 2.10
+
+    def before_dataset_view(self, pkg_dict):
         # TODO: append comments from model to pkg_dict
         return pkg_dict
+
+    def before_dataset_index(self, pkg_dict):
+        """Index dataset comments to make them searchable via package_search"""
+        thread = self._get_comment_thread(pkg_dict["name"], pkg_dict["type"])
+
+        if thread:
+            pkg_dict["extras_ytp_comments_idx"] = util.get_comments_data_for_index(thread)
+
+        return pkg_dict
+
+    def _get_comment_thread(self, content_id, content_type):
+        """Get a comment thread if exists and attach related comments to it,
+        otherwise return None"""
+        thread_url = "/{}/{}".format(content_type, content_id)
+        thread = model.Session.query(CommentThread) \
+            .filter(CommentThread.url == thread_url) \
+            .first()
+
+        if not thread:
+            return
+
+        comments = model.Session.query(Comment). \
+            filter(Comment.thread_id == thread.id). \
+            filter(Comment.state == 'active'). \
+            filter(Comment.approval_status == COMMENT_APPROVED)
+
+        thread_dict = thread.as_dict()
+        thread_dict["comments"] = [
+            c.as_dict(only_active_children=False) for c in comments.all()
+        ]
+
+        return thread_dict
