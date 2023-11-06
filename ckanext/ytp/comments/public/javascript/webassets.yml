@@ -4,7 +4,13 @@ comments-js:
   output: comments_js/%(version)s_comments.js
   extra:
     preload:
+      - comments_js/comments-css
       - vendor/jquery
+
+comments-css:
+  contents:
+    - comments.css
+  output: comments_js/%(version)s_comments.css
 
 comment-validation-js:
   contents:
