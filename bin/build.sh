@@ -14,12 +14,6 @@ sed -i -e "s/##//" docker-compose.yml
 # Pull the latest images.
 ahoy pull
 
-# Disable checks used on host machine.
-export DOCTOR_CHECK_PYGMY=0
-export DOCTOR_CHECK_PORT=0
-export DOCTOR_CHECK_SSH=0
-export DOCTOR_CHECK_WEBSERVER=0
-export DOCTOR_CHECK_BOOTSTRAP=0
 
 PYTHON=python
 if [ "$CKAN_VERSION" = "2.8" ] || [ "$CKAN_VERSION" = "2.9-py2" ]; then
