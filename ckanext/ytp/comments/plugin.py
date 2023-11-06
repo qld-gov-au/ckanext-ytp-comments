@@ -60,6 +60,8 @@ class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
             'user_can_manage_comments': helpers.user_can_manage_comments,
             'get_org_id': helpers.get_org_id,
             'user_comment_follow_mute_status': notification_helpers.get_user_comment_follow_mute_status,
+            'comment_notification_recipients_enabled':
+                notification_helpers.comment_notification_recipients_enabled,
             'ytp_comments_show_comments_tab_page': helpers.show_comments_tab_page
         }
 
