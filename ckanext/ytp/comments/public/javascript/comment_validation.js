@@ -1,27 +1,27 @@
 function hideFormErrors()
 {
-    jQuery('.form_errors').addClass('hidden');
-    jQuery('.form_errors li').addClass('hidden');
+    jQuery('.form_errors').addClass('hidden d-none');
+    jQuery('.form_errors li').addClass('hidden d-none');
 }
 
 function showFormErrors()
 {
-    jQuery('#comment_form_errors').removeClass('hidden');
+    jQuery('#comment_form_errors').removeClass('hidden').removeClass('d-none');
 }
 
 function showFormError(id, error_name)
 {
-    jQuery('#' + id + ' .error-' + error_name).removeClass('hidden');
+    jQuery('#' + id + ' .error-' + error_name).removeClass('hidden').removeClass('d-none');
 }
 
 function showEditFormErrors(id)
 {
-    jQuery('#' + id + ' .edit_form_errors').removeClass('hidden');
+    jQuery('#' + id + ' .edit_form_errors').removeClass('hidden').removeClass('d-none');
 }
 
 function showReplyFormErrors(id)
 {
-    jQuery('#' + id + ' .reply_form_errors').removeClass('hidden');
+    jQuery('#' + id + ' .reply_form_errors').removeClass('hidden').removeClass('d-none');
 }
 
 jQuery(document).ready(function() {
@@ -35,11 +35,11 @@ jQuery(document).ready(function() {
             hideFormErrors();
 
             if (!comment) {
-                form.find('.error-comment').removeClass('hidden');
+                form.find('.error-comment').removeClass('hidden').removeClass('d-none');
                 display_errors = true;
             }
             if (display_errors) {
-                form.find('.form-errors').removeClass('hidden');
+                form.find('.form-errors').removeClass('hidden').removeClass('d-none');
                 return false;
             }
         }
@@ -54,14 +54,14 @@ jQuery(document).ready(function() {
                 var error_message = jQuery('#content .flash-messages').text()
                 //  Check for profanity error message
                 if (error_message.search("profanity") !== -1) {
-                    jQuery('#comment_form_errors .error-profanity').removeClass('hidden');
+                    jQuery('#comment_form_errors .error-profanity').removeClass('hidden').removeClass('d-none');
                     showFormErrors();
                 }
             }
         }
         else if (hash_no_hash.indexOf('edit_') !== -1) {
             var form_wrapper_id = 'comment_form_' + hash_no_hash;
-            jQuery(hash).removeClass('hidden');
+            jQuery(hash).removeClass('hidden').removeClass('d-none');
             document.getElementById(form_wrapper_id).scrollIntoView();
             //  Regex the flash-messages for 'subject' 'comment' and 'profanity'
             if (jQuery('#content .flash-messages').children().length > 0) {
@@ -76,7 +76,7 @@ jQuery(document).ready(function() {
         else if (hash_no_hash.indexOf('reply_') !== -1) {
             var form_wrapper_id = 'comment_form_' + hash_no_hash;
             var parent_comment_wrapper_id = 'comment_' + hash_no_hash.replace('reply_', '');
-            jQuery(hash).removeClass('hidden');
+            jQuery(hash).removeClass('hidden').removeClass('d-none');
             document.getElementById(parent_comment_wrapper_id).scrollIntoView();
             //  Regex the flash-messages for 'subject' 'comment' and 'profanity'
             if (jQuery('#content .flash-messages').children().length > 0) {

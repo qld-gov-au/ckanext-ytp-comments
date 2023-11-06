@@ -92,8 +92,8 @@ this.ckan.module('flag-comment', function (jQuery) {
       var comment_id = this.options.comment_id;
       var element = this
       jQuery.get('/comment/' + comment_id + '/flag', function() {
-        jQuery(element.el).addClass('hidden');
-        jQuery(element.el).parent().find('.comment-flagged').removeClass('hidden');
+        jQuery(element.el).addClass('hidden d-none');
+        jQuery(element.el).parent().find('.comment-flagged').removeClass('hidden').removeClass('d-none');
       })
       .fail(function() {
         element.options.content = 'An error occurred while attempting to flag this comment.';

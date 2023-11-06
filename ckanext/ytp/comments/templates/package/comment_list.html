@@ -10,16 +10,16 @@
 {%- endif -%}
 
 {% macro comment_form(values={}, empty=False, hidden=True, prefix="", action="add", depth=0) %}
-    <form id="{{ prefix + values.id }}" class="form comment-{{ action }} {% if hidden %}hidden{% endif %}" action="/{{ content_type }}/{{ pkg_id }}/comments/{% if values.id %}{{ values.id }}/{% endif %}{{ action }}" method="POST">
+    <form id="{{ prefix + values.id }}" class="form comment-{{ action }} {% if hidden %}hidden d-none{% endif %}" action="/{{ content_type }}/{{ pkg_id }}/comments/{% if values.id %}{{ values.id }}/{% endif %}{{ action }}" method="POST">
         <hr />
         {% if action == "edit" %}
             <h3>Edit comment:</h3>
         {% elif action == "reply" %}
             <h3>Reply to comment:</h3>
         {% endif %}
-        <div class="{{ action }}_form_errors form-errors alert alert-error hidden">
-            <div class="hidden error-comment">{{ _('Please enter a Comment.') }}</div>
-            <div class="hidden error-profanity">{{ _('Comment blocked due to profanity.') }}</div>
+        <div class="{{ action }}_form_errors form-errors alert alert-error hidden d-none">
+            <div class="hidden d-none error-comment">{{ _('Please enter a Comment.') }}</div>
+            <div class="hidden d-none error-profanity">{{ _('Comment blocked due to profanity.') }}</div>
         </div>
         {% if action == "edit" and depth < 1 %}
         <div class="form-group">
@@ -66,7 +66,7 @@
                             </div>
                         {% endif %}
                         <div class="comment-action flag-button">
-                            <span class="comment-flagged {% if not comment.flagged %}hidden{% endif %}" title="Comment has been flagged as inappropriate">
+                            <span class="comment-flagged {% if not comment.flagged %}hidden d-none{% endif %}" title="Comment has been flagged as inappropriate">
                                 <i class="fa fa-flag"></i> Reported
                             </span>
                             {% if userobj and comment.flagged != True %}
@@ -150,9 +150,9 @@
     <h3>Add a comment{% if content_type == 'dataset' %} or ask a question about this dataset{% endif %}</h3>
 
     <form id="comment_form" class="form" action="/{{ content_type }}/{{ pkg_id }}/comments/add" method="POST">
-        <div id="comment_form_errors" class="alert alert-error form-errors hidden">
-            <div class="hidden error-comment">{{ _('Please enter a Comment.') }}</div>
-            <div class="hidden error-profanity">{{ _('Comment blocked due to profanity.') }}</div>
+        <div id="comment_form_errors" class="alert alert-error form-errors hidden d-none">
+            <div class="hidden d-none error-comment">{{ _('Please enter a Comment.') }}</div>
+            <div class="hidden d-none error-profanity">{{ _('Comment blocked due to profanity.') }}</div>
         </div>
         <div class="form-group">
             <label for="subject">{{ _('Subject') }}</label>

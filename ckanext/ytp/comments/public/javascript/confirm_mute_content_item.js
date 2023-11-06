@@ -81,13 +81,13 @@ this.ckan.module('confirm-mute-content-item', function (jQuery) {
       var element = this.modal;
       var el = this.el;
       jQuery.get(this.el.attr('href'), function() {
-        jQuery(el).addClass('hidden');
-        jQuery(el).parent().find('.comments-follow').removeClass('hidden');
+        jQuery(el).addClass('hidden d-none');
+        jQuery(el).parent().find('.comments-follow').removeClass('hidden').removeClass('d-none');
         element.modal('hide');
         jQuery('.comments-mute-thread').each(function(){
           if (!jQuery(this).hasClass('hidden')) {
-            jQuery(this).addClass('hidden');
-            jQuery(this).parent().find('.comments-follow-thread').removeClass('hidden');
+            jQuery(this).addClass('hidden d-none');
+            jQuery(this).parent().find('.comments-follow-thread').removeClass('hidden').removeClass('d-none');
           }
         });
       })
