@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 import os
 from behaving import environment as benv
 
