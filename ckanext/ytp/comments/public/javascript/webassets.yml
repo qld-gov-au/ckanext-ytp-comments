@@ -22,3 +22,13 @@ follow_or_mute-js:
   extra:
     preload:
       - vendor/jquery
+
+flag-comment-js:
+  contents:
+    - flag-comment.js
+  filters: rjsmin
+  output: comments_js/%(version)s_flag-comment.js
+  extra:
+    preload:
+      - base/main
+
