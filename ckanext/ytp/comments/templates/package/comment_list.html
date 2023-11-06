@@ -5,10 +5,6 @@
 {% set thread = h.get_comment_thread(pkg_name, content_type) %}
 {% set depth = 0 %}
 
-{%- if h.user_can_manage_comments(content_type, pkg_id) -%}
-    {% set unreplied_comments_x_days = h.unreplied_comments_x_days(thread.url) %}
-{%- endif -%}
-
 {% macro comment_form(values={}, empty=False, hidden=True, prefix="", action="add", depth=0) %}
     <form id="{{ prefix + values.id }}" class="form comment-{{ action }} {% if hidden %}hidden d-none{% endif %}" action="/{{ content_type }}/{{ pkg_id }}/comments/{% if values.id %}{{ values.id }}/{% endif %}{{ action }}" method="POST">
         <hr />
@@ -51,7 +47,7 @@
     {% for comment in thread.comments %}
     <div id="comment_{{ comment.id }}" class="comment-wrapper">
         {% set user_can_manage = h.user_can_manage_comments(content_type, pkg_id) %}
-        <div class="comment comment-{{ comment.state }} {% if user_can_manage and comment.id in unreplied_comments_x_days %}unreplied{% endif %}">
+        <div class="comment comment-{{ comment.state }}">
             <div class="comment-header">
                 <div class="comment-actions">
                     {% if comment.state != 'deleted' %}
