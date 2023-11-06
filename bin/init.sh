@@ -7,7 +7,6 @@ set -e
 . ${APP_DIR}/bin/activate
 CLICK_ARGS="--yes" ckan_cli db clean
 ckan_cli db init
-ckan_cli db upgrade
 
 echo "Creating comment tables..."
 PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments initdb
