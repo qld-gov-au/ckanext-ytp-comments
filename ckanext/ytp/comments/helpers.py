@@ -6,7 +6,7 @@ import sqlalchemy
 from ckan import model
 from ckan.plugins.toolkit import asbool, c, h, config, check_access, \
     check_ckan_version, get_action, render, render_snippet, url_for
-from profanityfilter import ProfanityFilter
+from profanityfilter.profanityfilter import ProfanityFilter
 
 _and_ = sqlalchemy.and_
 log = logging.getLogger(__name__)
