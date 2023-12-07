@@ -2,9 +2,8 @@
 ##
 # Run tests in CI.
 #
-set -e
+set -ex
 
-echo "==> Lint code"
 ahoy lint
 
 ahoy test-unit
