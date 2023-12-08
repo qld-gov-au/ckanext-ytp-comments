@@ -3,7 +3,7 @@
 from flask import Blueprint
 
 from ckanext.ytp.comments import helpers
-from ckanext.ytp.comments.controllers import add, edit, reply, delete,\
+from ckanext.ytp.comments.controllers import add, edit, reply, delete, \
     flag, unflag, dataset_comments, follow, mute
 
 
