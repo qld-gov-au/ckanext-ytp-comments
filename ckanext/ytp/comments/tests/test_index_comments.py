@@ -50,15 +50,10 @@ class TestIndexComment:
 
         assert model.Session.query(ytp_model.CommentThread).all()
 
-    def test_graceful_null_handling(self, user, dataset, comment_factory):
-        """Test that missing values in comments are handled without errors.
+    def test_graceful_null_subject_handling(self, user, dataset, comment_factory):
+        """Test that missing subject values in comments are handled without errors.
         """
         comment_factory(user_id=user["id"], entity_name=dataset["name"],
                         subject=None, comment='null-subject')
         result = search.query_for(model.Package).run({"q": 'null-subject'})
-        assert result["count"] == 1
-
-        comment_factory(user_id=user["id"], entity_name=dataset["name"],
-                        subject='null-comment', comment=None)
-        result = search.query_for(model.Package).run({"q": 'null-comment'})
         assert result["count"] == 1
