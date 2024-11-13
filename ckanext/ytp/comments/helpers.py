@@ -5,7 +5,7 @@ import sqlalchemy
 
 from ckan import model
 from ckan.plugins.toolkit import asbool, c, h, config, check_access, \
-    check_ckan_version, get_action, render, render_snippet, url_for
+    get_action, render, render_snippet, url_for
 from profanityfilter import ProfanityFilter
 
 _and_ = sqlalchemy.and_
@@ -91,14 +91,12 @@ def get_content_item_link(content_type, content_item_id, comment_id=None, anchor
     """
     kwargs = {'id': content_item_id, 'qualified': True}
     if content_type == 'datarequest':
-        route_name = 'datarequest.comment' \
-            if is_ckan_29() else 'comment_datarequest'
+        route_name = 'datarequest.comment'
     elif asbool(config.get('ckan.comments.show_comments_tab_page', False)):
-        route_name = 'comments.list' \
-            if is_ckan_29() else 'dataset_comments'
+        route_name = 'comments.list'
         kwargs['content_type'] = content_type
     else:
-        route_name = ('{}.read' if is_ckan_29() else '{]_read').format(content_type)
+        route_name = ('{}.read').format(content_type)
     url = url_for(route_name, **kwargs)
     if comment_id:
         url = '{}#{}{}'.format(url, anchor_prefix, comment_id)
@@ -154,11 +152,3 @@ def get_comment_count_for_dataset(dataset_name, content_type='dataset'):
 def get_content_type_comments_badge(dataset_name, content_type='dataset'):
     comments_count = get_comment_count_for_dataset(dataset_name, content_type)
     return render_snippet('snippets/count_badge.html', {'count': comments_count})
-
-
-def is_ckan_29():
-    """
-    Returns True if using CKAN 2.9+, with Flask and Webassets.
-    Returns False if those are not present.
-    """
-    return check_ckan_version(min_version='2.9.0')

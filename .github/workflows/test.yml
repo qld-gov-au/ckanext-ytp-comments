@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ckan-version: ["2.10", 2.9, 2.9-py2, 2.8]
+        ckan-version: ["2.11", "2.10", 2.9]
 
     name: Test on CKAN ${{ matrix.ckan-version }}
     runs-on: ubuntu-latest
@@ -61,14 +61,20 @@ jobs:
         timeout-minutes: 20
 
       - name: Retrieve logs
-        if: failure()
+        if: always()
         run: ahoy logs
-        timeout-minutes: 5
+        timeout-minutes: 1
 
-      - name: Retrieve screenshots
-        if: failure()
+      - name: Retrieve results
+        if: always()
         run: bin/process-artifacts.sh
         timeout-minutes: 1
+
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: "/tmp/artifacts/junit/*.xml"
+        if: always()
 
       - name: Upload screenshots
         if: failure()

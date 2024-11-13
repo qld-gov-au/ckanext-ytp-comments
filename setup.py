@@ -86,12 +86,5 @@ setup(
     entry_points='''
         [ckan.plugins]
         ytp_comments=ckanext.ytp.comments.plugin:YtpCommentsPlugin
-
-        [paste.paster_command]
-        comments = ckanext.ytp.comments.cli.paster_cli:CommentsDBCommand
-
-        initdb = ckanext.ytp.comments.cli.paster_cli:InitDBCommand
-        init_notifications_db = ckanext.ytp.comments.cli.paster_cli:InitNotificationsDB
-        updatedb = ckanext.ytp.comments.cli.paster_cli:UpdateDBCommand
     ''',
 )
