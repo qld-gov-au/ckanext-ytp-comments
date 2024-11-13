@@ -8,16 +8,11 @@ from ckan.plugins import implements, toolkit
 from ckanext.ytp.comments.model import CommentThread, Comment, COMMENT_APPROVED
 
 from . import helpers, notification_helpers, util
+from .plugin_mixins.flask_plugin import MixinPlugin
 
 log = logging.getLogger(__name__)
 
-
-if helpers.is_ckan_29():
-    from .plugin_mixins.flask_plugin import MixinPlugin
-    unicode_safe = toolkit.get_validator('unicode_safe')
-else:
-    from .plugin_mixins.pylons_plugin import MixinPlugin
-    unicode_safe = str
+unicode_safe = toolkit.get_validator('unicode_safe')
 
 
 class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
@@ -53,7 +48,6 @@ class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
         return {
             'get_comment_thread': helpers.get_comment_thread,
             'get_content_type_comments_badge': helpers.get_content_type_comments_badge,
-            'is_ckan_29': helpers.is_ckan_29,
             'threaded_comments_enabled': helpers.threaded_comments_enabled,
             'users_can_edit': helpers.users_can_edit,
             'user_can_edit_comment': helpers.user_can_edit_comment,
