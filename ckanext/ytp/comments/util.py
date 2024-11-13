@@ -54,8 +54,11 @@ def get_comments_data_for_index(thread):
         if comment["state"] != "active":
             continue
 
-        chunks.append(strip_html_tags(comment["content"]))
-        chunks.append(comment["subject"])
+        content = comment.get("content") or ""
+        if content:
+            content = strip_html_tags(content)
+        chunks.append(content)
+        chunks.append(comment.get("subject") or "")
 
     return _munge_to_string(set(chunks))
 
