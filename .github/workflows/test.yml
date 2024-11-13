@@ -27,6 +27,10 @@ jobs:
       fail-fast: false
       matrix:
         ckan-version: ["2.11", "2.10", 2.9]
+        experimental: [false]
+        include:
+          - ckan-version: 'master'
+            experimental: true  #master is unstable, good to know if we are compatible or not
 
     name: Test on CKAN ${{ matrix.ckan-version }}
     runs-on: ubuntu-latest
@@ -43,18 +47,22 @@ jobs:
         timeout-minutes: 2
 
       - name: Build
+        continue-on-error: ${{ matrix.experimental }}
         run: bin/build.sh
         timeout-minutes: 15
 
       - name: Lint
+        continue-on-error: ${{ matrix.experimental }}
         run: ahoy lint
         timeout-minutes: 2
 
       - name: Unit test
+        continue-on-error: ${{ matrix.experimental }}
         run: ahoy test-unit
         timeout-minutes: 5
 
       - name: Scenario test
+        continue-on-error: ${{ matrix.experimental }}
         run: |
           ahoy install-site
           ahoy test-bdd
@@ -77,7 +85,7 @@ jobs:
         if: always()
 
       - name: Upload screenshots
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: CKAN ${{ matrix.ckan-version }} screenshots
