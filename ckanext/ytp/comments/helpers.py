@@ -25,6 +25,8 @@ def show_comments_tab_page():
 
 
 def profanity_check(cleaned_comment):
+    if not cleaned_comment:
+        return False
     custom_profanity_list = config.get('ckan.comments.profanity_list', [])
 
     if custom_profanity_list:
