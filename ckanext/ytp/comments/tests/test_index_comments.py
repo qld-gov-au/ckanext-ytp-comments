@@ -57,3 +57,8 @@ class TestIndexComment:
                         subject=None, comment='null-subject')
         result = search.query_for(model.Package).run({"q": 'null-subject'})
         assert result["count"] == 1
+
+        comment_factory(user_id=user["id"], entity_name=dataset["name"],
+                        subject='null-comment', comment=None)
+        result = search.query_for(model.Package).run({"q": 'null-comment'})
+        assert result["count"] == 1
