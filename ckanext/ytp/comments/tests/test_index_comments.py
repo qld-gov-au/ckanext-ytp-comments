@@ -49,3 +49,11 @@ class TestIndexComment:
         helpers.call_action("package_patch", id=dataset["id"], notes="xxx")
 
         assert model.Session.query(ytp_model.CommentThread).all()
+
+    def test_graceful_null_handling(self, user, dataset, comment_factory):
+        """Test that missing values in comments are handled without errors.
+        """
+        comment_factory(user_id=user["id"], entity_name=dataset["name"],
+                        subject=None, comment='null-subject')
+        result = search.query_for(model.Package).run({"q": 'null-subject'})
+        assert result["count"] == 1
