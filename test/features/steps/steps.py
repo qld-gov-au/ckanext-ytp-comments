@@ -1,43 +1,65 @@
-from behave import step
+from behave import when, then
 from behaving.personas.steps import *  # noqa: F401, F403
 from behaving.mail.steps import *  # noqa: F401, F403
 from behaving.web.steps import *  # noqa: F401, F403
-from behaving.web.steps.url import when_i_visit_url
 import email
 import quopri
 import six
 
 
-@step(u'I get the current URL')
+# Monkey-patch Selenium 3 to handle Python 3.9
+import base64
+if not hasattr(base64, 'encodestring'):
+    base64.encodestring = base64.encodebytes
+
+
+@when(u'I take a debugging screenshot')
+def debug_screenshot(context):
+    """ Take a screenshot only if debugging is enabled in the persona.
+    """
+    if context.persona and context.persona.get('debug') == 'True':
+        context.execute_steps(u"""
+            When I take a screenshot
+        """)
+
+
+@when(u'I get the current URL')
 def get_current_url(context):
     context.browser.evaluate_script("document.documentElement.clientWidth")
 
 
-@step(u'I go to homepage')
+@when(u'I go to homepage')
 def go_to_home(context):
-    when_i_visit_url(context, '/')
-
-
-@step(u'I go to register page')
-def go_to_register_page(context):
     context.execute_steps(u"""
-        When I go to homepage
-        And I click the link with text that contains "Register"
+        When I visit "/"
     """)
 
 
-@step(u'I log in')
-def log_in(context):
-    assert context.persona
+@when(u'I go to register page')
+def go_to_register_page(context):
     context.execute_steps(u"""
         When I go to homepage
-        And I resize the browser to 1024x2048
-        And I click the link with text that contains "Log in"
+        And I press "Register"
+    """)
+
+
+@when(u'I log in')
+def log_in(context):
+    context.execute_steps(u"""
+        When I go to homepage
+        And I expand the browser height
+        And I press "Log in"
         And I log in directly
     """)
 
 
-@step(u'I log in directly')
+@when(u'I expand the browser height')
+def expand_height(context):
+    # Work around x=null bug in Selenium set_window_size
+    context.browser.driver.set_window_rect(x=0, y=0, width=1024, height=3072)
+
+
+@when(u'I log in directly')
 def log_in_directly(context):
     """
     This differs to the `log_in` function above by logging in directly to a page where the user login form is presented
@@ -45,14 +67,15 @@ def log_in_directly(context):
     :return:
     """
 
-    assert context.persona
+    assert context.persona, "A persona is required to log in, found [{}] in context." \
+        " Have you configured the personas in before_scenario?".format(context.persona)
     context.execute_steps(u"""
         When I attempt to log in with password "$password"
-        Then I should see an element with xpath "//a[@title='Log out']"
+        Then I should see an element with xpath "//*[@title='Log out']/i[contains(@class, 'fa-sign-out')]"
     """)
 
 
-@step(u'I attempt to log in with password "{password}"')
+@when(u'I attempt to log in with password "{password}"')
 def attempt_login(context, password):
     assert context.persona
     context.execute_steps(u"""
@@ -62,22 +85,27 @@ def attempt_login(context, password):
     """.format(password))
 
 
-@step(u'I go to dataset page')
+@when(u'I go to dataset page')
 def go_to_dataset_page(context):
-    when_i_visit_url(context, '/dataset')
+    context.execute_steps(u"""
+        When I visit "/dataset"
+    """)
 
 
-@step(u'I go to dataset "{name}"')
+@when(u'I go to dataset "{name}"')
 def go_to_dataset(context, name):
-    when_i_visit_url(context, '/dataset/' + name)
+    context.execute_steps(u"""
+        When I visit "/dataset/{0}"
+        And I take a debugging screenshot
+    """.format(name))
 
 
-@step(u'I should receive a base64 email at "{address}" containing "{text}"')
+@then(u'I should receive a base64 email at "{address}" containing "{text}"')
 def should_receive_base64_email_containing_text(context, address, text):
     should_receive_base64_email_containing_texts(context, address, text, None)
 
 
-@step(u'I should receive a base64 email at "{address}" containing both "{text}" and "{text2}"')
+@then(u'I should receive a base64 email at "{address}" containing both "{text}" and "{text2}"')
 def should_receive_base64_email_containing_texts(context, address, text, text2):
     # The default behaving step does not convert base64 emails
     # Modified the default step to decode the payload from base64
@@ -88,21 +116,29 @@ def should_receive_base64_email_containing_texts(context, address, text, text2):
         payload_bytes = quopri.decodestring(payload)
         if len(payload_bytes) > 0:
             payload_bytes += b'='  # do fix the padding error issue
-        if six.PY2:
-            decoded_payload = payload_bytes.decode('base64')
-        else:
-            import base64
-            decoded_payload = six.ensure_text(base64.b64decode(six.ensure_binary(payload_bytes)))
-        print('decoded_payload: ', decoded_payload)
+        decoded_payload = six.ensure_text(base64.b64decode(six.ensure_binary(payload_bytes)))
+        print('Searching for', text, ' and ', text2, ' in decoded_payload: ', decoded_payload)
         return text in decoded_payload and (not text2 or text2 in decoded_payload)
 
     assert context.mail.user_messages(address, filter_contents)
 
 
+@when(u'I go to organisation page')
+def go_to_organisation_page(context):
+    context.execute_steps(u"""
+        When I visit "/organization"
+    """)
+
+
+@when(u'I set persona var "{key}" to "{value}"')
+def set_persona_var(context, key, value):
+    context.persona[key] = value
+
+
 # ckanext-ytp-comments
 
 
-@step(u'I go to dataset "{name}" comments')
+@when(u'I go to dataset "{name}" comments')
 def go_to_dataset_comments(context, name):
     context.execute_steps(u"""
         When I go to dataset "%s"
@@ -110,14 +146,14 @@ def go_to_dataset_comments(context, name):
     """ % (name))
 
 
-@step(u'I should see the add comment form')
+@then(u'I should see the add comment form')
 def comment_form_visible(context):
     context.execute_steps(u"""
         Then I should see an element with xpath "//textarea[@name='comment']"
     """)
 
 
-@step(u'I should not see the add comment form')
+@then(u'I should not see the add comment form')
 def comment_form_not_visible(context):
     context.execute_steps(u"""
         Then I should not see an element with xpath "//input[@name='subject']"
@@ -125,17 +161,7 @@ def comment_form_not_visible(context):
     """)
 
 
-@step(u'I go to organisation page')
-def go_to_organisation_page(context):
-    when_i_visit_url(context, '/organization')
-
-
-@step(u'I set persona var "{key}" to "{value}"')
-def set_persona_var(context, key, value):
-    context.persona[key] = value
-
-
-@step(u'I submit a comment with subject "{subject}" and comment "{comment}"')
+@when(u'I submit a comment with subject "{subject}" and comment "{comment}"')
 def submit_comment_with_subject_and_comment(context, subject, comment):
     """
     There can be multiple comment forms per page (add, edit, reply) each with fields named "subject" and "comment"
@@ -158,7 +184,7 @@ def submit_comment_with_subject_and_comment(context, subject, comment):
         """ % comment)
 
 
-@step(u'I submit a reply with comment "{comment}"')
+@when(u'I submit a reply with comment "{comment}"')
 def submit_reply_with_comment(context, comment):
     """
     There can be multiple comment forms per page (add, edit, reply) each with fields named "subject" and "comment"
@@ -167,11 +193,11 @@ def submit_reply_with_comment(context, comment):
     :param comment:
     :return:
     """
-    context.execute_steps(u'Then I click the link with text that contains "Reply"')
+    context.execute_steps(u'When I click the link with text that contains "Reply"')
     context.browser.execute_script("""
         document.querySelector('.comment-wrapper form.comment-reply textarea[name="comment"]').value = '%s';
         """ % comment)
-    context.execute_steps(u'Then I take a screenshot')
+    context.execute_steps(u'When I take a screenshot')
     context.browser.execute_script("""
         document.querySelector('.comment-wrapper form.comment-reply .btn-primary[type="submit"]').click();
         """)

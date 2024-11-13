@@ -1,4 +1,4 @@
-{% set type = 'asset' if h.is_ckan_29() else 'resource' %}
+{% set type = 'asset' %}
 {% include "snippets/comments-js_" ~ type ~ ".html" %}
 
 {% macro comment_form(values={}, empty=False, hidden=True, prefix="", action="add") %}

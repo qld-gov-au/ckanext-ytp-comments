@@ -4,14 +4,14 @@
 #
 set -e
 
-. ${APP_DIR}/bin/activate
+. "${APP_DIR}"/bin/activate
 CLICK_ARGS="--yes" ckan_cli db clean
 ckan_cli db init
 ckan_cli db upgrade
 
 echo "Creating comment tables..."
-PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments initdb
+ckan_cli comments initdb
 echo "Adding deletion metadata fields..."
-PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments updatedb
+ckan_cli comments updatedb
 echo "Adding comment notification tables..."
-PASTER_PLUGIN=ckanext-ytp-comments ckan_cli comments init_notifications_db
+ckan_cli comments init_notifications_db
