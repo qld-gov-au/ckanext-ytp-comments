@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages  # Always prefer setuptools over distutils
 
-version='2.6.0'
+version='2.5.0'
 
 setup(
     name='ckanext-ytp-comments',
