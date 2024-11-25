@@ -172,7 +172,7 @@ jobs:
       - name: Validate tag version
         if: ${{ startsWith(github.ref, 'refs/tags') }}
         run: |
-          PYTHON_VERSION=$(git statgrep -E "\bversion = '[^']+'" setup.py | awk -F "'" '{print $2}')
+          PYTHON_VERSION=$(grep -E "\bversion = '[^']+'" setup.py | awk -F "'" '{print $2}')
           echo "Tag version is [${{ steps.version.outputs.version }}], Python version is [$PYTHON_VERSION]"
           if [ "${{ steps.version.outputs.version }}" != "$PYTHON_VERSION" ]; then
             echo "Version mismatch; tag version is [${{ steps.version.outputs.version }}] but Python version is [$PYTHON_VERSION]" >> $GITHUB_STEP_SUMMARY
