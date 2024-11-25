@@ -23,11 +23,6 @@ def debug_screenshot(context):
         """)
 
 
-@when(u'I get the current URL')
-def get_current_url(context):
-    context.browser.evaluate_script("document.documentElement.clientWidth")
-
-
 @when(u'I go to homepage')
 def go_to_home(context):
     context.execute_steps(u"""
@@ -100,6 +95,13 @@ def go_to_dataset(context, name):
     """.format(name))
 
 
+@when(u'I go to organisation page')
+def go_to_organisation_page(context):
+    context.execute_steps(u"""
+        When I visit "/organization"
+    """)
+
+
 @then(u'I should receive a base64 email at "{address}" containing "{text}"')
 def should_receive_base64_email_containing_text(context, address, text):
     should_receive_base64_email_containing_texts(context, address, text, None)
@@ -123,18 +125,6 @@ def should_receive_base64_email_containing_texts(context, address, text, text2):
     assert context.mail.user_messages(address, filter_contents)
 
 
-@when(u'I go to organisation page')
-def go_to_organisation_page(context):
-    context.execute_steps(u"""
-        When I visit "/organization"
-    """)
-
-
-@when(u'I set persona var "{key}" to "{value}"')
-def set_persona_var(context, key, value):
-    context.persona[key] = value
-
-
 # ckanext-ytp-comments
 
 
@@ -142,7 +132,7 @@ def set_persona_var(context, key, value):
 def go_to_dataset_comments(context, name):
     context.execute_steps(u"""
         When I go to dataset "%s"
-        And I click the link with text that contains "Comments"
+        And I press "Comments"
     """ % (name))
 
 

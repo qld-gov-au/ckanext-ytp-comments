@@ -44,6 +44,7 @@ jobs:
         run: echo HOME=/root >> "$GITHUB_ENV"
 
       - uses: actions/checkout@v4
+        continue-on-error: ${{ matrix.experimental }}
         timeout-minutes: 2
 
       - name: Build
@@ -71,15 +72,18 @@ jobs:
       - name: Retrieve logs
         if: always()
         run: ahoy logs
+        continue-on-error: ${{ matrix.experimental }}
         timeout-minutes: 1
 
       - name: Retrieve results
         if: always()
         run: bin/process-artifacts.sh
+        continue-on-error: ${{ matrix.experimental }}
         timeout-minutes: 1
 
       - name: Test Summary
         uses: test-summary/action@v2
+        continue-on-error: ${{ matrix.experimental }}
         with:
           paths: "/tmp/artifacts/junit/*.xml"
         if: always()
@@ -87,6 +91,7 @@ jobs:
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4
+        continue-on-error: ${{ matrix.experimental }}
         with:
           name: CKAN ${{ matrix.ckan-version }} screenshots
           path: /tmp/artifacts/behave/screenshots
