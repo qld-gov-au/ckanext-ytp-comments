@@ -137,14 +137,14 @@ You can point to another word list by setting `ckan.comments.good_words_file` in
 
 1. Initialise the comment notification recipients database table, e.g.
 
-        cd /usr/lib/ckan/default/src/ckanext-ytp-comments # Your PATH may vary
-        paster initdb -c /etc/ckan/default/development.ini # Use YOUR path and relevant CKAN .ini file
-        paster updatedb -c /etc/ckan/default/development.ini # Use YOUR path and relevant CKAN .ini file
-        paster init_notifications_db -c /etc/ckan/default/development.ini # Use YOUR path and relevant CKAN .ini file
+        cd /usr/lib/ckan/default/src/ckanext-ytp-comments  # Your PATH may vary
+        ckan -c /etc/ckan/default/development.ini initdb  # Use YOUR path and relevant CKAN .ini file
+        ckan -c /etc/ckan/default/development.ini updatedb  # Use YOUR path and relevant CKAN .ini file
+        ckan -c /etc/ckan/default/development.ini init_notifications_db  # Use YOUR path and relevant CKAN .ini file
 
     This will create a new table in the CKAN database named `comment_notification_recipient` that holds the status of individual user's follow or mute preferences.
 
-    *Note:* if your deployment process does not run `python setup.py develop` after deploying code changes for extensions, you may need to run this in order for paster to recognise the `init_notifications_db` command:
+    *Note:* if your deployment process does not run `python setup.py develop` after deploying code changes for extensions, you may need to run this in order for 'ckan' to recognise the `init_notifications_db` command:
 
         python setup.py develop
 

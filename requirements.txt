@@ -1,3 +1,2 @@
 lxml==4.9.1
-
--e git+https://github.com/qld-gov-au/profanityfilter.git@2.0.6-qgov.3#egg=profanityfilter
+git+https://github.com/qld-gov-au/profanityfilter.git@2.0.6-qgov.3#egg=profanityfilter
