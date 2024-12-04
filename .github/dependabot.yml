@@ -15,7 +15,7 @@ updates:
   insecure-external-code-execution: allow
   schedule:
     interval: daily
-    time: "8:00"
+    time: "08:00"
     timezone: "Australia/Brisbane"
   open-pull-requests-limit: 10
   registries:
