@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages  # Always prefer setuptools over distutils
+from codecs import open  # To use a consistent encoding
+from os import path
 
-version = '0.0'
+here = path.abspath(path.dirname(__file__))
+
+# Get the long description from the relevant file
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
+version = '2.5.0'
 
 setup(
     name='ckanext-ytp-comments',
@@ -11,7 +19,8 @@ setup(
     # http://packaging.python.org/en/latest/tutorial.html#version
     version=version,
     description="Adds commenting on datasets and data requests",
-    long_description='',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
 
     # The project's main homepage.
     url='https://github.com/qld-gov-au/ckanext-ytp-comments',
