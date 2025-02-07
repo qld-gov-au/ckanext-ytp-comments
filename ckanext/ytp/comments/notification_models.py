@@ -1,23 +1,11 @@
-import ckan.model as model
 import datetime
 
-from sqlalchemy import Table, Column, MetaData
+from sqlalchemy import Table, Column
 from sqlalchemy import types
-from sqlalchemy.orm import mapper
+from ckan.model.meta import engine, metadata
 from ckan.model.types import make_uuid
 
 log = __import__('logging').getLogger(__name__)
-
-metadata = MetaData()
-
-
-class CommentNotificationRecipient(object):
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-        self.id = make_uuid()
-        self.timestamp = datetime.datetime.utcnow()
 
 
 comment_notification_recipient_table = Table('comment_notification_recipient', metadata,
@@ -30,8 +18,18 @@ comment_notification_recipient_table = Table('comment_notification_recipient', m
                                              Column('notification_level', types.UnicodeText),
                                              Column('action', types.UnicodeText)
                                              )
-mapper(CommentNotificationRecipient, comment_notification_recipient_table)
+
+
+class CommentNotificationRecipient(object):
+
+    __table__ = comment_notification_recipient_table
+
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+        self.id = make_uuid()
+        self.timestamp = datetime.datetime.utcnow()
 
 
 def init_tables():
-    metadata.create_all(model.meta.engine)
+    metadata.create_all(engine)
