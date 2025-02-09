@@ -1,14 +1,16 @@
 import datetime
 
-from sqlalchemy import Table, Column
-from sqlalchemy import types
-from ckan.model.meta import engine, metadata
+from sqlalchemy import Column, Table, types
+from sqlalchemy.ext.declarative import declarative_base
+
+from ckan.model import meta
 from ckan.model.types import make_uuid
 
 log = __import__('logging').getLogger(__name__)
 
+Base = declarative_base(metadata=meta.metadata)
 
-comment_notification_recipient_table = Table('comment_notification_recipient', metadata,
+comment_notification_recipient_table = Table('comment_notification_recipient', meta.metadata,
                                              Column('id', types.UnicodeText, primary_key=True,
                                                     default=make_uuid),
                                              Column('timestamp', types.DateTime, default=datetime.datetime.utcnow),
@@ -20,7 +22,7 @@ comment_notification_recipient_table = Table('comment_notification_recipient', m
                                              )
 
 
-class CommentNotificationRecipient(object):
+class CommentNotificationRecipient(Base):
 
     __table__ = comment_notification_recipient_table
 
@@ -32,4 +34,4 @@ class CommentNotificationRecipient(object):
 
 
 def init_tables():
-    metadata.create_all(engine)
+    meta.metadata.create_all(meta.engine)
