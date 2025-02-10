@@ -1,26 +1,16 @@
-import ckan.model as model
 import datetime
 
-from sqlalchemy import Table, Column, MetaData
-from sqlalchemy import types
-from sqlalchemy.orm import mapper
+from sqlalchemy import Column, Table, types
+from sqlalchemy.ext.declarative import declarative_base
+
+from ckan.model import meta
 from ckan.model.types import make_uuid
 
 log = __import__('logging').getLogger(__name__)
 
-metadata = MetaData()
+Base = declarative_base(metadata=meta.metadata)
 
-
-class CommentNotificationRecipient(object):
-
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-        self.id = make_uuid()
-        self.timestamp = datetime.datetime.utcnow()
-
-
-comment_notification_recipient_table = Table('comment_notification_recipient', metadata,
+comment_notification_recipient_table = Table('comment_notification_recipient', meta.metadata,
                                              Column('id', types.UnicodeText, primary_key=True,
                                                     default=make_uuid),
                                              Column('timestamp', types.DateTime, default=datetime.datetime.utcnow),
@@ -30,8 +20,18 @@ comment_notification_recipient_table = Table('comment_notification_recipient', m
                                              Column('notification_level', types.UnicodeText),
                                              Column('action', types.UnicodeText)
                                              )
-mapper(CommentNotificationRecipient, comment_notification_recipient_table)
+
+
+class CommentNotificationRecipient(Base):
+
+    __table__ = comment_notification_recipient_table
+
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+        self.id = make_uuid()
+        self.timestamp = datetime.datetime.utcnow()
 
 
 def init_tables():
-    metadata.create_all(model.meta.engine)
+    meta.metadata.create_all(meta.engine)
