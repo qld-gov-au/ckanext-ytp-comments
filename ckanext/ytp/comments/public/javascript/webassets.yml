@@ -1,3 +1,8 @@
+comments-css:
+  contents:
+    - comments.css
+  output: ytp_comments/%(version)s_comments.css
+
 comments-js:
   contents:
     - comments.js
@@ -22,3 +27,12 @@ follow_or_mute-js:
   extra:
     preload:
       - vendor/jquery
+
+flag-comment-js:
+  contents:
+    - flag-comment.js
+  filters: rjsmin
+  output: comments_js/%(version)s_flag-comment.js
+  extra:
+    preload:
+      - base/main
