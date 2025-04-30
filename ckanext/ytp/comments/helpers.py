@@ -160,8 +160,10 @@ def get_content_type_comments_badge(dataset_name, content_type='dataset'):
     comments_count = get_comment_count_for_dataset(dataset_name, content_type)
     return render_snippet('snippets/count_badge.html', {'count': comments_count})
 
+
 def is_reporting_enabled():
     return _is_action_configured('report_list')
+
 
 def unreplied_comments_x_days(thread_url):
     """A helper function for Data.Qld Engagement Reporting

@@ -131,14 +131,14 @@ def edit(content_type, content_item_id, comment_id):
         get_action('comment_update')(context, data_dict)
         success = True
     except ValidationError as ve:
-        log.debug(ve)
+        log.debug("Validation Error", exc_info=True)
         if ve.error_dict and ve.error_dict.get('message'):
             msg = ve.error_dict['message']
         else:
             msg = str(ve)
         h.flash_error(msg)
-    except Exception as e:
-        log.debug(e)
+    except Exception:
+        log.debug("Exception", exc_info=True)
         return abort(403)
 
     return h.redirect_to(
@@ -201,7 +201,7 @@ def _add_or_reply(comment_type, content_item_id, content_type='dataset', parent_
         res = get_action('comment_create')(context, data_dict)
         success = True
     except ValidationError as ve:
-        log.debug(ve)
+        log.debug("Validation Error", exc_info=True)
         if ve.error_dict and ve.error_dict.get('message'):
             msg = ve.error_dict['message']
         else:
@@ -210,8 +210,8 @@ def _add_or_reply(comment_type, content_item_id, content_type='dataset', parent_
     except captcha.CaptchaError:
         error_msg = _(u'Bad Captcha. Please try again.')
         h.flash_error(error_msg)
-    except Exception as e:
-        log.debug(e)
+    except Exception:
+        log.debug("Exception", exc_info=True)
         return abort(403)
 
     if success:
@@ -271,7 +271,7 @@ def delete(content_type, content_item_id, comment_id):
         data_dict = {'id': comment_id, 'content_type': content_type, 'content_item_id': content_item_id}
         get_action('comment_delete')(context, data_dict)
     except Exception as e:
-        log.debug(e)
+        log.debug("Exception", exc_info=True)
         if e.error_dict and e.error_dict.get('message'):
             msg = e.error_dict['message']
         else:
