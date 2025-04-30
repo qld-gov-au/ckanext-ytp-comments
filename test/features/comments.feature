@@ -16,7 +16,7 @@ Feature: Comments
 
     @comment-add
     Scenario: When a logged-in user submits a comment on a Dataset the comment should display within 10 seconds
-        Given "CKANUser" as the persona
+        Given "TestOrgEditor" as the persona
         When I log in
         And I create a dataset with key-value parameters "notes=Add Dataset Comment"
         And I go to dataset "$last_generated_name" comments
@@ -49,7 +49,7 @@ Feature: Comments
 
     @comment-add @comment-profane
     Scenario: When a logged-in user submits a comment containing whitelisted profanity on a Dataset the comment should display within 10 seconds
-        Given "CKANUser" as the persona
+        Given "TestOrgEditor" as the persona
         When I log in
         And I create a dataset with key-value parameters "notes=Whitelisted Dataset Comment"
         And I go to dataset "$last_generated_name" comments
@@ -74,7 +74,7 @@ Feature: Comments
 
     @comment-reply
     Scenario: When a logged-in user submits a reply comment on a Dataset, the comment should display within 10 seconds
-        Given "CKANUser" as the persona
+        Given "TestOrgEditor" as the persona
         When I log in
         And I create a dataset with key-value parameters "notes=Reply to Dataset Comment"
         And I go to dataset "$last_generated_name" comments
