@@ -166,7 +166,7 @@ def is_reporting_enabled():
 
 
 def unreplied_comments_x_days(thread_url):
-    """A helper function for Data.Qld Engagement Reporting
+    """A helper function for Engagement Reporting
     to highlight un-replied comments after x number of days.
     (Number of days is a constant in the reporting plugin)
     """

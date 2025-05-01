@@ -3,10 +3,10 @@
 {% set content_type = content_type or 'dataset' %}
 {% set thread = h.get_comment_thread(pkg_name, content_type) %}
 {% set depth = 0 %}
-{% set notification_actions_enabled = userobj and h.comment_notification_recipients_enabled() %}
+{% set notification_actions_enabled = userobj and h.ytp_comments_notification_recipients_enabled() %}
 
 {%- if h.user_can_manage_comments(content_type, pkg_id) -%}
-    {% set unreplied_comments_x_days = h.unreplied_comments_x_days(thread.url) %}
+    {% set unreplied_comments_x_days = h.ytp_comments_unreplied_comments_x_days(thread.url) %}
 {%- endif -%}
 
 {% if notification_actions_enabled %}

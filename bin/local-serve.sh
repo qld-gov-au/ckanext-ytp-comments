@@ -17,10 +17,10 @@ sed -i -e "/###/d" docker-compose.yml
 # Uncomment lines containing '##'.
 sed -i -e "s/##//" docker-compose.yml
 
-export CKAN_VERSION="2.11"
-export PYTHON_VERSION=py3
-export PYTHON=python3
-export SOLR_VERSION=9
+export CKAN_VERSION="${CKAN_VERSION:-2.11}"
+export PYTHON_VERSION=${PYTHON_VERSION:-py3}
+export PYTHON="${PYTHON:-python3}"
+export SOLR_VERSION="${SOLR_VERSION:-9}"
 
 if [ "$CKAN_VERSION" = "2.9" ]; then
     SOLR_VERSION=8

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-export CKAN_VERSION="2.11"
-export PYTHON_VERSION=py3
-export PYTHON=python3
-export SOLR_VERSION=9
+export CKAN_VERSION="${CKAN_VERSION:-2.11}"
+export PYTHON_VERSION=${PYTHON_VERSION:-py3}
+export PYTHON="${PYTHON:-python3}"
+export SOLR_VERSION="${SOLR_VERSION:-9}"
 
 function cli {
   CKAN_CONTAINER=$(sh bin/docker-compose.sh ps -q ckan)

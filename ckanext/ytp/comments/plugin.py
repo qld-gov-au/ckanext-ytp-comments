@@ -55,9 +55,9 @@ class YtpCommentsPlugin(MixinPlugin, plugins.SingletonPlugin):
             'get_org_id': helpers.get_org_id,
             'user_comment_follow_mute_status': notification_helpers.get_user_comment_follow_mute_status,
             'ytp_comments_show_comments_tab_page': helpers.show_comments_tab_page,
-            'comment_notification_recipients_enabled':
+            'ytp_comments_notification_recipients_enabled':
                 helpers.get_comment_notification_recipients_enabled,
-            'unreplied_comments_x_days': helpers.unreplied_comments_x_days,
+            'ytp_comments_unreplied_comments_x_days': helpers.unreplied_comments_x_days,
         }
 
     # IActions
