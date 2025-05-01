@@ -5,6 +5,11 @@ on:
   pull_request:
     branches:
       - master
+      - develop
+  workflow_call:
+
+#https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
+permissions: read-all
 
 jobs:
   # Quick check so we don't waste minutes if there's a Flake8 error
@@ -26,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ckan-version: ["2.11", "2.10", 2.9]
+        ckan-version: ["2.11", "2.10", "2.9"]
         experimental: [false]
         include:
           - ckan-version: 'master'

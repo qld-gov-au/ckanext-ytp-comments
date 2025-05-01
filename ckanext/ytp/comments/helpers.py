@@ -12,6 +12,13 @@ _and_ = sqlalchemy.and_
 log = logging.getLogger(__name__)
 
 
+def _is_action_configured(name):
+    try:
+        return get_action(name) is not None
+    except KeyError:
+        return False
+
+
 def threaded_comments_enabled():
     return asbool(config.get('ckan.comments.threaded_comments', False))
 
@@ -152,3 +159,28 @@ def get_comment_count_for_dataset(dataset_name, content_type='dataset'):
 def get_content_type_comments_badge(dataset_name, content_type='dataset'):
     comments_count = get_comment_count_for_dataset(dataset_name, content_type)
     return render_snippet('snippets/count_badge.html', {'count': comments_count})
+
+
+def is_reporting_enabled():
+    return _is_action_configured('report_list')
+
+
+def unreplied_comments_x_days(thread_url):
+    """A helper function for Engagement Reporting
+    to highlight un-replied comments after x number of days.
+    (Number of days is a constant in the reporting plugin)
+    """
+    comment_ids = []
+
+    if is_reporting_enabled():
+        unreplied_comments = get_action(
+            'comments_no_replies_after_x_days'
+        )({}, {'thread_url': thread_url})
+
+        comment_ids = [comment[1] for comment in unreplied_comments]
+
+    return comment_ids
+
+
+def get_comment_notification_recipients_enabled():
+    return config.get('ckan.comments.follow_mute_enabled', False)

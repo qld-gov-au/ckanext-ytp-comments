@@ -1,4 +1,4 @@
-this.ckan.module('confirm-mute-content-item', function (jQuery) {
+this.ckan.module('flag-comment', function (jQuery) {
   return {
     /* An object of module options */
     options: {
@@ -28,11 +28,10 @@ this.ckan.module('confirm-mute-content-item', function (jQuery) {
         '<div class="modal-content">',
         '<div class="modal-header">',
         '<button type="button" class="close" data-dismiss="modal">×</button>',
-        '<h3 class="modal-title"></h3>',
+        '<h3 class="modal-title">Comment Reported</h3>',
         '</div>',
         '<div class="modal-body"></div>',
         '<div class="modal-footer">',
-        '<button class="btn btn-default btn-cancel"></button>',
         '<button class="btn btn-primary"></button>',
         '</div>',
         '</div>',
@@ -51,18 +50,12 @@ this.ckan.module('confirm-mute-content-item', function (jQuery) {
       this.el.on('click', this._onClick);
     },
 
-    /* Presents the user with a confirm dialogue to ensure that they wish to
-     * continue with the current action.
-     *
-     * Examples
-     *
-     *   jQuery('.delete').click(function () {
-     *     module.confirm();
-     *   });
+    /* Presents the user with a modal dialogue to notify them that the
+     * comment has been flagged.
      *
      * Returns nothing.
      */
-    confirm: function () {
+    flagged: function () {
       this.sandbox.body.append(this.createModal());
       this.modal.modal('show');
 
@@ -73,31 +66,6 @@ this.ckan.module('confirm-mute-content-item', function (jQuery) {
       });
     },
 
-    /* Performs the action for the current item.
-     *
-     * Returns nothing.
-     */
-    performAction: function (thread_id) {
-      var element = this.modal;
-      var el = this.el;
-      jQuery.get(this.el.attr('href'), function() {
-        jQuery(el).addClass('comment-hidden');
-        jQuery(el).parent().find('.comments-follow').removeClass('comment-hidden');
-        element.modal('hide');
-        jQuery('.comments-mute-thread').each(function(){
-          if (!jQuery(this).hasClass('comment-hidden')) {
-            jQuery(this).addClass('comment-hidden');
-            jQuery(this).parent().find('.comments-follow-thread').removeClass('comment-hidden');
-          }
-        });
-      })
-      .fail(function() {
-        element.find('.modal-title').text('Error');
-        element.find('.modal-body').text('An unexpected error has occurred. Please close this pop-up and try again.');
-      });
-
-    },
-
     /* Creates the modal dialog, attaches event listeners and localised
      * strings.
      *
@@ -106,18 +74,14 @@ this.ckan.module('confirm-mute-content-item', function (jQuery) {
     createModal: function () {
       if (!this.modal) {
         var element = this.modal = jQuery(this.options.template);
-        element.on('click', '.btn-primary', this._onConfirmSuccess);
-        element.on('click', '.btn-cancel', this._onConfirmCancel);
+        element.on('click', '.btn-primary', this._onClose);
         element.modal({show: false});
 
-        var title = jQuery(this.el).attr('title') || 'Confirm action';
-        element.find('.modal-title').text(title);
         var content = this.options.content ||
                       this.options.i18n.content || /* Backwards-compatibility */
-                      this._('Are you sure you want to perform this action?');
+                      this._('This comment has been flagged as inappropriate and will be reviewed by an administrator.');
         element.find('.modal-body').text(content);
-        element.find('.btn-primary').text(this._('Confirm'));
-        element.find('.btn-cancel').text(this._('Cancel'));
+        element.find('.btn-primary').text(this._('Close'));
       }
       return this.modal;
     },
@@ -125,16 +89,21 @@ this.ckan.module('confirm-mute-content-item', function (jQuery) {
     /* Event handler that displays the confirm dialog */
     _onClick: function (event) {
       event.preventDefault();
-      this.confirm();
+      var comment_id = this.options.comment_id;
+      var element = this
+      jQuery.get('/comment/' + comment_id + '/flag', function() {
+        jQuery(element.el).addClass('comment-hidden');
+        jQuery(element.el).parent().find('.comment-flagged').removeClass('comment-hidden');
+      })
+      .fail(function() {
+        element.options.content = 'An error occurred while attempting to flag this comment.';
+      });
+      this.flagged();
+      return false;
     },
 
-    /* Event handler for the success event */
-    _onConfirmSuccess: function (event) {
-      this.performAction();
-    },
-
-    /* Event handler for the cancel event */
-    _onConfirmCancel: function (event) {
+    /* Event handler for the close event */
+    _onClose: function (event) {
       this.modal.modal('hide');
     }
   };

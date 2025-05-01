@@ -1,27 +1,27 @@
 function hideFormErrors()
 {
-    jQuery('.form_errors').addClass('hidden');
-    jQuery('.form_errors li').addClass('hidden');
+    jQuery('.form_errors').addClass('comment-hidden');
+    jQuery('.form_errors li').addClass('comment-hidden');
 }
 
 function showFormErrors()
 {
-    jQuery('#comment_form_errors').removeClass('hidden');
+    jQuery('#comment_form_errors').removeClass('comment-hidden');
 }
 
 function showFormError(id, error_name)
 {
-    jQuery('#' + id + ' .error-' + error_name).removeClass('hidden');
+    jQuery('#' + id + ' .error-' + error_name).removeClass('comment-hidden');
 }
 
 function showEditFormErrors(id)
 {
-    jQuery('#' + id + ' .edit_form_errors').removeClass('hidden');
+    jQuery('#' + id + ' .edit_form_errors').removeClass('comment-hidden');
 }
 
 function showReplyFormErrors(id)
 {
-    jQuery('#' + id + ' .reply_form_errors').removeClass('hidden');
+    jQuery('#' + id + ' .reply_form_errors').removeClass('comment-hidden');
 }
 
 jQuery(document).ready(function() {
@@ -35,11 +35,11 @@ jQuery(document).ready(function() {
             hideFormErrors();
 
             if (!comment) {
-                form.find('.error-comment').removeClass('hidden');
+                form.find('.error-comment').removeClass('comment-hidden');
                 display_errors = true;
             }
             if (display_errors) {
-                form.find('.form-errors').removeClass('hidden');
+                form.find('.form-errors').removeClass('comment-hidden');
                 return false;
             }
         }
@@ -54,14 +54,14 @@ jQuery(document).ready(function() {
                 var error_message = jQuery('#content .flash-messages').text()
                 //  Check for profanity error message
                 if (error_message.search("profanity") !== -1) {
-                    jQuery('#comment_form_errors .error-profanity').removeClass('hidden');
+                    jQuery('#comment_form_errors .error-profanity').removeClass('comment-hidden');
                     showFormErrors();
                 }
             }
         }
         else if (hash_no_hash.indexOf('edit_') !== -1) {
             var form_wrapper_id = 'comment_form_' + hash_no_hash;
-            jQuery(hash).removeClass('hidden');
+            jQuery(hash).removeClass('comment-hidden');
             document.getElementById(form_wrapper_id).scrollIntoView();
             //  Regex the flash-messages for 'subject' 'comment' and 'profanity'
             if (jQuery('#content .flash-messages').children().length > 0) {
@@ -76,7 +76,7 @@ jQuery(document).ready(function() {
         else if (hash_no_hash.indexOf('reply_') !== -1) {
             var form_wrapper_id = 'comment_form_' + hash_no_hash;
             var parent_comment_wrapper_id = 'comment_' + hash_no_hash.replace('reply_', '');
-            jQuery(hash).removeClass('hidden');
+            jQuery(hash).removeClass('comment-hidden');
             document.getElementById(parent_comment_wrapper_id).scrollIntoView();
             //  Regex the flash-messages for 'subject' 'comment' and 'profanity'
             if (jQuery('#content .flash-messages').children().length > 0) {

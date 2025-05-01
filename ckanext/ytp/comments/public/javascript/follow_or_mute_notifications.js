@@ -103,11 +103,11 @@ this.ckan.module('follow-or-mute', function (jQuery) {
       var element = this;
       this.options.title = jQuery(element.el).attr('title');
       jQuery.get('/comments/' + (thread_id ? thread_id : comment_id) + '/' + action, function() {
-        jQuery(element.el).addClass('hidden');
-        jQuery(element.el).parent().find('.comments-' + inverse + (thread_id ? '' : '-thread')).removeClass('hidden');
+        jQuery(element.el).addClass('comment-hidden');
+        jQuery(element.el).parent().find('.comments-' + inverse + (thread_id ? '' : '-thread')).removeClass('comment-hidden');
         if (!comment_id) {
-          jQuery('.comments-follow-thread').addClass('hidden');
-          jQuery('.comments-mute-thread').removeClass('hidden');
+          jQuery('.comments-follow-thread').addClass('comment-hidden');
+          jQuery('.comments-mute-thread').removeClass('comment-hidden');
         }
       })
       .fail(function() {

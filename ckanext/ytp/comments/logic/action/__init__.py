@@ -25,7 +25,7 @@ def _trigger_package_index_on_comment(thread_id):
     try:
         package = tk.get_action("package_show")({"ignore_auth": True}, {"id": entity_id})
     except tk.ObjectNotFound:
-        log.warn("Could not find package [%s] for comment thread [%s]!", entity_id, thread_id)
+        log.warning("Could not find package [%s] for comment thread [%s]!", entity_id, thread_id)
         return
 
     index = search.PackageSearchIndex()

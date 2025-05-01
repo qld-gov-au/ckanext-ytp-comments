@@ -89,4 +89,4 @@ class CommentsDBCommand(CkanCommand):
         elif cmd == 'updatedb':
             updatedb()
         else:
-            self.parser.error('Command not recognized: %r' % cmd)
+            self.parser.error('Command not recognized: %r', cmd)
