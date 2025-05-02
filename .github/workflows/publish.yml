@@ -34,7 +34,7 @@ permissions: read-all
 jobs:
   validateVersion:
     runs-on: ubuntu-latest
-    if: github.repository == 'ckan/ckanext-xloader'
+    if: github.repository == 'qld-gov-au/ckanext-ytp-comments'
     steps:
       - uses: actions/checkout@v4
 
