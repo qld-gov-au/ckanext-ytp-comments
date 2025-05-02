@@ -121,7 +121,7 @@ def send_email(to, subject, msg):
     try:
         mail_recipient(**mail_dict)
     except MailerException:
-        log1.error(u'Cannot send email notification to %s.', to, exc_info=1)
+        log1.exception(u'Cannot send email notification to %s.', to)
 
 
 def send_notification_emails(users, template, extra_vars):
@@ -150,8 +150,7 @@ def get_admins(owner_org, user, content_type, content_item_id):
             author_email = get_dataset_author_email(content_item_id)
             users = [author_email] if author_email else []
         except ObjectNotFound:
-            log1.warn("No accounts found to notify for %s: %s",
-                      content_type, content_item_id)
+            log1.warning("No accounts found to notify for %s: %s", content_type, content_item_id)
             users = []
     return users
 
@@ -245,7 +244,7 @@ def get_content_type_and_org_id(context, thread_url, content_item_id):
         if content_item:
             org_id = content_item['organization_id'] if content_type == 'datarequest' else content_item['owner_org']
     except ObjectNotFound:
-        log1.error('Content item (%s) with ID %s not found' % (content_type, content_item_id))
+        log1.error('Content item (%s) with ID %s not found', content_type, content_item_id)
 
     return content_type, org_id
 

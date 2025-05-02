@@ -71,9 +71,8 @@ def get_comment_notification_records_for_user(user_id, thread_id):
             )
         )
         return records
-    except Exception as e:
-        log.error('Unable to retrieve comment notification statuses')
-        log.error(str(e))
+    except Exception:
+        log.exception('Unable to retrieve comment notification statuses')
 
 
 def get_user_comment_follow_mute_status(user_id, content_item_thread_id):
@@ -96,9 +95,8 @@ def remove_comment_notification_record(record):
     try:
         model.Session.delete(record)
         model.Session.commit()
-    except Exception as e:
-        log.error('Error removing `comment_notification_recipient` record:')
-        log.error(str(e))
+    except Exception:
+        log.exception('Error removing `comment_notification_recipient` record:')
 
 
 def remove_existing_follows_for_user(user_id, thread_id):
@@ -118,9 +116,8 @@ def add_comment_notification_record(user_id, thread_id, comment_id, notification
     try:
         model.Session.add(CommentNotificationRecipient(**data_dict))
         model.Session.commit()
-    except Exception as e:
-        log.error('Error adding `comment_notification_recipient` record:')
-        log.error(str(e))
+    except Exception:
+        log.exception('Error adding `comment_notification_recipient` record:')
 
 
 def add_user_to_comment_notifications(user_id, thread_id, comment_id=u''):
@@ -218,9 +215,8 @@ def get_comment_notification_recipients(action, user_email, thread_id, comment_i
             .group_by(model.User.email)
         )
         return [email[0] for email in emails.all()]
-    except Exception as e:
-        log.error('Exception raised in `get_comment_notification_recipients`')
-        log.error(str(e))
+    except Exception:
+        log.exception('Exception raised in `get_comment_notification_recipients`')
     return []
 
 

@@ -14,7 +14,7 @@
     {% endif %}
 
     <button href="{{ base_url }}/{{action}}"
-            class="btn btn-xs {{ btn_style }} comments-{{ action }}-thread {{ 'hidden' if hidden_class }}"
+            class="btn btn-xs {{ btn_style }} comments-{{ action }}-thread {{ 'comment-hidden' if hidden_class }}"
             title="{{ title }}"
             data-module="follow-or-mute"
             data-module-action="{{ action }}"

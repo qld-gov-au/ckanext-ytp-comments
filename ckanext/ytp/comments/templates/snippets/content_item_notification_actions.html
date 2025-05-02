@@ -2,7 +2,7 @@
 {% set content_type_display = content_type if content_type == 'datarequest' else 'dataset' %}
 <div class="notification-actions">
     <button href="{{ base_url }}/follow"
-            class="btn btn-success comments-follow {{ 'hidden' if following }}"
+            class="btn btn-success comments-follow {{ 'comment-hidden' if following }}"
             title="{{ content_type[0]|upper }}{{ content_type[1:] }} followed"
             data-module="follow-or-mute"
             data-module-action="follow"
@@ -12,7 +12,7 @@
         Follow comments
     </button>
     <button href="{{ base_url }}/mute"
-            class="btn btn-warning comments-mute {{ 'hidden' if not following }}"
+            class="btn btn-warning comments-mute {{ 'comment-hidden' if not following }}"
             title="Mute comments"
             data-module="confirm-mute-content-item"
             data-module-content="By muting comments on this {{ content_type_display }} you will no longer receive any email notifications on this {{ content_type_display }} when new comments are posted. Are you sure?">
