@@ -9,7 +9,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-version = '2.5.0'
+version = '2.5.2'
 
 setup(
     name='ckanext-ytp-comments',
