@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ckanext-ytp-comments"
-version = "2.5.2"
+version = "2.5.3"
 requires-python = ">=3.8"
 description = "Adds commenting on datasets and data requests"
 classifiers = ["Development Status :: 5 - Production/Stable",
