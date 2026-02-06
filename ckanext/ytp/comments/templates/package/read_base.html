@@ -3,6 +3,7 @@
 {% block content_primary_nav %}
     {{ super() }}
     {% if h.ytp_comments_show_comments_tab_page() %}
+        {% asset "comments_js/comments-css" %}
         {{ h.build_nav_icon('comments.list', _('Comments') + ' ' + h.get_content_type_comments_badge(pkg.name, 'dataset'), id=pkg.name, content_type=pkg.type) }}
     {% endif %}
 {% endblock %}

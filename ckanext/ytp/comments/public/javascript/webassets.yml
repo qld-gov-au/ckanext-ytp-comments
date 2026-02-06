@@ -1,7 +1,7 @@
 comments-css:
   contents:
     - comments.css
-  output: ytp_comments/%(version)s_comments.css
+  output: comments_js/%(version)s_comments.css
 
 comments-js:
   contents:
@@ -10,6 +10,7 @@ comments-js:
   extra:
     preload:
       - vendor/jquery
+      - comments_js/comments-css
 
 comment-validation-js:
   contents:
@@ -36,3 +37,4 @@ flag-comment-js:
   extra:
     preload:
       - base/main
+      - comments_js/comments-validation-js
