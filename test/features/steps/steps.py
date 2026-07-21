@@ -695,5 +695,5 @@ def submit_reply_with_comment(context, comment):
     element = context.browser.find_by_xpath("//div[contains(@id, 'comment_form_reply')]//textarea[@name='comment']")
     element.fill(comment)
     context.execute_steps("""
-        When I press "Save"
+        When I press the element with xpath "//div[contains(@id, 'comment_form_reply')]//form[not(contains(@class, 'hidden'))]//input[@value='Save']"
     """)
