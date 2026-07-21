@@ -160,8 +160,14 @@ commands:
       ahoy start-mailmock &
       sleep 5
       JUNIT_OUTPUT="--junit --junit-directory=test/junit/"
-      ahoy cli "behave $JUNIT_OUTPUT --no-skipped ${*:-test/features} --tags=-comment-report" || \
-      [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
+      if [ "$BEHAVE_TAG" = "" ]; then
+        ahoy cli "behave $JUNIT_OUTPUT --no-skipped ${*:-test/features} --tags=-comment-report" || \
+        [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
+      else
+        # run tests with the specified tag
+        ahoy cli "behave $JUNIT_OUTPUT --no-skipped ${*:-test/features} --tags=$BEHAVE_TAG" \
+          || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
+      fi
       ahoy stop-mailmock
       ahoy stop-ckan-job-worker
 
