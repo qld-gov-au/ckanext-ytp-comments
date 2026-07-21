@@ -43,7 +43,7 @@ jobs:
       CKAN_VERSION: ${{ matrix.ckan-version }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         continue-on-error: ${{ matrix.experimental }}
         timeout-minutes: 2
 
