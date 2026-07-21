@@ -1,10 +1,10 @@
 beautifulsoup4==4.9.1
-behaving==3.1.5
+behaving==3.3.*
 Appium-Python-Client==2.10.1
 ckanapi>=4.7
 ckantoolkit>=0.0.4
 factory-boy
-flake8==6.0.0
+flake8==7.3.*
 pytest-ckan
 selenium<4.10
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
