@@ -689,6 +689,7 @@ def submit_reply_with_comment(context, comment):
     """
     context.execute_steps("""
         When I press "Reply"
+        Then I should see an element with xpath "//div[contains(@id, 'comment_form_reply')]//form[not(contains(@class, 'hidden'))]" within 2 seconds
     """)
 
     element = context.browser.find_by_xpath("//div[contains(@id, 'comment_form_reply')]//textarea[@name='comment']")
