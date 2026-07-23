@@ -2,7 +2,7 @@
 
 import logging
 
-from ckan.lib import search
+from ckan import logic
 import ckan.plugins.toolkit as tk
 
 from ckanext.ytp.comments import model as ytp_model
@@ -22,11 +22,18 @@ def _trigger_package_index_on_comment(thread_id):
     if content_type == "datarequest":
         return
 
+    context = {'ignore_auth': True}
     try:
-        package = tk.get_action("package_show")({"ignore_auth": True}, {"id": entity_id})
+        try:
+            tk.get_action('package_reindex')(context, {'id': entity_id})
+        except KeyError:
+            if hasattr(logic, 'index_update_package'):
+                logic.index_update_package(context, entity_id)
+            else:
+                from ckan.lib.search import PackageSearchIndex
+                package_index = PackageSearchIndex()
+                package = tk.get_action("package_show")(context, {"id": entity_id})
+                package_index.index_package(package, defer_commit=False)
     except tk.ObjectNotFound:
         log.warning("Could not find package [%s] for comment thread [%s]!", entity_id, thread_id)
         return
-
-    index = search.PackageSearchIndex()
-    index.update_dict(package)
