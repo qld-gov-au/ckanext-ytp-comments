@@ -15,7 +15,7 @@
         #}
         <li>
           <a href="{% url_for 'comments.list', id=pkg.name, content_type=pkg.type %}">
-            <i class="fa fa-comment"></i>{{_('Comments')}} {{ h.get_content_type_comments_badge(pkg.name, pkg.type) }}
+            <i class="fa fa-comment"></i> {{_('Comments')}} {{ h.get_content_type_comments_badge(pkg.name, pkg.type) }}
           </a>
         </li>
     {% endif %}
