@@ -67,4 +67,4 @@ target/
 
 # generated from template
 Dockerfile.ckan
-docker-compose.yml-e
+docker-compose.yml

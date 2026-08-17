@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.x'
       - name: Install requirements
@@ -31,60 +31,64 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ckan-version: ["2.11", "2.10", "2.9"]
+        ckan-version: ['2.12', '2.11', '2.10', '2.9']
         experimental: [false]
         include:
           - ckan-version: 'master'
             experimental: true  # master is unstable, good to know if we are compatible or not
 
-    name: Test on CKAN ${{ matrix.ckan-version }}
+    name: ${{ matrix.experimental && '**Fail_Ignored** ' || '' }} Test on CKAN ${{ matrix.ckan-version }}
     runs-on: ubuntu-latest
-    container: drevops/ci-runner:23.12.0
     env:
       CKAN_VERSION: ${{ matrix.ckan-version }}
 
     steps:
-      # Patch https://github.com/actions/runner/issues/863
-      - name: Preserve $HOME set in the container
-        run: echo HOME=/root >> "$GITHUB_ENV"
-
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         continue-on-error: ${{ matrix.experimental }}
         timeout-minutes: 2
+
+      - name: Install Ahoy and dependencies
+        continue-on-error: ${{ matrix.experimental }}
+        run: |
+          sudo wget https://github.com/ahoy-cli/ahoy/releases/download/v2.5.0/ahoy-bin-linux-amd64 -O /usr/local/bin/ahoy \
+            && sudo chown $USER /usr/local/bin/ahoy \
+            && chmod +x /usr/local/bin/ahoy
+          sudo wget https://github.com/pygmystack/pygmy/releases/download/v0.14.0/pygmy_0.14.0_linux_amd64.tar.gz -O - | tar xvzf - -C /tmp/ \
+            && sudo mv /tmp/pygmy /usr/local/bin/pygmy
 
       - name: Build
-        continue-on-error: ${{ matrix.experimental }}
         run: bin/build.sh
         timeout-minutes: 15
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Lint
-        continue-on-error: ${{ matrix.experimental }}
         run: ahoy lint
         timeout-minutes: 2
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Unit test
-        continue-on-error: ${{ matrix.experimental }}
         run: ahoy test-unit
         timeout-minutes: 5
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Scenario test
-        continue-on-error: ${{ matrix.experimental }}
         run: |
           ahoy install-site
           ahoy test-bdd
         timeout-minutes: 20
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Retrieve logs
         if: always()
         run: ahoy logs
-        continue-on-error: ${{ matrix.experimental }}
         timeout-minutes: 1
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Retrieve results
         if: always()
         run: bin/process-artifacts.sh
-        continue-on-error: ${{ matrix.experimental }}
         timeout-minutes: 1
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Test Summary
         uses: test-summary/action@v2
@@ -96,8 +100,8 @@ jobs:
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4
-        continue-on-error: ${{ matrix.experimental }}
         with:
           name: CKAN ${{ matrix.ckan-version }} screenshots
           path: /tmp/artifacts/behave/screenshots
         timeout-minutes: 1
+        continue-on-error: ${{ matrix.experimental }}

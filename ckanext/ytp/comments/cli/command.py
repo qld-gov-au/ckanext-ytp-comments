@@ -2,7 +2,10 @@
 
 import logging
 
+from sqlalchemy import text
+
 from ckan import model
+
 
 log = logging.getLogger(__name__)
 
@@ -36,14 +39,14 @@ def updatedb():
     """
     log.info("YTP-Comments-UpdateDBCommand: Starting command")
 
-    from sqlalchemy import MetaData, DDL
-    meta = MetaData()
-    meta.reflect(bind=model.Session.get_bind())
+    comment_table = model.meta.metadata.tables.get('comment')
+    if comment_table:
+        if 'deleted_by_user_id' not in comment_table.columns:
+            log.info("YTP-Comments-UpdateDBCommand: 'deleted_by_user_id' field does not exist, adding...")
+            with model.meta.engine.connect() as conn:
+                conn.execute(text('ALTER TABLE "comment" ADD COLUMN "deleted_by_user_id" text NULL'))
 
-    if 'comment' in meta.tables and 'deleted_by_user_id' not in meta.tables['comment'].columns:
-        log.info("YTP-Comments-UpdateDBCommand: 'deleted_by_user_id' field does not exist, adding...")
-        DDL('ALTER TABLE "comment" ADD COLUMN "deleted_by_user_id" text NULL').execute(model.Session.get_bind())
-
-    if 'comment' in meta.tables and not any(x for x in meta.tables['comment'].foreign_key_constraints if x.name == 'comment_user_deleted_by_user_id_fkey'):
-        log.info("YTP-Comments-UpdateDBCommand: 'comment_user_deleted_by_user_id_fkey' foreign_key does not exist, adding...")
-        DDL('ALTER TABLE "comment" ADD CONSTRAINT "comment_user_deleted_by_user_id_fkey" FOREIGN KEY ("deleted_by_user_id") REFERENCES "user" ("id")').execute(model.Session.get_bind())
+        if not any(x for x in comment_table.foreign_key_constraints if x.name == 'comment_user_deleted_by_user_id_fkey'):
+            log.info("YTP-Comments-UpdateDBCommand: 'comment_user_deleted_by_user_id_fkey' foreign_key does not exist, adding...")
+            with model.meta.engine.connect() as conn:
+                conn.execute(text('ALTER TABLE "comment" ADD CONSTRAINT "comment_user_deleted_by_user_id_fkey" FOREIGN KEY ("deleted_by_user_id") REFERENCES "user" ("id")'))
