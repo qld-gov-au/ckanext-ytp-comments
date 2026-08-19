@@ -45,7 +45,7 @@ if [ "$CKAN_VERSION" = "2.9" ]; then
     pip install "setuptools>=44.1.0,<71"
 fi
 install_requirements . dev-requirements requirements-dev
-for extension in . `ls -d $SRC_DIR/ckanext-*`; do
+for extension in . `ls -d $SRC_DIR/ckan $SRC_DIR/ckanext-*`; do
     TOOL=uv install_requirements $extension requirements pip-requirements
 done
 pip install -e .
