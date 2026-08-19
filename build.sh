@@ -219,7 +219,11 @@ run_bdd_tests () {
 
 _single_bdd_test_run () {
     # Perform a single Behave run using the specified tag argument
-    cli "behave $JUNIT_OUTPUT --no-skipped ${*:-test/features} $1" || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
+    if [ $# -ge 1 ]; then
+        TAGS="$1"
+        shift
+    fi
+    cli "behave $JUNIT_OUTPUT --no-skipped ${*:-test/features} $TAGS" || [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
 }
 
 process_artifacts () {
