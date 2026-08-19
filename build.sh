@@ -245,7 +245,7 @@ stop_mailmock () {
 start_ckan_job_worker () {
     # Starts default CKAN background job worker
     title 'Starting default CKAN background job worker'
-    cli "ckan_cli jobs clear && ckan_cli jobs worker"
+    cli "ckan_cli jobs clear && ckan_cli jobs worker &"
 }
 
 stop_ckan_job_worker () {
