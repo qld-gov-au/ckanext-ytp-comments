@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
           python-version: '3.x'
       - name: Install requirements
@@ -31,63 +31,56 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ckan-version: ["2.11", "2.10", "2.9"]
+        ckan-version: ['2.12', '2.11']
         experimental: [false]
         include:
           - ckan-version: 'master'
             experimental: true  # master is unstable, good to know if we are compatible or not
 
-    name: Test on CKAN ${{ matrix.ckan-version }}
+    name: ${{ matrix.experimental && '**Fail_Ignored** ' || '' }} Test on CKAN ${{ matrix.ckan-version }}
     runs-on: ubuntu-latest
-    container: drevops/ci-runner:23.12.0
     env:
       CKAN_VERSION: ${{ matrix.ckan-version }}
 
     steps:
-      # Patch https://github.com/actions/runner/issues/863
-      - name: Preserve $HOME set in the container
-        run: echo HOME=/root >> "$GITHUB_ENV"
-
-      - uses: actions/checkout@v4
-        continue-on-error: ${{ matrix.experimental }}
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         timeout-minutes: 2
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Build
-        continue-on-error: ${{ matrix.experimental }}
-        run: bin/build.sh
+        run: ./build.sh
         timeout-minutes: 15
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Lint
+        run: ./build.sh lint
+        timeout-minutes: 1
         continue-on-error: ${{ matrix.experimental }}
-        run: ahoy lint
-        timeout-minutes: 2
 
       - name: Unit test
-        continue-on-error: ${{ matrix.experimental }}
-        run: ahoy test-unit
+        run: ./build.sh test_unit
         timeout-minutes: 5
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Scenario test
-        continue-on-error: ${{ matrix.experimental }}
-        run: |
-          ahoy install-site
-          ahoy test-bdd
+        run: ./build.sh test_bdd
         timeout-minutes: 20
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Retrieve logs
         if: always()
-        run: ahoy logs
-        continue-on-error: ${{ matrix.experimental }}
+        run: ./build.sh logs
         timeout-minutes: 1
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Retrieve results
         if: always()
-        run: bin/process-artifacts.sh
-        continue-on-error: ${{ matrix.experimental }}
+        run: ./build.sh process_artifacts
         timeout-minutes: 1
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Test Summary
-        uses: test-summary/action@v2
+        uses: test-summary/action@37b508cfee6d4d080eedd00b5bb240a6a784a6a5  # v2.6
         continue-on-error: ${{ matrix.experimental }}
         with:
           paths: "/tmp/artifacts/junit/*.xml"
@@ -95,9 +88,9 @@ jobs:
 
       - name: Upload screenshots
         if: always()
-        uses: actions/upload-artifact@v4
-        continue-on-error: ${{ matrix.experimental }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: CKAN ${{ matrix.ckan-version }} screenshots
           path: /tmp/artifacts/behave/screenshots
         timeout-minutes: 1
+        continue-on-error: ${{ matrix.experimental }}

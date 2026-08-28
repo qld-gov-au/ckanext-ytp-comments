@@ -140,7 +140,7 @@ def press_search_facet(context, title):
 def fill_in_field_if_present(context, name, value):
     context.execute_steps(u"""
         When I execute the script "field = $('#{0}'); if (!field.length) field = $('[name={0}]'); if (!field.length) field = $('#field-{0}'); field.val('{1}'); field.keyup();"
-    """.format(name, value))
+    """.format(name, value.replace("'", r"\'")))
 
 
 @when(u'I clear the URL field')
@@ -156,7 +156,7 @@ def confirm_dialog_if_present(context, text):
     if context.browser.is_element_present_by_xpath(dialog_xpath):
         parent_xpath = dialog_xpath
     elif context.browser.is_text_present(text):
-        parent_xpath = "//div[contains(string(), '{0}')]/..".format(text)
+        parent_xpath = "//div[contains(string(), '{0}')]".format(text)
     else:
         return
     button_xpath = parent_xpath + "//button[contains(@class, 'btn-primary')]"
@@ -177,7 +177,7 @@ def confirm_dataset_deletion_dialog_if_present(context):
         """)
     # Press the Confirm button whether it is in a dialog or a page
     context.execute_steps(u"""
-        When I press the element with xpath "//button[contains(@class, 'btn-primary') and contains(string(), 'Confirm') ]"
+        When I press the element with xpath "//div[@id='content']//button[contains(@class, 'btn-primary') and contains(string(), 'Confirm') ]"
         Then I should see "Dataset has been deleted"
     """)
 
@@ -441,7 +441,7 @@ def _parse_params(param_string):
     for param in param_string.split("::"):
         entry = param.split("=", 1)
         params[entry[0]] = entry[1] if len(entry) > 1 else ""
-    return six.iteritems(params)
+    return params.items()
 
 
 @when(u'I show the non-JavaScript schema fields')
@@ -687,9 +687,13 @@ def submit_reply_with_comment(context, comment):
     :param comment:
     :return:
     """
-    context.browser.execute_script("""
-        document.querySelector('.comment-wrapper form textarea[name="comment"]').value = '%s';
-        """ % comment)
-    context.browser.execute_script("""
-        document.querySelector('.comment-wrapper form .form-actions input[type="submit"]').click();
-        """)
+    context.execute_steps("""
+        When I press "Reply"
+        Then I should see an element with xpath "//div[contains(@id, 'comment_form_reply')]//form[not(contains(@class, 'hidden'))]" within 2 seconds
+    """)
+
+    element = context.browser.find_by_xpath("//div[contains(@id, 'comment_form_reply')]//textarea[@name='comment']")
+    element.fill(comment)
+    context.execute_steps("""
+        When I press the element with xpath "//div[contains(@id, 'comment_form_reply')]//form[not(contains(@class, 'hidden'))]//input[@value='Save']"
+    """)

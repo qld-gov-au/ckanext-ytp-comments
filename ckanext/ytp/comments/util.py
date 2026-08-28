@@ -18,13 +18,15 @@ ALLOWED_TAGS = [
 def clean_input(comment):
     try:
         data = comment
-        if 'href' not in data:
+        if '://' in data and 'href' not in data:
             data = autolink_html(data, avoid_elements=['a'])
 
-        cleaner = Cleaner(add_nofollow=True, allow_tags=ALLOWED_TAGS,
-                          remove_unknown_tags=False)
-        content = cleaner.clean_html(data).replace('\n', '<br/>')
-        return content
+        if '<' in data or '>' in data:
+            cleaner = Cleaner(add_nofollow=True, allow_tags=ALLOWED_TAGS,
+                              page_structure=False, remove_unknown_tags=False)
+            content = cleaner.clean_html(data).replace('\n', '<br/>')
+            return content
+        return data
     except Exception as e:
         if type(e).__name__ == "ParserError":
             raise ValidationError("Comment text is required")
